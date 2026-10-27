@@ -367,7 +367,11 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 .video-thumb { position: absolute; inset: 0; }
 .video-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; transition: transform 1s var(--ease-out); }
 .video:hover .video-thumb img { transform: scale(1.05); }
-.video.has-yt-thumb .video-thumb img { object-position: center; }
+.video.has-yt-thumb .video-thumb img, .video-yt .video-thumb img { object-position: center; }
+.video-yt .video-play { top: auto; left: auto; right: 20px; bottom: 20px; transform: none; }
+.video-yt:hover .video-play { transform: scale(1.1); }
+.video-yt .video-meta { padding-right: 90px; }
+.video-yt::after { background: linear-gradient(to top, rgba(7, 13, 24, .88), rgba(7, 13, 24, 0) 42%); }
 .video.has-yt-thumb::after { background: linear-gradient(to top, rgba(7, 13, 24, .85), rgba(7, 13, 24, 0) 45%); }
 .video::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(7, 13, 24, .92), rgba(7, 13, 24, .1) 60%); z-index: 0; }
 .video-play {

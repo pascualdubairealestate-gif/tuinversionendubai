@@ -388,7 +388,7 @@ window.__PV__ = {
     $$("[data-yt]").forEach(function (v, i) {
       var id = v.getAttribute("data-yt") || CFG.youtube[i] || "";
       v.setAttribute("data-yt", id);
-      if (id) {
+      if (id && !v.hasAttribute("data-thumb-local")) {
         var img = v.querySelector(".video-thumb img");
         if (img) {
           // Miniatura oficial del vídeo: primero HD (maxres), si no existe, la estándar (hq)
