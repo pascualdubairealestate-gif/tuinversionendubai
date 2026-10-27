@@ -371,6 +371,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 .video-yt .video-play { top: auto; left: auto; right: 20px; bottom: 20px; transform: none; }
 .video-yt:hover .video-play { transform: scale(1.1); }
 .video-yt .video-meta { padding-right: 90px; }
+.video-yt .video-meta b { color: var(--amber); }
 .video-yt::after { background: linear-gradient(to top, rgba(7, 13, 24, .88), rgba(7, 13, 24, 0) 42%); }
 .video.has-yt-thumb::after { background: linear-gradient(to top, rgba(7, 13, 24, .85), rgba(7, 13, 24, 0) 45%); }
 .video::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(7, 13, 24, .92), rgba(7, 13, 24, .1) 60%); z-index: 0; }
