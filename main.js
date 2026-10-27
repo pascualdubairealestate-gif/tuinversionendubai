@@ -391,10 +391,19 @@ window.__PV__ = {
       if (id) {
         var img = v.querySelector(".video-thumb img");
         if (img) {
-          var hq = "https://i.ytimg.com/vi/" + id + "/hqdefault.jpg";
-          var test = new Image();
-          test.onload = function () { if (test.naturalWidth > 120) img.src = hq; };
-          test.src = hq;
+          // Miniatura oficial del vídeo: primero HD (maxres), si no existe, la estándar (hq)
+          var base = "https://i.ytimg.com/vi/" + id + "/";
+          var tryThumb = function (names) {
+            if (!names.length) return;
+            var t = new Image();
+            t.onload = function () {
+              if (t.naturalWidth > 120) { img.src = t.src; v.classList.add("has-yt-thumb"); }
+              else tryThumb(names.slice(1));
+            };
+            t.onerror = function () { tryThumb(names.slice(1)); };
+            t.src = base + names[0];
+          };
+          tryThumb(["maxresdefault.jpg", "sddefault.jpg", "hqdefault.jpg"]);
         }
       }
       v.addEventListener("click", function () {
