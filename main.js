@@ -135,12 +135,12 @@ window.__PV__ = {
       entries.forEach(function (e) {
         if (!e.isIntersecting) return;
         io.unobserve(e.target);
-        var el = e.target, to = parseFloat(el.getAttribute("data-count")), suf = el.getAttribute("data-suffix") || "";
+        var el = e.target, to = parseFloat(el.getAttribute("data-count")), suf = el.getAttribute("data-suffix") || "", pre = el.getAttribute("data-prefix") || "";
         if (!to) return;
         var t0 = performance.now(), dur = 1400;
         (function tick(now) {
           var p = Math.min(1, (now - t0) / dur), v = Math.round(to * (1 - Math.pow(1 - p, 3)));
-          el.textContent = v + suf;
+          el.textContent = pre + v + suf;
           if (p < 1) requestAnimationFrame(tick);
         })(t0);
       });
