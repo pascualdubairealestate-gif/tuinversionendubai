@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Pascual Vidal · Invierte en Dubái — main.js
+   Pascual Vidal · Tu inversión en Dubái — main.js
    Patrón IIFE, sin módulos. Cada init va envuelto en safe().
    ========================================================================== */
 
