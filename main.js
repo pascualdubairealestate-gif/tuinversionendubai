@@ -8,6 +8,9 @@
    ------------------------------------------------------------------------- */
 window.__PV__ = {
   // Número de WhatsApp en formato internacional, sin "+" ni espacios (ej. 971501234567)
+  // Enlace directo de WhatsApp Business. Si está relleno, TODOS los botones usan este enlace.
+  whatsappLink: "https://wa.me/message/QI3A7Q5BXFTCA1",
+  // Alternativa: número internacional sin "+" ni espacios (solo se usa si whatsappLink está vacío)
   whatsapp: "971500000000",
 
   // URL del webhook / endpoint de tu CRM. Vacío = los leads se guardan solo en el navegador (pruebas).
@@ -97,7 +100,7 @@ window.__PV__ = {
   function initWhatsApp() {
     $$("[data-wa]").forEach(function (a) {
       var msg = a.getAttribute("data-wa-msg") || "Hola Pascual";
-      a.href = "https://wa.me/" + CFG.whatsapp + "?text=" + encodeURIComponent(msg);
+      a.href = CFG.whatsappLink || ("https://wa.me/" + CFG.whatsapp + "?text=" + encodeURIComponent(msg));
       a.addEventListener("click", function () { track("whatsapp_click", { ubicacion: a.className }); });
     });
     $$("[data-youtube-channel]").forEach(function (a) { a.href = CFG.youtubeChannel; });
