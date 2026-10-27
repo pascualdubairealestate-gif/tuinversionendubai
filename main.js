@@ -73,7 +73,7 @@ window.__PV__ = {
     var onScroll = function () {
       var y = window.scrollY;
       nav.classList.toggle("is-scrolled", y > 40);
-      if (wa && y > 300) wa.classList.add("is-visible");
+      if (wa && y > 40) wa.classList.add("is-visible");
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();

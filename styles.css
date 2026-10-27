@@ -156,6 +156,8 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
 .nav-cta-mobile { display: none; }
 .nav-actions { display: flex; align-items: center; gap: 12px; }
+.nav-actions .btn-wa { transition: opacity .35s var(--ease-out), transform .35s var(--ease-out), visibility .35s, background .3s, box-shadow .3s; }
+.nav.is-scrolled .nav-actions .btn-wa { opacity: 0; visibility: hidden; transform: translateY(-10px) scale(.92); pointer-events: none; }
 .nav-burger { display: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); position: relative; }
 .nav-burger span { position: absolute; left: 13px; right: 13px; height: 1.5px; background: var(--ivory); transition: transform .4s var(--ease-out), top .4s; }
 .nav-burger span:first-child { top: 17px; }
