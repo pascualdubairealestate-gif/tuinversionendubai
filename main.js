@@ -25,7 +25,7 @@ window.__PV__ = {
   guideDelay: 7,
 
   // Canal de YouTube
-  youtubeChannel: "https://www.youtube.com/",
+  youtubeChannel: "https://www.youtube.com/@pascual.dubairealestate",
   // IDs de tus vídeos, en el mismo orden que las tarjetas (lo que va tras "v=" en la URL)
   youtube: ["", "", ""]
 };
