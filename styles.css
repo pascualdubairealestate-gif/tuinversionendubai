@@ -286,7 +286,10 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 /* ---------- Proyectos (slider) ---------- */
 .projects { overflow: hidden; padding-bottom: clamp(56px, 7vw, 90px); }
 .projects-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; margin-bottom: 32px; }
-.projects-head .h2 { margin-bottom: 0; }
+.projects-head { flex-wrap: wrap; }
+.projects-head > div:first-child { min-width: 0; }
+.projects-head .h2 { margin-bottom: 0; max-width: none; }
+@media (min-width: 761px) { .projects-head .h2 { white-space: nowrap; font-size: clamp(30px, 3.9vw, 60px); } }
 .slider-controls { display: flex; align-items: center; gap: 12px; }
 .slider-count { font-size: 14px; color: var(--mute); margin-right: 10px; font-variant-numeric: tabular-nums; }
 .slider-count b { color: var(--ivory); font-weight: 600; }
