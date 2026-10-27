@@ -359,6 +359,21 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 .slider-progress span { display: block; height: 100%; width: 25%; background: var(--amber); transform-origin: left; transition: width .3s var(--ease-out); }
 .slider-hint { margin: 14px 0 0; font-size: 13px; color: var(--mute); }
 
+/* En pantallas grandes los 4 proyectos se ven a la vez, sin deslizar */
+@media (min-width: 1100px) {
+  .slider-track { overflow: visible; cursor: default; scroll-snap-type: none; gap: 20px; padding-bottom: 10px; }
+  .slider-track > div[aria-hidden="true"] { display: none; }
+  .project { flex: 1 1 0; min-width: 0; aspect-ratio: auto; min-height: 580px; --s: 1; --o: 1; transition: transform .5s var(--ease-out), box-shadow .5s; }
+  .project:hover { transform: translateY(-8px); box-shadow: 0 40px 70px -35px rgba(0, 0, 0, .9); }
+  .project:not(.is-active) .project-foot { opacity: 1; transform: none; }
+  .project-media img { transform: scale(1.05); }
+  .project-body { padding: 22px; }
+  .project h3 { font-size: clamp(26px, 2.1vw, 32px); }
+  .project-specs li { font-size: 12px; padding: 5px 10px; }
+  .project-foot { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .slider-controls, .slider-progress, .slider-hint { display: none; }
+}
+
 /* ---------- Vídeos ---------- */
 .videos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .video {
