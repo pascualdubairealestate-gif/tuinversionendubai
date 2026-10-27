@@ -72,7 +72,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
   margin: 0 0 24px; max-width: 18ch;
 }
 .h2 em, h1 em { font-style: italic; color: var(--amber); }
-.section-light .h2 em { color: var(--amber-ink); }
+.section-light .h2 em { color: var(--amber); }
 .body-lg { font-size: clamp(17px, 1.4vw, 19px); color: var(--mute); max-width: 54ch; }
 .section-light .body-lg { color: var(--mute-dark); }
 .section-head { margin-bottom: clamp(28px, 4vw, 48px); }
