@@ -406,6 +406,27 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 .review figcaption small { color: var(--mute-dark); }
 .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--navy-900); color: var(--sand); display: grid; place-items: center; font-weight: 600; font-size: 14px; flex: none; }
 
+/* ---------- Preguntas frecuentes ---------- */
+.faq { background: var(--navy-900); }
+.faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 clamp(28px, 4vw, 56px); align-items: start; }
+.faq-col { display: flex; flex-direction: column; min-width: 0; }
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-item summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  padding: 22px 0; font-family: var(--f-display); font-size: clamp(20px, 1.7vw, 24px); font-weight: 600; line-height: 1.25;
+  transition: color .3s;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary:hover { color: var(--amber); }
+.faq-item summary:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; border-radius: 4px; }
+.faq-item summary svg { width: 22px; height: 22px; flex: none; color: var(--amber); transition: transform .4s var(--ease-out); }
+.faq-item[open] summary svg { transform: rotate(180deg); }
+.faq-item p { margin: 0 0 24px; color: var(--mute); font-size: 16px; max-width: 60ch; animation: faqIn .45s var(--ease-out); }
+@keyframes faqIn { from { opacity: 0; transform: translateY(-6px); } }
+.faq-cta { margin-top: 40px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.faq-cta p { margin: 0; font-family: var(--f-display); font-style: italic; font-size: 24px; }
+@media (max-width: 860px) { .faq-grid { grid-template-columns: 1fr; } }
+
 /* ---------- Boletín ---------- */
 .news-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: clamp(40px, 7vw, 100px); align-items: center; }
 .inline-form { display: flex; flex-wrap: wrap; gap: 10px; margin: 30px 0 0; max-width: 520px; }
