@@ -272,9 +272,9 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 }
 .service:hover { background: var(--navy-900); color: var(--ivory); box-shadow: 0 30px 60px -30px rgba(11, 20, 36, .55); }
 .service:hover p { color: var(--mute); }
-.service:hover .service-ico { color: var(--sand); }
+.service:hover .service-ico { color: var(--amber); }
 .service-num { position: absolute; top: 24px; right: 24px; font-size: 12px; font-weight: 600; color: var(--mute-dark); letter-spacing: .1em; }
-.service-ico { width: 40px; height: 40px; color: var(--navy-700); margin-bottom: 30px; stroke-width: 1.4; transition: color .4s; }
+.service-ico { width: 40px; height: 40px; color: var(--amber); margin-bottom: 30px; stroke-width: 1.6; transition: color .4s; }
 .service h3 { font-family: var(--f-display); font-size: 26px; font-weight: 600; line-height: 1.1; margin: 0 0 12px; }
 .service p { margin: 0; font-size: 15px; color: var(--mute-dark); transition: color .4s; }
 .services-cta {
