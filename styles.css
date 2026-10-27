@@ -599,15 +599,20 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
   .nav-links { gap: 20px; }
 }
 @media (max-width: 960px) {
+  /* Menú móvil: panel compacto que se despliega justo debajo de la barra con el logo */
   .nav-links {
-    position: fixed; inset: 0; z-index: -1; flex-direction: column; justify-content: center; align-items: flex-start;
-    gap: 22px; padding: 100px var(--pad) 40px; background: var(--navy-950);
-    font-family: var(--f-display); font-size: 36px;
-    opacity: 0; visibility: hidden; transition: opacity .4s, visibility .4s;
+    position: fixed; top: 0; left: 0; right: 0; z-index: -1; flex-direction: column; justify-content: flex-start; align-items: stretch;
+    gap: 0; padding: 88px var(--pad) 22px; background: var(--navy-950);
+    font-family: var(--f-body); font-size: 17px; font-weight: 500;
+    max-height: 100svh; overflow-y: auto;
+    box-shadow: 0 24px 40px -24px rgba(0, 0, 0, .35); border-bottom: 1px solid var(--line);
+    opacity: 0; visibility: hidden; transform: translateY(-12px);
+    transition: opacity .35s, visibility .35s, transform .35s var(--ease-out);
   }
-  .nav.is-open .nav-links { opacity: 1; visibility: visible; }
-  .nav-links a { color: var(--ivory); }
-  .nav-cta-mobile { display: inline-block; font-family: var(--f-body); font-size: 16px; margin-top: 10px; padding: 14px 24px; border-radius: 999px; background: var(--amber); color: var(--navy-950) !important; font-weight: 600; }
+  .nav.is-open .nav-links { opacity: 1; visibility: visible; transform: none; }
+  .nav-links a { color: var(--ivory); padding: 13px 0; border-bottom: 1px solid var(--line); }
+  .nav-links a::after { display: none; }
+  .nav-cta-mobile { display: inline-block; align-self: flex-start; border-bottom: 0 !important; font-family: var(--f-body); font-size: 15px; margin-top: 16px; padding: 12px 22px !important; border-radius: 999px; background: var(--amber); color: var(--navy-950) !important; font-weight: 600; }
   .nav-cta-mobile::after { display: none; }
   .nav-burger { display: block; }
   .hero { padding-top: 110px; }
