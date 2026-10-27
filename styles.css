@@ -657,3 +657,46 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
   .marquee-track, .reviews-track { animation-duration: 120s; }
   .badge-pulse, .wa-float::before, .video-play::before { animation: none; }
 }
+
+/* ===== Tema claro: fondo blanco (elegido por el cliente) ===== */
+:root { --sand-bg: #ffffff; --sand-bg-2: #f6f1e8; }
+body, .splash { background: var(--sand-bg); }
+.nav, .hero, .about, .projects, .newsletter, .marquee, .footer, .section-deep, .faq {
+  --ivory: #0b1424; --mute: #4a5262; --line: rgba(11, 20, 36, .16); --sand: #1b2c4b;
+  color: var(--ivory);
+}
+.hero, .about, .projects, .newsletter { background: var(--sand-bg); }
+.section-deep, .marquee, .footer { background: var(--sand-bg-2); }
+.faq { background: var(--sand-bg); }
+.faq .h2 em { color: var(--amber); }
+/* Elementos oscuros que conservan su paleta original */
+.project, .video, .news-preview, .hero-badge, .nav-cta-mobile {
+  --ivory: #f4efe6; --mute: #9aa6b8; --line: rgba(244, 239, 230, .12); --sand: #d9c7a7;
+}
+.news-preview { --ivory: #f4efe6; background: var(--ivory); }
+/* Acentos naranjas legibles sobre arena */
+.hero h1 em, .about .h2 em, .projects .h2 em, .newsletter .h2 em, .section-deep .h2 em,
+.hero-facts b, .problem-item .num, .about-turn { color: var(--amber); }
+.eyebrow .dot { background: var(--amber); }
+.brand-text small { color: var(--amber); }
+.hero-glow {
+  background:
+    radial-gradient(560px circle at var(--mx, 70%) var(--my, 40%), rgba(217, 182, 120, .55), transparent 62%),
+    radial-gradient(420px circle at 88% 12%, rgba(217, 199, 167, .35), transparent 70%);
+}
+.nav-links a { color: rgba(11, 20, 36, .8); }
+.nav-links a:hover { color: #0b1424; }
+.nav.is-scrolled { background: rgba(255, 255, 255, .94); }
+.problem-item { background: #faf7f1; }
+.problem-item:hover { border-color: rgba(11, 20, 36, .35); }
+.inline-form input { background: #f6f1e8; }
+.inline-form input:focus { background: rgba(255, 255, 255, .55); }
+.hero-sign strong, .hero-lead strong { color: #0b1424; }
+@media (max-width: 960px) { .nav-links { background: var(--sand-bg); } }
+.project, .video, .news-preview, .hero-badge { color: var(--ivory); }
+.news-preview { color: #0b1424; }
+.project:not(.is-active) { --o: .85; }
+.sources li { color: rgba(11, 20, 36, .8); }
+.footer-links, .footer-social { color: rgba(11, 20, 36, .8); }
+.footer-links a:hover, .footer-social a:hover { color: var(--amber); }
+.slider-progress span { background: var(--amber); }
