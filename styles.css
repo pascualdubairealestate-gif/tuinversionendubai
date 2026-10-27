@@ -263,7 +263,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 .about-copy .link-arrow { margin-top: 18px; color: var(--sand); }
 
 /* ---------- Servicios ---------- */
-.services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 .service {
   position: relative; padding: 30px 26px 30px; border-radius: var(--radius);
   background: #fff; border: 1px solid var(--line-dark);
