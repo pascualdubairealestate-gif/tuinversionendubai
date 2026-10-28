@@ -317,39 +317,33 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
   flex: 0 0 clamp(290px, 38vw, 500px);
   scroll-snap-align: start;
   position: relative; border-radius: 22px; overflow: hidden;
-  aspect-ratio: 4 / 4.7; background: var(--navy-800);
+  display: flex; flex-direction: column; background: var(--navy-800);
   transform: scale(var(--s, .94)); opacity: var(--o, .6);
   transition: transform .6s var(--ease-out), opacity .6s, box-shadow .6s;
   user-select: none;
 }
 .project.is-active { --s: 1; --o: 1; box-shadow: 0 50px 90px -40px rgba(0, 0, 0, .9); }
-.project-media { position: absolute; inset: 0; overflow: hidden; }
+.project-media { position: relative; overflow: hidden; margin: 10px 10px 0; border-radius: 16px; aspect-ratio: 4 / 3; flex: none; }
 .project-media img {
-  position: absolute; top: 0; left: -12%; width: 124%; max-width: none; height: 100%; object-fit: cover;
-  transform: translate3d(var(--px, 0), 0, 0) scale(1.05);
-  transition: transform .25s linear, filter .6s;
-  filter: saturate(.85);
+  position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover;
+  transition: transform .8s var(--ease-out);
 }
-.project:hover .project-media img { filter: saturate(1.05); }
-.project::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(to top, rgba(7, 13, 24, .96) 0%, rgba(7, 13, 24, .78) 45%, rgba(7, 13, 24, .35) 75%, rgba(7, 13, 24, .1) 100%);
-}
+.project:hover .project-media img { transform: scale(1.04); }
 .project-tag {
-  position: absolute; top: 20px; left: 20px; z-index: 2;
+  position: absolute; top: 22px; left: 22px; z-index: 2;
   padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; letter-spacing: .04em;
   background: rgba(7, 13, 24, .55); border: 1px solid var(--line);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
 }
-.project-body { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 28px; }
+.project-body { position: relative; padding: 22px 24px 26px; display: flex; flex-direction: column; flex: 1; }
 .project-zone { margin: 0 0 6px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--amber); }
 .project h3 { font-family: var(--f-display); font-size: clamp(30px, 3vw, 42px); font-weight: 500; line-height: 1; margin: 0 0 16px; }
-.project-specs { list-style: none; margin: 0 0 22px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.project-specs { list-style: none; margin: 0 0 20px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .project-specs li { font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); color: rgba(244, 239, 230, .85); }
 .project-foot {
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
-  padding-top: 18px; border-top: 1px solid var(--line);
-  max-height: 120px; opacity: 1;
+  padding-top: 18px; border-top: 1px solid var(--line); margin-top: auto;
+  opacity: 1;
   transition: opacity .5s, transform .5s var(--ease-out);
 }
 .project:not(.is-active) .project-foot { opacity: .0; transform: translateY(10px); }
@@ -363,11 +357,10 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 @media (min-width: 1100px) {
   .slider-track { overflow: visible; cursor: default; scroll-snap-type: none; gap: 20px; padding-bottom: 10px; }
   .slider-track > div[aria-hidden="true"] { display: none; }
-  .project { flex: 1 1 0; min-width: 0; aspect-ratio: auto; min-height: 580px; --s: 1; --o: 1; transition: transform .5s var(--ease-out), box-shadow .5s; }
+  .project { flex: 1 1 0; min-width: 0; --s: 1; --o: 1; transition: transform .5s var(--ease-out), box-shadow .5s; }
   .project:hover { transform: translateY(-8px); box-shadow: 0 40px 70px -35px rgba(0, 0, 0, .9); }
   .project:not(.is-active) .project-foot { opacity: 1; transform: none; }
-  .project-media img { transform: scale(1.05); }
-  .project-body { padding: 22px; }
+  .project-body { padding: 20px 20px 22px; }
   .project h3 { font-size: clamp(26px, 2.1vw, 32px); }
   .project-specs li { font-size: 12px; padding: 5px 10px; }
   .project-foot { flex-direction: column; align-items: flex-start; gap: 12px; }
@@ -746,3 +739,4 @@ body, .splash { background: var(--sand-bg); }
 .footer-links, .footer-social { color: rgba(11, 20, 36, .8); }
 .footer-links a:hover, .footer-social a:hover { color: var(--amber); }
 .slider-progress span { background: var(--amber); }
+@media (min-width: 1100px) { .project:not(.is-active) { --o: 1; } }
