@@ -276,7 +276,9 @@ if ($action === 'sale_save' && $method === 'POST') {
 /* ---------- Documentos ---------- */
 if ($action === 'docs') {
   require_auth(false);
-  json_out(['docs' => store_read('docs', []), 'carpetas' => store_read('carpetas', DEFAULT_FOLDERS)]);
+  $folders = store_read('carpetas', DEFAULT_FOLDERS);
+  if ($folders === ['OQOODs', 'SPAs', 'DUBANA', 'GUÍAS']) $folders = DEFAULT_FOLDERS; // orden antiguo → nuevo
+  json_out(['docs' => store_read('docs', []), 'carpetas' => $folders]);
 }
 
 if ($action === 'upload' && $method === 'POST') {
