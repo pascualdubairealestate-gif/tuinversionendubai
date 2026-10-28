@@ -374,6 +374,41 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
   .slider-controls, .slider-progress, .slider-hint { display: none; }
 }
 
+/* ---------- Otros emiratos ---------- */
+.emirates { background: var(--navy-900); }
+.emirates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.emirate {
+  display: flex; flex-direction: column; min-width: 0; overflow: hidden;
+  border-radius: 22px; background: var(--navy-800); color: #f4efe6; border: 1px solid rgba(244, 239, 230, .1);
+  transition: transform .5s var(--ease-out), box-shadow .5s;
+}
+.emirate:hover { transform: translateY(-6px); box-shadow: 0 40px 70px -35px rgba(0, 0, 0, .7); }
+.emirate-media { position: relative; aspect-ratio: 16 / 9; overflow: hidden; margin: 12px 12px 0; border-radius: 16px; }
+.emirate-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--ease-out); }
+.emirate:hover .emirate-media img { transform: scale(1.05); }
+.emirate-badge {
+  position: absolute; top: 16px; left: 16px; display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 10px; background: rgba(7, 13, 24, .82); color: #f4efe6;
+  font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+}
+.emirate-badge svg { width: 15px; height: 15px; fill: var(--amber); stroke: none; }
+.emirate-body { padding: 26px 28px 30px; display: flex; flex-direction: column; gap: 18px; flex: 1; }
+.emirate h3 { font-family: var(--f-display); font-size: clamp(32px, 3vw, 44px); font-weight: 500; line-height: 1; margin: 0; }
+.emirate-body > p { margin: 0; color: #9aa6b8; font-size: 15.5px; }
+.emirate-feats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.emirate-feats li {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;
+  padding: 16px 10px; border-radius: 14px; background: rgba(7, 13, 24, .45); font-size: 13.5px; line-height: 1.3;
+}
+.emirate-feats svg { width: 30px; height: 30px; color: var(--amber); stroke-width: 1.5; }
+.emirate-ctas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
+.emirate-ctas .btn { width: 100%; border-radius: 12px; }
+@media (max-width: 900px) { .emirates-grid { grid-template-columns: 1fr; } }
+@media (max-width: 420px) { .emirate-feats { grid-template-columns: 1fr; } .emirate-feats li { flex-direction: row; text-align: left; padding: 12px 14px; } .emirate-ctas { grid-template-columns: 1fr; } }
+
+/* Titulares en una sola línea en pantallas medianas y grandes */
+@media (min-width: 761px) { .h2-line { max-width: none; white-space: nowrap; } }
+
 /* ---------- Vídeos ---------- */
 .videos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .video {
@@ -670,16 +705,18 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 /* ===== Tema claro: fondo blanco (elegido por el cliente) ===== */
 :root { --sand-bg: #ffffff; --sand-bg-2: #f6f1e8; }
 body, .splash { background: var(--sand-bg); }
-.nav, .hero, .about, .projects, .newsletter, .marquee, .footer, .section-deep, .faq {
+.nav, .hero, .about, .projects, .newsletter, .marquee, .footer, .section-deep, .faq, .emirates {
   --ivory: #0b1424; --mute: #4a5262; --line: rgba(11, 20, 36, .16); --sand: #1b2c4b;
   color: var(--ivory);
 }
 .hero, .about, .projects, .newsletter { background: var(--sand-bg); }
 .section-deep, .marquee, .footer { background: var(--sand-bg-2); }
 .faq { background: var(--sand-bg); }
+.emirates { background: var(--sand-bg-2); }
+.emirates .h2 em { color: var(--amber); }
 .faq .h2 em { color: var(--amber); }
 /* Elementos oscuros que conservan su paleta original */
-.project, .video, .news-preview, .hero-badge, .nav-cta-mobile {
+.project, .video, .news-preview, .hero-badge, .nav-cta-mobile, .emirate {
   --ivory: #f4efe6; --mute: #9aa6b8; --line: rgba(244, 239, 230, .12); --sand: #d9c7a7;
 }
 .news-preview { --ivory: #f4efe6; background: var(--ivory); }
