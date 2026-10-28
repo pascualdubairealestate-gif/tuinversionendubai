@@ -494,6 +494,12 @@
   function field(name, label, val, type, list) {
     return '<label class="f"><span>' + label + '</span><input name="' + name + '" type="' + (type || "text") + '" value="' + esc(val) + '"' + (list ? ' list="dl-' + name + '"' : "") + " /></label>";
   }
+  function select(name, label, val, arr) {
+    var opts = val && arr.indexOf(val) < 0 ? [val].concat(arr) : arr;
+    return '<label class="f"><span>' + label + '</span><select name="' + name + '">' + opts.map(function (o) {
+      return "<option" + (o === val ? " selected" : "") + ">" + esc(o) + "</option>";
+    }).join("") + "</select></label>";
+  }
   function datalist(name, arr) {
     return '<datalist id="dl-' + name + '">' + arr.map(function (o) { return "<option>" + esc(o) + "</option>"; }).join("") + "</datalist>";
   }
@@ -530,7 +536,7 @@
       '<div class="grid">' +
       field("nombre", "Nombre", l.nombre) + field("email", "Email", l.email, "email") +
       field("telefono", "Teléfono / WhatsApp", l.telefono, "tel") + field("pais", "País", l.pais) +
-      field("origen", "Origen", l.origen, "text", true) + field("presupuesto", "Presupuesto", l.presupuesto, "text", true) +
+      select("origen", "Origen", l.origen || "Manual", ORIGENES) + field("presupuesto", "Presupuesto", l.presupuesto, "text", true) +
       field("objetivo", "Objetivo", l.objetivo, "text", true) + field("proyecto", "Proyecto de interés", l.proyecto) +
       field("valor", "Valor operación (€)", l.valor, "text") + field("etiquetas", "Etiquetas", l.etiquetas) +
       field("proxima_accion", "Próxima acción", l.proxima_accion) + field("seguimiento", "Fecha de seguimiento", l.seguimiento, "date") +
@@ -541,7 +547,7 @@
       (l.id ? '<button class="btn danger" type="button" data-act="delete">Eliminar</button>' : "") + "</div>" +
       (l.id ? '<div class="lead-docs"><header class="panel-h"><h3>Documentos</h3><label class="btn ghost sm">+ Subir<input type="file" id="lead-file" multiple hidden /></label></header><ul class="doc-list" id="lead-doc-list"><li class="muted small">Cargando…</li></ul></div>' : "") +
       (acts ? '<h3>Actividad</h3><ol class="timeline">' + acts + "</ol>" : "") + utm +
-      datalist("origen", ORIGENES) + datalist("presupuesto", PRESUPUESTOS) + datalist("objetivo", OBJETIVOS) +
+      datalist("presupuesto", PRESUPUESTOS) + datalist("objetivo", OBJETIVOS) +
       "</form>";
     showDrawer();
     if (!l.id) setTimeout(function () { $("#lead-form [name=nombre]").focus(); }, 60);
@@ -584,7 +590,7 @@
 
   function submitLead(form) {
     var patch = {};
-    $$("input[name], textarea[name]", form).forEach(function (f) {
+    $$("input[name], select[name], textarea[name]", form).forEach(function (f) {
       patch[f.name] = f.type === "checkbox" ? f.checked : f.value.trim();
     });
     if (!patch.nombre && !patch.email && !patch.telefono) { toast("Pon al menos nombre, email o teléfono", true); return; }
