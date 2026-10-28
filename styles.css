@@ -391,7 +391,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
   padding: 8px 14px; border-radius: 10px; background: rgba(7, 13, 24, .82); color: #f4efe6;
   font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
 }
-.emirate-badge svg { width: 15px; height: 15px; fill: var(--amber); stroke: none; }
+.emirate-badge svg { width: 15px; height: 15px; fill: #ffd23f; stroke: none; }
 .emirate-body { padding: 26px 28px 30px; display: flex; flex-direction: column; gap: 18px; flex: 1; }
 .emirate h3 { font-family: var(--f-display); font-size: clamp(32px, 3vw, 44px); font-weight: 500; line-height: 1; margin: 0; }
 .emirate-body > p { margin: 0; color: #9aa6b8; font-size: 15.5px; }
