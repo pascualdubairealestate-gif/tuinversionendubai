@@ -183,6 +183,7 @@ function h($s) { return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8'); }
 
 /* ---------- Documentos ---------- */
 const DOC_EXT = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'webp', 'heic', 'txt', 'csv', 'zip', 'mp4', 'mov'];
+const DEFAULT_FOLDERS = ['OQOODs', 'SPAs', 'DUBANA', 'GUÍAS'];
 const DOC_MAX = 25 * 1024 * 1024;
 function docs_dir() {
   $d = crm_dir() . '/docs';

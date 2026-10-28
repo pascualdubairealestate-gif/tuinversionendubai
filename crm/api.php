@@ -276,7 +276,7 @@ if ($action === 'sale_save' && $method === 'POST') {
 /* ---------- Documentos ---------- */
 if ($action === 'docs') {
   require_auth(false);
-  json_out(['docs' => store_read('docs', [])]);
+  json_out(['docs' => store_read('docs', []), 'carpetas' => store_read('carpetas', DEFAULT_FOLDERS)]);
 }
 
 if ($action === 'upload' && $method === 'POST') {
@@ -291,9 +291,28 @@ if ($action === 'upload' && $method === 'POST') {
   if ($f['size'] > DOC_MAX) json_out(['error' => 'Máximo 25 MB por archivo'], 422);
   $id = 'd' . bin2hex(random_bytes(8));
   if (!move_uploaded_file($f['tmp_name'], docs_dir() . '/' . $id)) json_out(['error' => 'No se pudo guardar'], 500);
-  $doc = ['id' => $id, 'nombre' => $name, 'ext' => $ext, 'tamano' => (int) $f['size'], 'lead' => cut($_POST['lead'] ?? '', 40), 'creado' => now_iso()];
+  $doc = ['id' => $id, 'nombre' => $name, 'ext' => $ext, 'tamano' => (int) $f['size'], 'lead' => cut($_POST['lead'] ?? '', 40), 'carpeta' => cut($_POST['carpeta'] ?? '', 60), 'creado' => now_iso()];
   with_lock('docs', function () use ($doc) { $d = store_read('docs', []); $d[] = $doc; store_write('docs', $d); });
   json_out(['doc' => $doc]);
+}
+
+// Carpetas de documentos: guarda la lista; los documentos de una carpeta borrada pasan a «Sin carpeta».
+if ($action === 'folders_save' && $method === 'POST') {
+  require_auth();
+  $in = body()['carpetas'] ?? [];
+  $list = [];
+  foreach (is_array($in) ? $in : [] as $n) {
+    $n = cut($n, 60);
+    if ($n !== '' && !in_array($n, $list, true) && count($list) < 60) $list[] = $n;
+  }
+  store_write('carpetas', $list);
+  $docs = with_lock('docs', function () use ($list) {
+    $d = store_read('docs', []);
+    foreach ($d as $i => $x) if (!empty($x['carpeta']) && !in_array($x['carpeta'], $list, true)) $d[$i]['carpeta'] = '';
+    store_write('docs', $d);
+    return $d;
+  });
+  json_out(['carpetas' => $list, 'docs' => $docs]);
 }
 
 if ($action === 'doc_update' && $method === 'POST') {
@@ -305,7 +324,10 @@ if ($action === 'doc_update' && $method === 'POST') {
     foreach ($d as $i => $x) {
       if ($x['id'] !== $id) continue;
       if (!empty($b['borrar'])) { @unlink(docs_dir() . '/' . $x['id']); unset($d[$i]); }
-      elseif (array_key_exists('lead', $b)) $d[$i]['lead'] = cut($b['lead'], 40);
+      else {
+        if (array_key_exists('lead', $b)) $d[$i]['lead'] = cut($b['lead'], 40);
+        if (array_key_exists('carpeta', $b)) $d[$i]['carpeta'] = cut($b['carpeta'], 60);
+      }
     }
     $d = array_values($d);
     store_write('docs', $d);

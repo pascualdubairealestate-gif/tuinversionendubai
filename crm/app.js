@@ -9,7 +9,7 @@
     page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(), orden: savedSort().por, dir: savedSort().dir, plegadas: savedFolds(),
     open: null, dirty: false,
     cal: {}, calErr: "", month: null, day: null,
-    tpls: null, docs: null, mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false }
+    tpls: null, docs: null, carpetas: [], carpeta: "", newFolder: false, mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false }
   };
   var PAGES = { inicio: "Inicio", contactos: "Contactos", ventas: "Ventas", correo: "Correo", calendario: "Calendario", documentos: "Documentos" };
   var STAGE_HINT = {
@@ -95,6 +95,7 @@
   var ICON = {
     cal: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
     user: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>',
+    folder: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg>',
     file: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>'
   };
 
@@ -657,7 +658,7 @@
 
   /* ---------- Documentos ---------- */
   function loadDocs() {
-    return api("docs").then(function (j) { S.docs = j.docs || []; return S.docs; });
+    return api("docs").then(function (j) { S.docs = j.docs || []; S.carpetas = j.carpetas || []; return S.docs; });
   }
 
   function leadOptions(selected) {
@@ -668,9 +669,11 @@
 
   function docRow(d, compact) {
     var url = API + "doc&id=" + encodeURIComponent(d.id);
-    return '<li class="doc" data-doc="' + esc(d.id) + '"><span class="doc-ic ext-' + esc(d.ext) + '">' + esc(d.ext.toUpperCase()) + '</span><span class="doc-main"><a href="' + url + '" target="_blank" rel="noopener"><b>' + esc(d.nombre) + "</b></a><small>" + size(d.tamano) + " · " + fmtDate(d.creado) +
+    return '<li class="doc"' + (compact ? "" : ' draggable="true"') + ' data-doc="' + esc(d.id) + '"><span class="doc-ic ext-' + esc(d.ext) + '">' + esc(d.ext.toUpperCase()) + '</span><span class="doc-main"><a href="' + url + '" target="_blank" rel="noopener"><b>' + esc(d.nombre) + "</b></a><small>" + size(d.tamano) + " · " + fmtDate(d.creado) +
       (compact ? "" : (d.lead && leadName(d.lead) ? " · " + esc(leadName(d.lead)) : "")) + "</small></span>" +
-      (compact ? "" : '<select class="doc-lead" aria-label="Contacto vinculado">' + leadOptions(d.lead) + "</select>") +
+      (compact ? "" : '<select class="doc-folder" aria-label="Carpeta"><option value="">Sin carpeta</option>' + S.carpetas.map(function (c) {
+        return "<option" + (c === d.carpeta ? " selected" : "") + ">" + esc(c) + "</option>";
+      }).join("") + '</select><select class="doc-lead" aria-label="Contacto vinculado">' + leadOptions(d.lead) + "</select>") +
       '<a class="btn icon sm" href="' + url + '&dl=1" aria-label="Descargar">↓</a><button class="btn icon sm" data-act="doc-del" aria-label="Eliminar">✕</button></li>';
   }
 
@@ -680,14 +683,39 @@
       loadDocs().then(function () { if (S.page === "documentos") renderDocs(); }).catch(function (e) { toast(e.message, true); });
       return;
     }
-    var q = S.q.toLowerCase();
-    var list = S.docs.filter(function (d) { return !q || (d.nombre + " " + leadName(d.lead)).toLowerCase().indexOf(q) > -1; })
+    var q = S.q.toLowerCase(), cur = S.carpeta;
+    if (cur && cur !== "__none" && S.carpetas.indexOf(cur) < 0) cur = S.carpeta = "";
+    var inFolder = function (d, c) { return c === "" || (c === "__none" ? !d.carpeta || S.carpetas.indexOf(d.carpeta) < 0 : d.carpeta === c); };
+    var tile = function (c, label, cls) {
+      var n = S.docs.filter(function (d) { return inFolder(d, c); }).length;
+      return '<button type="button" class="folder' + (cls || "") + (cur === c ? " is-on" : "") + '" data-act="folder" data-folder="' + esc(c) + '">' + ICON.folder +
+        "<b>" + esc(label) + "</b><small>" + n + (n === 1 ? " documento" : " documentos") + "</small></button>";
+    };
+    var folders = '<div class="folders">' + tile("", "Todos", " all") + S.carpetas.map(function (c) { return tile(c, c); }).join("") + tile("__none", "Sin carpeta", " none") +
+      (S.newFolder ? '<form class="folder new" id="folder-form">' + ICON.folder + '<input name="nombre" maxlength="60" placeholder="Nombre de la carpeta" aria-label="Nombre de la carpeta" required /><span class="folder-btns"><button class="btn primary sm" type="submit">Crear</button><button class="btn ghost sm" type="button" data-act="folder-cancel">Cancelar</button></span></form>'
+        : '<button type="button" class="folder add" data-act="folder-new">+ Nueva carpeta</button>') + "</div>";
+    var where = cur && cur !== "__none" ? cur : "";
+    var list = S.docs.filter(function (d) { return inFolder(d, cur) && (!q || (d.nombre + " " + leadName(d.lead) + " " + (d.carpeta || "")).toLowerCase().indexOf(q) > -1); })
       .sort(function (a, b) { return b.creado.localeCompare(a.creado); });
     $("#main").innerHTML =
       '<label class="drop" id="dropzone"><input type="file" id="doc-file" multiple accept="' + DOC_EXT.split(",").map(function (e) { return "." + e; }).join(",") + '" hidden />' +
-      ICON.file + "<b>Arrastra archivos aquí o pulsa para subir</b><small>Contratos, dossiers, pasaportes, planos… PDF, Word, Excel, imágenes · máx. 25 MB</small></label>" +
-      '<nav class="toolbar"><input class="search" id="q-docs" type="search" placeholder="Buscar documento o contacto…" value="' + esc(S.q) + '" /></nav>' +
-      (list.length ? '<ul class="doc-list">' + list.map(function (d) { return docRow(d); }).join("") + "</ul>" : '<p class="empty big">' + (S.docs.length ? "Ningún documento coincide." : "Todavía no has subido documentos.") + "</p>");
+      ICON.file + "<b>Arrastra archivos aquí o pulsa para subir" + (where ? " a «" + esc(where) + "»" : "") + "</b><small>Contratos, dossiers, pasaportes, planos… PDF, Word, Excel, imágenes · máx. 25 MB</small></label>" +
+      folders +
+      '<nav class="toolbar"><input class="search" id="q-docs" type="search" placeholder="Buscar documento, contacto o carpeta…" value="' + esc(S.q) + '" />' +
+      (where ? '<button type="button" class="btn danger sm" data-act="folder-del">Eliminar carpeta «' + esc(where) + "»</button>" : "") + "</nav>" +
+      (list.length ? '<ul class="doc-list">' + list.map(function (d) { return docRow(d); }).join("") + "</ul>" : '<p class="empty big">' + (S.docs.length ? (cur ? "Esta carpeta está vacía. Sube archivos arriba o arrastra documentos a la carpeta." : "Ningún documento coincide.") : "Todavía no has subido documentos.") + "</p>");
+  }
+
+  function saveFolders(list) {
+    return api("folders_save", { carpetas: list }).then(function (j) { S.carpetas = j.carpetas; S.docs = j.docs; })
+      .catch(function (e) { toast(e.message, true); throw e; });
+  }
+  function moveDoc(id, carpeta) {
+    var d = (S.docs || []).filter(function (x) { return x.id === id; })[0];
+    if (!d || (d.carpeta || "") === carpeta) return;
+    api("doc_update", { id: id, carpeta: carpeta }).then(function (j) {
+      S.docs = j.docs; toast(carpeta ? "Movido a «" + carpeta + "»" : "Movido a «Sin carpeta»"); renderDocs();
+    }).catch(function (err) { toast(err.message, true); });
   }
 
   function uploadFiles(files, leadId) {
@@ -699,6 +727,7 @@
         var fd = new FormData();
         fd.append("file", f);
         fd.append("lead", leadId || "");
+        if (!leadId && S.page === "documentos" && S.carpeta && S.carpeta !== "__none") fd.append("carpeta", S.carpeta);
         return api("upload", fd, true).then(function (j) { (S.docs = S.docs || []).push(j.doc); })
           .catch(function (e) { toast(f.name + ": " + e.message, true); });
       });
@@ -868,6 +897,13 @@
     if (act) {
       var a = act.getAttribute("data-act");
       if (a === "new") openLead(null);
+      if (a === "folder") { S.carpeta = act.getAttribute("data-folder"); renderDocs(); }
+      if (a === "folder-new") { S.newFolder = true; renderDocs(); $("#folder-form [name=nombre]").focus(); }
+      if (a === "folder-cancel") { S.newFolder = false; renderDocs(); }
+      if (a === "folder-del" && confirm("¿Eliminar la carpeta «" + S.carpeta + "»? Sus documentos no se borran: pasan a «Sin carpeta».")) {
+        var gone = S.carpeta;
+        saveFolders(S.carpetas.filter(function (c) { return c !== gone; })).then(function () { S.carpeta = ""; renderDocs(); toast("Carpeta eliminada"); });
+      }
       if (a === "sale-new") openSale(null, act.getAttribute("data-lead") || "");
       if (a === "sale-lead") { var sv = $("#sale-form [name=lead]").value; if (sv) openLead(sv); }
       if (a === "sale-del" && S.open && confirm("¿Eliminar esta venta? No se puede deshacer.")) {
@@ -979,6 +1015,13 @@
     var f = e.target;
     if (f.id === "lead-form") { e.preventDefault(); submitLead(f); }
     if (f.id === "sale-form") { e.preventDefault(); submitSale(f); }
+    if (f.id === "folder-form") {
+      e.preventDefault();
+      var name = $("[name=nombre]", f).value.trim();
+      if (!name) return;
+      if (S.carpetas.indexOf(name) > -1) { toast("Ya existe esa carpeta", true); return; }
+      saveFolders(S.carpetas.concat([name])).then(function () { S.newFolder = false; S.carpeta = name; renderDocs(); toast("Carpeta creada"); });
+    }
     if (f.classList.contains("set-form")) { e.preventDefault(); submitSettings(f); }
     if (f.id === "tpl-form") {
       e.preventDefault();
@@ -1016,6 +1059,7 @@
     if (t.id === "m-bol") { S.mail.boletin = t.checked; renderMail(); }
     if (t.id === "doc-file") uploadFiles(t.files, "");
     if (t.id === "lead-file") uploadFiles(t.files, S.open);
+    if (t.classList.contains("doc-folder")) moveDoc(t.closest("[data-doc]").getAttribute("data-doc"), t.value);
     if (t.classList.contains("doc-lead")) {
       var id = t.closest("[data-doc]").getAttribute("data-doc");
       api("doc_update", { id: id, lead: t.value }).then(function (j) { S.docs = j.docs; toast("Documento vinculado"); renderDocs(); })
@@ -1038,6 +1082,14 @@
   // Arrastrar: tarjetas entre etapas (Ventas) y archivos a Documentos.
   var dragId = null;
   document.addEventListener("dragstart", function (e) {
+    var dd = e.target.closest && e.target.closest(".doc[data-doc]");
+    if (dd && S.page === "documentos") {
+      dragId = "d:" + dd.getAttribute("data-doc");
+      dd.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      try { e.dataTransfer.setData("text/plain", dragId); } catch (err) {}
+      return;
+    }
     var c = e.target.closest && e.target.closest(".card");
     if (!c) return;
     dragId = c.getAttribute("data-sale") ? "v:" + c.getAttribute("data-sale") : c.getAttribute("data-id");
@@ -1047,11 +1099,14 @@
   });
   document.addEventListener("dragend", function () {
     dragId = null;
-    $$(".dragging, .drop").forEach(function (el) { el.classList.remove("dragging", "drop"); });
+    $$(".dragging, .drop, .drop-on").forEach(function (el) { el.classList.remove("dragging", "drop", "drop-on"); });
   });
   document.addEventListener("dragover", function (e) {
     var zone = e.target.closest && e.target.closest("#dropzone");
     if (zone && !dragId) { e.preventDefault(); zone.classList.add("drop"); return; }
+    var fo = dragId && dragId.indexOf("d:") === 0 && e.target.closest && e.target.closest("[data-folder]:not(.all)");
+    if (fo) { e.preventDefault(); $$(".folder.drop-on").forEach(function (x) { if (x !== fo) x.classList.remove("drop-on"); }); fo.classList.add("drop-on"); return; }
+    if (dragId && dragId.indexOf("d:") === 0) return;
     var col = dragId && e.target.closest && e.target.closest(".col");
     if (!col) return;
     e.preventDefault();
@@ -1065,6 +1120,9 @@
   document.addEventListener("drop", function (e) {
     var zone = e.target.closest && e.target.closest("#dropzone");
     if (zone && !dragId) { e.preventDefault(); zone.classList.remove("drop"); uploadFiles(e.dataTransfer.files, ""); return; }
+    var fo = dragId && dragId.indexOf("d:") === 0 && e.target.closest && e.target.closest("[data-folder]:not(.all)");
+    if (fo) { e.preventDefault(); var fn = fo.getAttribute("data-folder"); moveDoc(dragId.slice(2), fn === "__none" ? "" : fn); return; }
+    if (dragId && dragId.indexOf("d:") === 0) return;
     var col = dragId && e.target.closest && e.target.closest(".col");
     if (!col) return;
     e.preventDefault();
