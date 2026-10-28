@@ -94,3 +94,9 @@
 #   RewriteCond %{REQUEST_FILENAME}.html -f
 #   RewriteRule ^(.+?)/?$ $1.html [L]
 # </IfModule>
+
+# ----- Carpeta interna con el generador del blog: no se sirve -----
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^tools/ - [F,L]
+</IfModule>
