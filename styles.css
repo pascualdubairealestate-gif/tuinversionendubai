@@ -741,3 +741,4 @@ body, .splash { background: var(--sand-bg); }
 .footer-links a:hover, .footer-social a:hover { color: var(--amber); }
 .slider-progress span { background: var(--amber); }
 @media (min-width: 1100px) { .project:not(.is-active) { --o: 1; } }
+.h2-about { max-width: 24ch; font-size: clamp(34px, 4.2vw, 58px); }
