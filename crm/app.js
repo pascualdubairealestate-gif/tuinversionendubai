@@ -6,7 +6,7 @@
   var TZ = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "UTC";
   var S = {
     leads: [], stages: {}, csrf: "", notify: "", ics: "",
-    page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(), plegadas: savedFolds(),
+    page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(), orden: savedSort(), plegadas: savedFolds(),
     open: null, dirty: false,
     cal: {}, calErr: "", month: null, day: null,
     tpls: null, docs: null, mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false }
@@ -35,6 +35,20 @@
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function ymd(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
   function today() { return ymd(new Date()); }
+  // Fecha de la última nota escrita a mano ("" si nunca se escribió ninguna).
+  function lastNote(l) {
+    var f = "";
+    (l.actividad || []).forEach(function (a) { if (a.tipo === "nota" && a.fecha > f) f = a.fecha; });
+    return f;
+  }
+  function daysSince(iso) { return Math.floor((Date.now() - new Date(iso).getTime()) / 864e5); }
+  function noteAge(l) {
+    var f = lastNote(l);
+    if (!f) return { txt: "Sin notas", cls: "old" };
+    var n = daysSince(f);
+    var txt = n < 1 ? "hoy" : n === 1 ? "ayer" : n < 60 ? "hace " + n + " días" : "hace " + Math.floor(n / 30) + " meses";
+    return { txt: "Nota " + txt, cls: n > 30 ? "old" : n > 7 ? "warn" : "ok" };
+  }
   function addDays(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
   function parseDay(s) { return new Date(s + "T12:00:00"); }
   function fmtDate(iso, withTime) {
@@ -240,16 +254,15 @@
       if (S.hoy && !overdue(l)) return false;
       if (!q) return true;
       return [l.nombre, l.email, l.telefono, l.proyecto, l.etiquetas, l.pais, l.origen].join(" ").toLowerCase().indexOf(q) > -1;
-    }).sort(function (a, b) { return (b.actualizado || "").localeCompare(a.actualizado || ""); });
+    }).sort(function (a, b) {
+      var x = lastNote(a), y = lastNote(b);
+      return S.orden === "recientes" ? y.localeCompare(x) : x.localeCompare(y);
+    });
   }
 
   function toolbar(withStage) {
-    var have = {};
-    S.leads.forEach(function (l) { if (l.origen) have[l.origen] = 1; });
     return '<nav class="toolbar"><input class="search" id="q" type="search" placeholder="Buscar nombre, email, teléfono, proyecto…" value="' + esc(S.q) + '" />' +
-      '<select id="f-origen" aria-label="Origen"><option value="">Todos los orígenes</option>' + Object.keys(have).sort().map(function (o) {
-        return "<option" + (o === S.origen ? " selected" : "") + ">" + esc(o) + "</option>";
-      }).join("") + "</select>" +
+      '<select id="f-orden" aria-label="Ordenar"><option value="antiguas"' + (S.orden !== "recientes" ? " selected" : "") + '>Más desactualizados primero</option><option value="recientes"' + (S.orden === "recientes" ? " selected" : "") + ">Nota más reciente primero</option></select>" +
       (withStage ? '<select id="f-etapa" aria-label="Etapa"><option value="">Todas las etapas</option>' + Object.keys(S.stages).map(function (k) {
         return '<option value="' + k + '"' + (k === S.etapa ? " selected" : "") + ">" + esc(S.stages[k]) + "</option>";
       }).join("") + "</select>" : "") +
@@ -258,6 +271,9 @@
 
   function savedFolds() {
     try { return JSON.parse(localStorage.getItem("crm-plegadas") || "{}") || {}; } catch (e) { return {}; }
+  }
+  function savedSort() {
+    try { return localStorage.getItem("crm-orden") === "recientes" ? "recientes" : "antiguas"; } catch (e) { return "antiguas"; }
   }
   function savedView() {
     try { return localStorage.getItem("crm-vista") === "columnas" ? "columnas" : "lista"; } catch (e) { return "lista"; }
@@ -277,10 +293,10 @@
 
   function contactsTable(list) {
     if (!list.length) return '<p class="empty big">' + (S.leads.length ? "No hay contactos con estos filtros." : "Aún no hay contactos. Añade el primero con «+ Nuevo contacto».") + "</p>";
-    return '<div class="table-wrap"><table class="contacts"><thead><tr><th>Nombre</th><th>Etapa</th><th>Origen</th><th>Teléfono</th><th>Proyecto</th><th>Seguimiento</th><th>Alta</th></tr></thead><tbody>' +
+    return '<div class="table-wrap"><table class="contacts"><thead><tr><th>Nombre</th><th>Etapa</th><th>Última nota</th><th>Teléfono</th><th>Proyecto</th><th>Seguimiento</th><th>Alta</th></tr></thead><tbody>' +
       list.map(function (l) {
         return '<tr data-id="' + esc(l.id) + '" tabindex="0"><td class="c-name"><span class="avatar">' + esc(initials(l)) + "</span><span><b>" + esc(up(l.nombre) || "Sin nombre") + (l.nuevo ? ' <span class="pill new">Nuevo</span>' : "") + "</b><small>" + esc(l.email) + "</small></span></td>" +
-          '<td><span class="stage s-' + esc(l.etapa) + '">' + esc(S.stages[l.etapa] || l.etapa) + '</span></td><td data-l="Origen">' + esc(l.origen) + '</td><td data-l="Teléfono">' + esc(l.telefono) + '</td><td data-l="Proyecto">' + esc(l.proyecto) + "</td>" +
+          '<td><span class="stage s-' + esc(l.etapa) + '">' + esc(S.stages[l.etapa] || l.etapa) + '</span></td><td data-l="Última nota"><span class="pill age ' + noteAge(l).cls + '">' + noteAge(l).txt.replace("Nota ", "") + '</span></td><td data-l="Teléfono">' + esc(l.telefono) + '</td><td data-l="Proyecto">' + esc(l.proyecto) + "</td>" +
           '<td data-l="Seguimiento" class="' + (overdue(l) ? "late" : "") + '">' + fmtDate(l.seguimiento) + '</td><td data-l="Alta">' + fmtDate(l.creado) + "</td></tr>";
       }).join("") + "</tbody></table></div>";
   }
@@ -289,7 +305,8 @@
   function card(l) {
     var tags = [];
     if (l.nuevo) tags.push('<span class="pill new">Nuevo</span>');
-    if (l.origen) tags.push('<span class="pill">' + esc(l.origen) + "</span>");
+    var age = noteAge(l);
+    tags.push('<span class="pill age ' + age.cls + '">' + age.txt + "</span>");
     var meta = [];
     if (l.proyecto) meta.push(esc(l.proyecto));
     if (l.presupuesto) meta.push(esc(l.presupuesto));
@@ -783,7 +800,11 @@
 
   document.addEventListener("change", function (e) {
     var t = e.target;
-    if (t.id === "f-origen") { S.origen = t.value; refreshResults(); }
+    if (t.id === "f-orden") {
+      S.orden = t.value;
+      try { localStorage.setItem("crm-orden", S.orden); } catch (err) {}
+      refreshResults();
+    }
     if (t.id === "f-etapa") { S.etapa = t.value; refreshResults(); }
     if (t.id === "f-hoy") { S.hoy = t.checked; refreshResults(); }
     if (t.id === "m-bol") { S.mail.boletin = t.checked; renderMail(); }

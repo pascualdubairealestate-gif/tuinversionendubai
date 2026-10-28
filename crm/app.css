@@ -185,8 +185,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--amber); box-shad
 .meta { margin: 0; overflow-wrap: anywhere; font-size: 12.5px; color: var(--mute); }
 .tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .tags:empty { display: none; }
-.pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: #f1efea; color: var(--mute); }
+.pill { white-space: nowrap; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: #f1efea; color: var(--mute); }
 .pill.new { background: var(--amber); color: #fff; }
+.pill.age.ok { background: rgba(31, 157, 99, .12); color: #17784b; }
+.pill.age.warn { background: var(--amber-soft); color: var(--amber-ink); }
+.pill.age.old { background: rgba(214, 69, 69, .1); color: var(--red); }
 .due { font-size: 12px; font-weight: 600; color: var(--mute); display: flex; align-items: center; gap: 5px; }
 .due.late, td.late { color: var(--red); font-weight: 700; }
 
