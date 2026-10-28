@@ -5,7 +5,7 @@
   var API = "api.php?action=";
   var TZ = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "UTC";
   var S = {
-    leads: [], stages: {}, csrf: "", notify: "", ics: "",
+    leads: [], ventas: [], hitos: {}, stages: {}, csrf: "", notify: "", ics: "",
     page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(), orden: savedSort().por, dir: savedSort().dir, plegadas: savedFolds(),
     open: null, dirty: false,
     cal: {}, calErr: "", month: null, day: null,
@@ -127,12 +127,14 @@
     return api("state").then(function (j) {
       var before = S.leads.length;
       S.leads = j.leads || [];
+      S.ventas = j.ventas || [];
+      S.hitos = j.hitos || {};
       S.stages = j.stages;
       S.csrf = j.csrf;
       S.notify = j.notify || "";
       S.ics = j.ics || "";
       if (silent && S.leads.length > before) toast("Nuevo contacto recibido desde la web");
-      if (S.ready && (!silent || ["inicio", "contactos", "ventas"].indexOf(S.page) > -1)) render();
+      if (S.ready && !S.open && (!silent || ["inicio", "contactos", "ventas"].indexOf(S.page) > -1)) render();
     }).catch(function (e) { if (e.message !== "auth") toast("No se pudo cargar el CRM", true); });
   }
 
@@ -210,9 +212,9 @@
       }).join("") + "</ul>" : "") +
       "</section>" +
       '<div class="home-side">' + statsHtml() +
-      '<section class="panel"><header class="panel-h"><h3>Pipeline</h3><a href="#ventas" class="link">Ver ventas →</a></header><div class="bars">' +
+      '<section class="panel"><header class="panel-h"><h3>Pipeline</h3><a href="#contactos" class="link">Ver contactos →</a></header><div class="bars">' +
       counts.map(function (c) {
-        return '<a href="#ventas" class="bar-row"><span>' + esc(S.stages[c[0]]) + '</span><span class="bar"><i class="s-' + c[0] + '" style="width:' + (c[1] / max * 100) + '%"></i></span><b>' + c[1] + "</b></a>";
+        return '<a href="#contactos" class="bar-row"><span>' + esc(S.stages[c[0]]) + '</span><span class="bar"><i class="s-' + c[0] + '" style="width:' + (c[1] / max * 100) + '%"></i></span><b>' + c[1] + "</b></a>";
       }).join("") + "</div></section>" +
       '<section class="panel"><header class="panel-h"><h3>Últimos contactos</h3><a href="#contactos" class="link">Ver todos →</a></header>' +
       (recent.length ? '<ul class="mini-list">' + recent.map(function (l) {
@@ -335,10 +337,6 @@
       '<div class="tags">' + tags.join("") + "</div>" + foot + "</article>";
   }
 
-  function renderSales() {
-    $("#main").innerHTML = statsHtml() + toolbar(false) + '<div id="results"></div>';
-    renderBoard();
-  }
 
   function renderBoard() {
     var list = filtered(), keys = Object.keys(S.stages);
@@ -355,10 +353,178 @@
     }).join("") + "</div>";
   }
 
+  /* ---------- Ventas (operaciones de compra) ---------- */
+  var HITO_HINT = {
+    inicio: "Ha puesto EOI o reserva",
+    booking: "Booking form firmado",
+    spa: "Sale & Purchase Agreement",
+    oqood: "Registro en la DLD",
+    factura: "Factura de comisión enviada",
+    cobrada: "La agencia ha cobrado",
+    pagado: "Me han pagado"
+  };
+  function saleById(id) { return S.ventas.filter(function (v) { return v.id === id; })[0]; }
+  function saleStep(v) {
+    var last = -1;
+    Object.keys(S.hitos).forEach(function (k, i) { if (v.hitos && v.hitos[k]) last = i; });
+    return last;
+  }
+  function hitoLabel(k, v) {
+    if (k !== "inicio") return S.hitos[k];
+    return v ? (v.inicio === "reserva" ? "Reserva" : "EOI") : S.hitos[k];
+  }
+  function saleWho(v) {
+    var l = v.lead && leadById(v.lead);
+    return l ? (up(l.nombre) || l.email || "Sin nombre") : "";
+  }
+  function saleTitle(v) { return saleWho(v) || v.proyecto || "Venta sin nombre"; }
+  function filteredSales() {
+    var q = S.q.toLowerCase().trim();
+    return S.ventas.filter(function (v) {
+      return !q || [saleTitle(v), v.proyecto, v.unidad, v.promotor].join(" ").toLowerCase().indexOf(q) > -1;
+    }).sort(function (a, b) { return (b.actualizado || "").localeCompare(a.actualizado || ""); });
+  }
+
+  function saleStatsHtml() {
+    var V = S.ventas, y = String(new Date().getFullYear());
+    var open = V.filter(function (v) { return !(v.hitos || {}).pagado; });
+    var porCobrar = V.filter(function (v) { return !(v.hitos || {}).cobrada; }).reduce(function (s, v) { return s + num(v.comision); }, 0);
+    var pagado = V.filter(function (v) { return ((v.hitos || {}).pagado || "").slice(0, 4) === y; }).reduce(function (s, v) { return s + num(v.comision); }, 0);
+    return '<section class="stats">' + [
+      ["Ventas en curso", open.length, ""],
+      ["Volumen en curso", money(open.reduce(function (s, v) { return s + num(v.precio); }, 0)), "Suma de precios"],
+      ["Comisión por cobrar", money(porCobrar), "Aún no recibida"],
+      ["Pagado en " + y, money(pagado), "Comisiones que ya cobraste"]
+    ].map(function (s) {
+      return '<div class="stat"><span>' + s[0] + "</span><b>" + esc(s[1]) + "</b>" + (s[2] ? "<small>" + esc(s[2]) + "</small>" : "") + "</div>";
+    }).join("") + "</section>";
+  }
+
+  function stepsHtml(v) {
+    var n = saleStep(v), keys = Object.keys(S.hitos);
+    return '<div class="steps" title="' + (n + 1) + " de " + keys.length + '">' + keys.map(function (k, i) { return '<i class="' + (i <= n ? "on" : "") + '"></i>'; }).join("") + "</div>";
+  }
+  function nextStep(v) {
+    var keys = Object.keys(S.hitos), n = saleStep(v);
+    return n >= keys.length - 1 ? "Completada" : "Siguiente: " + hitoLabel(keys[n + 1], n + 1 === 0 ? null : v).replace("EOI / Reserva", "EOI o reserva");
+  }
+
+  function saleCard(v) {
+    var where = [saleWho(v) ? v.proyecto : "", v.unidad ? "Unidad " + v.unidad : ""].filter(Boolean).join(" · ") || (saleWho(v) ? "Sin proyecto" : "Sin cliente asignado");
+    var done = saleStep(v) >= Object.keys(S.hitos).length - 1;
+    return '<article class="card sale" draggable="true" data-sale="' + esc(v.id) + '" tabindex="0">' +
+      '<div class="card-top"><span class="avatar">' + esc(initials(leadById(v.lead) || { nombre: v.proyecto })) + '</span><div class="who"><b>' + esc(saleTitle(v)) + "</b><small>" + esc(where) + "</small></div></div>" +
+      (num(v.precio) ? '<span class="val">' + money(num(v.precio)) + "</span>" : "") +
+      stepsHtml(v) +
+      '<span class="due' + (done ? " ok" : "") + '">' + esc(nextStep(v)) + (num(v.comision) ? " · comisión " + money(num(v.comision)) : "") + "</span></article>";
+  }
+
+  function renderSales() {
+    $("#main").innerHTML = saleStatsHtml() +
+      '<nav class="toolbar"><input class="search" id="q" type="search" placeholder="Buscar cliente, proyecto, unidad, promotor…" value="' + esc(S.q) + '" />' +
+      '<button type="button" class="btn primary" data-act="sale-new">+ Nueva venta</button></nav><div id="results"></div>';
+    renderSaleBoard();
+  }
+
+  function renderSaleBoard() {
+    var list = filteredSales(), keys = Object.keys(S.hitos);
+    if (!S.ventas.length) {
+      $("#results").innerHTML = '<p class="empty big">Aún no hay ventas. Cuando un cliente vaya a comprar, pulsa «+ Nueva venta» (o hazlo desde su ficha) y apunta proyecto y unidad.</p>';
+      return;
+    }
+    var fk = function (k) { return "v-" + k; };
+    var tpl = function (w) { return keys.map(function (k) { return S.plegadas[fk(k)] ? "52px" : w; }).join(" "); };
+    $("#results").innerHTML = '<div class="board sales" style="--cols:' + tpl("minmax(195px, 1fr)") + ";--cols-m:" + tpl("84%") + '">' + keys.map(function (k, i) {
+      var items = list.filter(function (v) { return Math.max(0, saleStep(v)) === i; });
+      var shut = S.plegadas[fk(k)];
+      var fold = '<button type="button" class="fold" data-act="fold" data-stage="' + fk(k) + '" aria-expanded="' + !shut + '" aria-label="' + (shut ? "Desplegar " : "Ocultar ") + esc(S.hitos[k]) + '">' +
+        '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>';
+      if (shut) return '<section class="col folded" data-hito="' + k + '">' + fold + '<span class="count">' + items.length + '</span><h2><i class="dot h-' + i + '"></i>' + esc(S.hitos[k]) + "</h2></section>";
+      return '<section class="col" data-hito="' + k + '"><header><div><h2>' + fold + '<i class="dot h-' + i + '"></i>' + esc(S.hitos[k]) + "</h2><small>" + HITO_HINT[k] + "</small></div>" +
+        '<span class="count">' + items.length + "</span></header>" +
+        '<div class="cards">' + (items.map(saleCard).join("") || '<p class="empty">Arrastra aquí</p>') + "</div></section>";
+    }).join("") + "</div>";
+  }
+
+  function openSale(id, leadId) {
+    var v = id ? saleById(id) : null;
+    if (id && !v) return;
+    v = v || { id: "", lead: leadId || "", inicio: "eoi", hitos: {} };
+    S.open = "_v" + (v.id || "new");
+    S.dirty = false;
+    var people = S.leads.slice().sort(function (a, b) { return up(a.nombre || a.email).localeCompare(up(b.nombre || b.email), "es"); });
+    var hitos = Object.keys(S.hitos).map(function (k) {
+      var d = (v.hitos || {})[k] || "";
+      var label = k === "inicio"
+        ? '<span class="pick" role="radiogroup" aria-label="Tipo"><label><input type="radio" name="inicio" value="eoi"' + (v.inicio !== "reserva" ? " checked" : "") + " /> EOI</label><label><input type=\"radio\" name=\"inicio\" value=\"reserva\"" + (v.inicio === "reserva" ? " checked" : "") + " /> Reserva</label></span>"
+        : "<span>" + esc(S.hitos[k]) + "</span>";
+      return '<li class="hito' + (d ? " done" : "") + '"><input type="checkbox" class="h-chk" data-hito="' + k + '" aria-label="' + esc(S.hitos[k]) + '"' + (d ? " checked" : "") + " />" + label +
+        '<input type="date" class="h-date" name="h-' + k + '" value="' + esc(d) + '" aria-label="Fecha ' + esc(S.hitos[k]) + '" /></li>';
+    }).join("");
+    $(".drawer-panel").innerHTML =
+      '<form id="sale-form" autocomplete="off">' +
+      '<header class="d-head"><div><h2 id="d-title">' + (v.id ? esc(saleTitle(v)) : "Nueva venta") + "</h2>" +
+      (v.id ? '<p class="muted small">' + esc([v.proyecto, v.unidad ? "Unidad " + v.unidad : ""].filter(Boolean).join(" · ")) + " · creada " + fmtDate(v.creado) + "</p>" : "") + "</div>" +
+      '<button type="button" class="btn icon" data-close aria-label="Cerrar">✕</button></header>' +
+      '<div class="grid">' +
+      '<label class="f full"><span>Cliente (opcional)</span><select name="lead"><option value="">Sin asignar</option>' + people.map(function (l) {
+        return '<option value="' + esc(l.id) + '"' + (l.id === v.lead ? " selected" : "") + ">" + esc(up(l.nombre) || l.email) + "</option>";
+      }).join("") + "</select></label>" +
+      field("proyecto", "Proyecto", v.proyecto) + field("unidad", "Unidad", v.unidad) +
+      field("promotor", "Promotor", v.promotor) + field("precio", "Precio (€)", v.precio) +
+      field("comision", "Mi comisión (€)", v.comision) +
+      "</div>" +
+      '<h3>Progreso</h3><ol class="hitos">' + hitos + "</ol>" +
+      '<label class="f full"><span>Notas de la venta</span><textarea name="notas" rows="3" placeholder="Plan de pagos, contacto en el promotor, número de factura…">' + esc(v.notas || "") + "</textarea></label>" +
+      '<div class="d-actions"><button class="btn primary" type="submit">' + (v.id ? "Guardar" : "Crear venta") + "</button>" +
+      (v.lead ? '<button class="btn ghost" type="button" data-act="sale-lead">Ver ficha del cliente</button>' : "") +
+      (v.id ? '<button class="btn danger" type="button" data-act="sale-del">Eliminar</button>' : "") + "</div>" +
+      "</form>";
+    showDrawer();
+  }
+
+  function submitSale(form) {
+    var data = { hitos: {} };
+    $$("input[name], select[name], textarea[name]", form).forEach(function (f) {
+      if (f.type === "radio") { if (f.checked) data[f.name] = f.value; return; }
+      if (f.name.indexOf("h-") === 0) { if (f.value) data.hitos[f.name.slice(2)] = f.value; return; }
+      data[f.name] = f.value.trim();
+    });
+    if (!data.lead && !data.proyecto) { toast("Pon al menos el proyecto o el cliente", true); return; }
+    var btn = $("button[type=submit]", form);
+    btn.disabled = true;
+    var id = S.open && S.open !== "_vnew" ? S.open.slice(2) : "";
+    saveSale(id, data).then(function (v) {
+      S.dirty = false;
+      toast(id ? "Venta guardada" : "Venta creada");
+      openSale(v.id);
+    }).catch(function (e) { toast(e.message, true); btn.disabled = false; });
+  }
+
+  // Guarda la venta y, si hace falta, avanza al cliente: con venta → Opportunity; con SPA firmado → Customer.
+  function saveSale(id, data) {
+    return api("sale_save", { id: id, data: data }).then(function (j) {
+      var v = j.venta, i = S.ventas.findIndex(function (x) { return x.id === v.id; });
+      if (i > -1) S.ventas[i] = v; else S.ventas.push(v);
+      var l = leadById(v.lead), want = (v.hitos || {}).spa ? "customer" : "opportunity";
+      if (l && l.etapa !== want && !(want === "opportunity" && l.etapa === "customer")) saveLead(l.id, { etapa: want }, true).catch(function () {});
+      if (S.page === "ventas") renderSaleBoard();
+      return v;
+    });
+  }
+
+  function leadSalesHtml(id) {
+    var mine = S.ventas.filter(function (v) { return v.lead === id; });
+    return '<div class="lead-docs"><header class="panel-h"><h3>Ventas</h3><button type="button" class="btn ghost sm" data-act="sale-new" data-lead="' + esc(id) + '">+ Nueva venta</button></header><ul class="doc-list">' +
+      (mine.length ? mine.map(function (v) {
+        return '<li class="doc sale-row" data-sale="' + esc(v.id) + '" tabindex="0"><span class="doc-main"><b>' + esc([v.proyecto || "Sin proyecto", v.unidad ? "Unidad " + v.unidad : ""].filter(Boolean).join(" · ")) + "</b><small>" + esc(nextStep(v)) + "</small></span>" + stepsHtml(v) + "</li>";
+      }).join("") : '<li class="muted small">Sin ventas. Cuando vaya a comprar, crea aquí la venta.</li>') + "</ul></div>";
+  }
+
   function refreshResults() {
     if (S.page === "contactos" && S.vista !== "columnas") $("#results").innerHTML = contactsTable(filtered());
     else if (S.page === "contactos") renderBoard();
-    else if (S.page === "ventas") renderBoard();
+    else if (S.page === "ventas") renderSaleBoard();
   }
 
   /* ---------- Correo ---------- */
@@ -597,6 +763,7 @@
       '<label class="f full"><span>Añadir nota</span><textarea name="nota" rows="3" placeholder="Llamada, lo que te ha contado, siguiente paso…"></textarea></label>' +
       '<div class="d-actions"><button class="btn primary" type="submit">' + (l.id ? "Guardar" : "Crear contacto") + "</button>" +
       (l.id ? '<button class="btn danger" type="button" data-act="delete">Eliminar</button>' : "") + "</div>" +
+      (l.id ? leadSalesHtml(l.id) : "") +
       (l.id ? '<div class="lead-docs"><header class="panel-h"><h3>Documentos</h3><label class="btn ghost sm">+ Subir<input type="file" id="lead-file" multiple hidden /></label></header><ul class="doc-list" id="lead-doc-list"><li class="muted small">Cargando…</li></ul></div>' : "") +
       (acts ? '<h3>Actividad</h3><ol class="timeline">' + acts + "</ol>" : "") + utm +
       datalist("presupuesto", PRESUPUESTOS) + datalist("objetivo", OBJETIVOS) +
@@ -700,11 +867,20 @@
     if (act) {
       var a = act.getAttribute("data-act");
       if (a === "new") openLead(null);
+      if (a === "sale-new") openSale(null, act.getAttribute("data-lead") || "");
+      if (a === "sale-lead") { var sv = $("#sale-form [name=lead]").value; if (sv) openLead(sv); }
+      if (a === "sale-del" && S.open && confirm("¿Eliminar esta venta? No se puede deshacer.")) {
+        var sid = S.open.slice(2);
+        api("sale_save", { id: sid, borrar: true }).then(function () {
+          S.ventas = S.ventas.filter(function (v) { return v.id !== sid; });
+          closeDrawer(true); render(); toast("Venta eliminada");
+        }).catch(function (err) { toast(err.message, true); });
+      }
       if (a === "fold") {
         var st = act.getAttribute("data-stage");
         if (S.plegadas[st]) delete S.plegadas[st]; else S.plegadas[st] = 1;
         try { localStorage.setItem("crm-plegadas", JSON.stringify(S.plegadas)); } catch (err) {}
-        renderBoard();
+        if (S.page === "ventas") renderSaleBoard(); else renderBoard();
       }
       if (a === "dir") {
         S.dir = S.dir === "desc" ? "asc" : "desc";
@@ -786,18 +962,22 @@
       renderCalendar();
       return;
     }
+    var sale = t.closest("[data-sale]");
+    if (sale) { openSale(sale.getAttribute("data-sale")); return; }
     var row = t.closest(".card, tr[data-id], li[data-id]");
     if (row && !t.closest("a")) openLead(row.getAttribute("data-id"));
   });
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && S.open !== null) closeDrawer();
-    if (e.key === "Enter" && e.target.matches && e.target.matches(".card, tr[data-id], li[data-id]")) openLead(e.target.getAttribute("data-id"));
+    if (e.key === "Enter" && e.target.matches && e.target.matches("[data-sale]")) openSale(e.target.getAttribute("data-sale"));
+    else if (e.key === "Enter" && e.target.matches && e.target.matches(".card, tr[data-id], li[data-id]")) openLead(e.target.getAttribute("data-id"));
   });
 
   document.addEventListener("submit", function (e) {
     var f = e.target;
     if (f.id === "lead-form") { e.preventDefault(); submitLead(f); }
+    if (f.id === "sale-form") { e.preventDefault(); submitSale(f); }
     if (f.classList.contains("set-form")) { e.preventDefault(); submitSettings(f); }
     if (f.id === "tpl-form") {
       e.preventDefault();
@@ -824,6 +1004,12 @@
   document.addEventListener("change", function (e) {
     var t = e.target;
     if (t.id === "f-orden") { S.orden = t.value; storeSort(); refreshResults(); }
+    if (t.classList.contains("h-chk") || t.classList.contains("h-date")) {
+      var li = t.closest(".hito"), box = $(".h-chk", li), date = $(".h-date", li);
+      if (t === box) date.value = box.checked ? (date.value || today()) : "";
+      box.checked = !!date.value;
+      li.classList.toggle("done", !!date.value);
+    }
     if (t.id === "f-etapa") { S.etapa = t.value; refreshResults(); }
     if (t.id === "f-hoy") { S.hoy = t.checked; refreshResults(); }
     if (t.id === "m-bol") { S.mail.boletin = t.checked; renderMail(); }
@@ -836,12 +1022,24 @@
     }
   });
 
+  // Soltar una venta en una columna: marca los hitos hasta ahí (con fecha de hoy si faltaba) y quita los siguientes.
+  function dropSale(id, hito) {
+    var v = saleById(id), keys = Object.keys(S.hitos), to = keys.indexOf(hito);
+    if (!v || to < 0 || Math.max(0, saleStep(v)) === to && (v.hitos || {})[hito]) return;
+    var prev = v.hitos, h = {};
+    keys.forEach(function (k, i) { if (i <= to) h[k] = (prev || {})[k] || today(); });
+    v.hitos = h;
+    renderSaleBoard();
+    saveSale(v.id, { hitos: h }).then(function () { toast("Movida a " + S.hitos[hito]); })
+      .catch(function (err) { v.hitos = prev; renderSaleBoard(); toast(err.message, true); });
+  }
+
   // Arrastrar: tarjetas entre etapas (Ventas) y archivos a Documentos.
   var dragId = null;
   document.addEventListener("dragstart", function (e) {
     var c = e.target.closest && e.target.closest(".card");
     if (!c) return;
-    dragId = c.getAttribute("data-id");
+    dragId = c.getAttribute("data-sale") ? "v:" + c.getAttribute("data-sale") : c.getAttribute("data-id");
     c.classList.add("dragging");
     e.dataTransfer.effectAllowed = "move";
     try { e.dataTransfer.setData("text/plain", dragId); } catch (err) {}
@@ -869,6 +1067,7 @@
     var col = dragId && e.target.closest && e.target.closest(".col");
     if (!col) return;
     e.preventDefault();
+    if (dragId.indexOf("v:") === 0) { dropSale(dragId.slice(2), col.getAttribute("data-hito")); return; }
     var stage = col.getAttribute("data-stage");
     var l = leadById(dragId);
     if (!l || l.etapa === stage) return;

@@ -345,3 +345,28 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 .agenda .task { grid-template-columns: 1fr; gap: 2px; }
 #lead-form input[name=nombre] { text-transform: uppercase; }
+
+/* ---------- Ventas (operaciones) ---------- */
+.h-0 { --sc: #8a97ab; }
+.h-1 { --sc: #2f7de1; }
+.h-2 { --sc: #5b5bd6; }
+.h-3 { --sc: #8a5cd1; }
+.h-4 { --sc: var(--amber); }
+.h-5 { --sc: #13a1a1; }
+.h-6 { --sc: var(--s-customer); }
+.steps { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.steps i { height: 5px; border-radius: 3px; background: #e6e3dc; }
+.steps i.on { background: var(--amber); }
+.due.ok { color: var(--s-customer); font-weight: 700; }
+.sale-row { cursor: pointer; box-shadow: none; border: 1px solid var(--line); }
+.sale-row:hover { border-color: rgba(247, 147, 30, .5); }
+.sale-row .steps { width: 96px; flex: none; }
+.hitos { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.hito { display: grid; grid-template-columns: 22px 1fr 150px; align-items: center; gap: 10px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); font-weight: 600; font-size: 14px; }
+.hito.done { background: color-mix(in srgb, var(--amber) 7%, #fff); border-color: rgba(247, 147, 30, .35); }
+.hito .h-chk { width: 18px; height: 18px; min-height: 18px; accent-color: var(--amber); }
+.hito .h-date { min-height: 36px; padding: 6px 8px; font-size: 13px; }
+.pick { display: inline-flex; gap: 14px; }
+.pick label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.pick input { width: 16px; height: 16px; min-height: 16px; accent-color: var(--amber); }
+@media (max-width: 420px) { .hito { grid-template-columns: 22px 1fr; } .hito .h-date { grid-column: 2; } }

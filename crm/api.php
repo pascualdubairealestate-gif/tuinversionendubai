@@ -90,7 +90,7 @@ if ($action === 'lead') {
 if ($action === 'state') {
   require_auth(false);
   $cfg = config();
-  json_out(['leads' => store_read('leads', []), 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'csrf' => csrf()]);
+  json_out(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'csrf' => csrf()]);
 }
 
 if ($action === 'save' && $method === 'POST') {
@@ -178,7 +178,7 @@ if ($action === 'export') {
   if ($fmt === 'json') {
     header('Content-Type: application/json; charset=utf-8');
     header("Content-Disposition: attachment; filename=\"crm-copia-$stamp.json\"");
-    echo json_encode($leads, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    echo json_encode(['contactos' => $leads, 'ventas' => store_read('ventas', [])], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
   }
   $onlyNl = ($_GET['solo'] ?? '') === 'boletin';
@@ -235,6 +235,42 @@ if ($action === 'tpl_save' && $method === 'POST') {
     return $list;
   });
   json_out(['plantillas' => $list]);
+}
+
+/* ---------- Ventas ---------- */
+if ($action === 'sale_save' && $method === 'POST') {
+  require_auth();
+  $b = body();
+  $id = (string) ($b['id'] ?? '');
+  $d = is_array($b['data'] ?? null) ? $b['data'] : [];
+  $res = with_lock('ventas', function () use ($b, $id, $d) {
+    $list = store_read('ventas', []);
+    if (!empty($b['borrar'])) {
+      $list = array_values(array_filter($list, function ($v) use ($id) { return $v['id'] !== $id; }));
+      store_write('ventas', $list);
+      return ['ok' => true];
+    }
+    $idx = null;
+    foreach ($list as $i => $v) if ($v['id'] === $id) $idx = $i;
+    if ($id !== '' && $idx === null) return null;
+    $v = $idx === null ? ['id' => 'v' . substr(new_id(), 1), 'creado' => now_iso(), 'hitos' => []] : $list[$idx];
+    foreach (SALE_FIELDS as $f => $max) if (array_key_exists($f, $d)) $v[$f] = cut($d[$f], $max);
+    if (!in_array($v['inicio'] ?? '', ['eoi', 'reserva'], true)) $v['inicio'] = 'eoi';
+    if (isset($d['hitos']) && is_array($d['hitos'])) {
+      $h = [];
+      foreach (HITOS as $k => $label) {
+        $f = cut($d['hitos'][$k] ?? '', 10);
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $f)) $h[$k] = $f;
+      }
+      $v['hitos'] = $h;
+    }
+    $v['actualizado'] = now_iso();
+    if ($idx === null) $list[] = $v; else $list[$idx] = $v;
+    store_write('ventas', $list);
+    return ['venta' => $v];
+  });
+  if (!$res) json_out(['error' => 'no existe'], 404);
+  json_out($res);
 }
 
 /* ---------- Documentos ---------- */

@@ -18,6 +18,20 @@ const FIELDS = [
   'presupuesto' => 60, 'objetivo' => 80, 'proyecto' => 120, 'valor' => 20,
   'proxima_accion' => 200, 'seguimiento' => 10, 'etiquetas' => 200,
 ];
+// Ventas: datos de la operación y sus hitos, en orden (cada hito guarda la fecha en que se cumplió).
+const SALE_FIELDS = [
+  'lead' => 40, 'proyecto' => 120, 'unidad' => 60, 'promotor' => 80,
+  'precio' => 20, 'comision' => 20, 'inicio' => 10, 'notas' => 2000,
+];
+const HITOS = [
+  'inicio'  => 'EOI / Reserva',
+  'booking' => 'Booking form',
+  'spa'     => 'SPA firmado',
+  'oqood'   => 'Oqood registrado',
+  'factura' => 'Factura enviada',
+  'cobrada' => 'Comisión recibida',
+  'pagado'  => 'Pagado',
+];
 // SHA-256 de la clave de instalación (un solo uso, se entregó por privado).
 const SETUP_KEY_HASH = 'c2005a8bdcd61388aa3f5633b8dc5d987884fa217882d3a17b61987f46fcf27d';
 const GUARD = "<?php http_response_code(404); exit; ?>\n";
