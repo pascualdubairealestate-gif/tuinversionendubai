@@ -262,7 +262,7 @@
 
   function toolbar(withStage) {
     return '<nav class="toolbar"><input class="search" id="q" type="search" placeholder="Buscar nombre, email, teléfono, proyecto…" value="' + esc(S.q) + '" />' +
-      '<select id="f-orden" aria-label="Ordenar"><option value="antiguas"' + (S.orden !== "recientes" ? " selected" : "") + '>Más desactualizados primero</option><option value="recientes"' + (S.orden === "recientes" ? " selected" : "") + ">Nota más reciente primero</option></select>" +
+      '<select id="f-orden" aria-label="Ordenar"><option value="antiguas"' + (S.orden !== "recientes" ? " selected" : "") + '>↑ Ascendente · nota más antigua primero</option><option value="recientes"' + (S.orden === "recientes" ? " selected" : "") + ">↓ Descendente · nota más reciente primero</option></select>" +
       (withStage ? '<select id="f-etapa" aria-label="Etapa"><option value="">Todas las etapas</option>' + Object.keys(S.stages).map(function (k) {
         return '<option value="' + k + '"' + (k === S.etapa ? " selected" : "") + ">" + esc(S.stages[k]) + "</option>";
       }).join("") + "</select>" : "") +
