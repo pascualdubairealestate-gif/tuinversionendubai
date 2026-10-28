@@ -617,6 +617,7 @@
       '<div class="cal-tools"><span class="legend"><i class="lg-g"></i>Google Calendar <i class="lg-c"></i>Seguimientos</span>' +
       '<a class="btn primary sm" href="' + gcalLink("", sel) + '" target="_blank" rel="noopener">+ Evento en Google Calendar</a></div></div>' +
       (!S.ics ? '<div class="connect"><p><b>Conecta tu Google Calendar</b> para ver aquí tus citas y tareas.</p><button class="btn primary sm" data-act="settings">Conectar</button></div>' : "") +
+      (/\/public\//.test(S.ics) ? '<div class="connect"><p><b>Solo ves «Busy» porque has pegado la dirección pública.</b> En Google Calendar → Integrar el calendario, copia la <b>Dirección secreta en formato iCal</b> (contiene «private-») y pégala en Ajustes.</p><button class="btn primary sm" data-act="settings">Cambiar</button></div>' : "") +
       '<div class="cal-wrap"><div class="cal" role="grid">' +
       ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map(function (d) { return '<div class="cal-dow">' + d + "</div>"; }).join("") +
       days.map(function (d) {
