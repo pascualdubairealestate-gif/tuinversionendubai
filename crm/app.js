@@ -262,7 +262,7 @@
 
   function toolbar(withStage) {
     return '<nav class="toolbar"><input class="search" id="q" type="search" placeholder="Buscar nombre, email, teléfono, proyecto…" value="' + esc(S.q) + '" />' +
-      '<select id="f-orden" aria-label="Ordenar"><option value="antiguas"' + (S.orden !== "recientes" ? " selected" : "") + '>↑ Ascendente · nota más antigua primero</option><option value="recientes"' + (S.orden === "recientes" ? " selected" : "") + ">↓ Descendente · nota más reciente primero</option></select>" +
+      '<button type="button" class="btn ghost sort" id="f-orden" data-act="orden" title="Cambiar orden">Fecha de última nota ' + (S.orden === "recientes" ? "↓" : "↑") + "</button>" +
       (withStage ? '<select id="f-etapa" aria-label="Etapa"><option value="">Todas las etapas</option>' + Object.keys(S.stages).map(function (k) {
         return '<option value="' + k + '"' + (k === S.etapa ? " selected" : "") + ">" + esc(S.stages[k]) + "</option>";
       }).join("") + "</select>" : "") +
@@ -691,6 +691,12 @@
         try { localStorage.setItem("crm-plegadas", JSON.stringify(S.plegadas)); } catch (err) {}
         renderBoard();
       }
+      if (a === "orden") {
+        S.orden = S.orden === "recientes" ? "antiguas" : "recientes";
+        try { localStorage.setItem("crm-orden", S.orden); } catch (err) {}
+        act.textContent = "Fecha de última nota " + (S.orden === "recientes" ? "↓" : "↑");
+        refreshResults();
+      }
       if (a === "vista") {
         S.vista = act.getAttribute("data-v");
         try { localStorage.setItem("crm-vista", S.vista); } catch (err) {}
@@ -800,11 +806,6 @@
 
   document.addEventListener("change", function (e) {
     var t = e.target;
-    if (t.id === "f-orden") {
-      S.orden = t.value;
-      try { localStorage.setItem("crm-orden", S.orden); } catch (err) {}
-      refreshResults();
-    }
     if (t.id === "f-etapa") { S.etapa = t.value; refreshResults(); }
     if (t.id === "f-hoy") { S.hoy = t.checked; refreshResults(); }
     if (t.id === "m-bol") { S.mail.boletin = t.checked; renderMail(); }
