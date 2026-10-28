@@ -6,7 +6,7 @@
   var TZ = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "UTC";
   var S = {
     leads: [], stages: {}, csrf: "", notify: "", ics: "",
-    page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(),
+    page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(), plegadas: savedFolds(),
     open: null, dirty: false,
     cal: {}, calErr: "", month: null, day: null,
     tpls: null, docs: null, mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false }
@@ -255,6 +255,9 @@
       '<label class="chk"><input type="checkbox" id="f-hoy"' + (S.hoy ? " checked" : "") + " /> Seguimientos pendientes</label></nav>";
   }
 
+  function savedFolds() {
+    try { return JSON.parse(localStorage.getItem("crm-plegadas") || "{}") || {}; } catch (e) { return {}; }
+  }
   function savedView() {
     try { return localStorage.getItem("crm-vista") === "columnas" ? "columnas" : "lista"; } catch (e) { return "lista"; }
   }
@@ -305,11 +308,15 @@
   }
 
   function renderBoard() {
-    var list = filtered();
-    $("#results").innerHTML = '<div class="board">' + Object.keys(S.stages).map(function (k) {
+    var list = filtered(), keys = Object.keys(S.stages);
+    var tpl = function (w) { return keys.map(function (k) { return S.plegadas[k] ? "52px" : w; }).join(" "); };
+    $("#results").innerHTML = '<div class="board" style="--cols:' + tpl("minmax(180px, 1fr)") + ";--cols-m:" + tpl("84%") + '">' + keys.map(function (k) {
       var items = list.filter(function (l) { return l.etapa === k; });
       var sum = items.reduce(function (s, l) { return s + num(l.valor); }, 0);
-      return '<section class="col" data-stage="' + k + '"><header><div><h2><i class="dot s-' + k + '"></i>' + esc(S.stages[k]) + "</h2><small>" + STAGE_HINT[k] + "</small></div>" +
+      var fold = '<button type="button" class="fold" data-act="fold" data-stage="' + k + '" aria-expanded="' + !S.plegadas[k] + '" aria-label="' + (S.plegadas[k] ? "Desplegar " : "Ocultar ") + esc(S.stages[k]) + '">' +
+        '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>';
+      if (S.plegadas[k]) return '<section class="col folded" data-stage="' + k + '">' + fold + '<span class="count">' + items.length + '</span><h2><i class="dot s-' + k + '"></i>' + esc(S.stages[k]) + "</h2></section>";
+      return '<section class="col" data-stage="' + k + '"><header><div><h2>' + fold + '<i class="dot s-' + k + '"></i>' + esc(S.stages[k]) + "</h2><small>" + STAGE_HINT[k] + "</small></div>" +
         '<span class="count">' + items.length + "</span></header>" + (sum ? '<p class="sum">' + money(sum) + "</p>" : "") +
         '<div class="cards">' + (items.map(card).join("") || '<p class="empty">Arrastra aquí</p>') + "</div></section>";
     }).join("") + "</div>";
@@ -660,6 +667,12 @@
     if (act) {
       var a = act.getAttribute("data-act");
       if (a === "new") openLead(null);
+      if (a === "fold") {
+        var st = act.getAttribute("data-stage");
+        if (S.plegadas[st]) delete S.plegadas[st]; else S.plegadas[st] = 1;
+        try { localStorage.setItem("crm-plegadas", JSON.stringify(S.plegadas)); } catch (err) {}
+        renderBoard();
+      }
       if (a === "vista") {
         S.vista = act.getAttribute("data-v");
         try { localStorage.setItem("crm-vista", S.vista); } catch (err) {}
