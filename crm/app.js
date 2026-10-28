@@ -6,7 +6,7 @@
   var TZ = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "UTC";
   var S = {
     leads: [], stages: {}, csrf: "", notify: "", ics: "",
-    page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(), orden: savedSort(), plegadas: savedFolds(),
+    page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(), orden: savedSort().por, dir: savedSort().dir, plegadas: savedFolds(),
     open: null, dirty: false,
     cal: {}, calErr: "", month: null, day: null,
     tpls: null, docs: null, mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false }
@@ -255,14 +255,17 @@
       if (!q) return true;
       return [l.nombre, l.email, l.telefono, l.proyecto, l.etiquetas, l.pais, l.origen].join(" ").toLowerCase().indexOf(q) > -1;
     }).sort(function (a, b) {
-      var x = lastNote(a), y = lastNote(b);
-      return S.orden === "recientes" ? y.localeCompare(x) : x.localeCompare(y);
+      var x = sortKey(a), y = sortKey(b);
+      if (S.orden === "seguimiento" && (!x || !y)) return x ? -1 : y ? 1 : 0; // sin fecha, siempre al final
+      return (S.dir === "desc" ? -1 : 1) * x.localeCompare(y, "es");
     });
   }
 
   function toolbar(withStage) {
     return '<nav class="toolbar"><input class="search" id="q" type="search" placeholder="Buscar nombre, email, teléfono, proyecto…" value="' + esc(S.q) + '" />' +
-      '<button type="button" class="btn ghost sort" id="f-orden" data-act="orden" title="Cambiar orden">Fecha de última nota ' + (S.orden === "recientes" ? "↓" : "↑") + "</button>" +
+      '<label class="sort-by"><span>Ordenar por:</span><select id="f-orden">' + Object.keys(ORDENES).map(function (k) {
+        return '<option value="' + k + '"' + (k === S.orden ? " selected" : "") + ">" + ORDENES[k] + "</option>";
+      }).join("") + '</select></label><button type="button" class="btn ghost icon" id="f-dir" data-act="dir" aria-label="' + (S.dir === "desc" ? "Descendente" : "Ascendente") + '" title="' + (S.dir === "desc" ? "Descendente" : "Ascendente") + '">' + (S.dir === "desc" ? "↓" : "↑") + "</button>" +
       (withStage ? '<select id="f-etapa" aria-label="Etapa"><option value="">Todas las etapas</option>' + Object.keys(S.stages).map(function (k) {
         return '<option value="' + k + '"' + (k === S.etapa ? " selected" : "") + ">" + esc(S.stages[k]) + "</option>";
       }).join("") + "</select>" : "") +
@@ -272,8 +275,20 @@
   function savedFolds() {
     try { return JSON.parse(localStorage.getItem("crm-plegadas") || "{}") || {}; } catch (e) { return {}; }
   }
+  var ORDENES = { actividad: "Última actividad", nombre: "Nombre", alta: "Fecha de alta", seguimiento: "Fecha de seguimiento" };
+  function sortKey(l) {
+    if (S.orden === "nombre") return (l.nombre || l.email || "").toLowerCase();
+    if (S.orden === "alta") return l.creado || "";
+    if (S.orden === "seguimiento") return l.seguimiento || "";
+    return lastNote(l);
+  }
   function savedSort() {
-    try { return localStorage.getItem("crm-orden") === "recientes" ? "recientes" : "antiguas"; } catch (e) { return "antiguas"; }
+    var o = {};
+    try { o = JSON.parse(localStorage.getItem("crm-orden2") || "{}") || {}; } catch (e) {}
+    return { por: ["actividad", "nombre", "alta", "seguimiento"].indexOf(o.por) > -1 ? o.por : "actividad", dir: o.dir === "desc" ? "desc" : "asc" };
+  }
+  function storeSort() {
+    try { localStorage.setItem("crm-orden2", JSON.stringify({ por: S.orden, dir: S.dir })); } catch (e) {}
   }
   function savedView() {
     try { return localStorage.getItem("crm-vista") === "columnas" ? "columnas" : "lista"; } catch (e) { return "lista"; }
@@ -293,10 +308,10 @@
 
   function contactsTable(list) {
     if (!list.length) return '<p class="empty big">' + (S.leads.length ? "No hay contactos con estos filtros." : "Aún no hay contactos. Añade el primero con «+ Nuevo contacto».") + "</p>";
-    return '<div class="table-wrap"><table class="contacts"><thead><tr><th>Nombre</th><th>Etapa</th><th>Última nota</th><th>Teléfono</th><th>Proyecto</th><th>Seguimiento</th><th>Alta</th></tr></thead><tbody>' +
+    return '<div class="table-wrap"><table class="contacts"><thead><tr><th>Nombre</th><th>Etapa</th><th>Última actividad</th><th>Teléfono</th><th>Proyecto</th><th>Seguimiento</th><th>Alta</th></tr></thead><tbody>' +
       list.map(function (l) {
         return '<tr data-id="' + esc(l.id) + '" tabindex="0"><td class="c-name"><span class="avatar">' + esc(initials(l)) + "</span><span><b>" + esc(up(l.nombre) || "Sin nombre") + (l.nuevo ? ' <span class="pill new">Nuevo</span>' : "") + "</b><small>" + esc(l.email) + "</small></span></td>" +
-          '<td><span class="stage s-' + esc(l.etapa) + '">' + esc(S.stages[l.etapa] || l.etapa) + '</span></td><td data-l="Última nota"><span class="pill age ' + noteAge(l).cls + '">' + noteAge(l).txt.replace("Nota ", "") + '</span></td><td data-l="Teléfono">' + esc(l.telefono) + '</td><td data-l="Proyecto">' + esc(l.proyecto) + "</td>" +
+          '<td><span class="stage s-' + esc(l.etapa) + '">' + esc(S.stages[l.etapa] || l.etapa) + '</span></td><td data-l="Última actividad"><span class="pill age ' + noteAge(l).cls + '">' + noteAge(l).txt.replace("Nota ", "") + '</span></td><td data-l="Teléfono">' + esc(l.telefono) + '</td><td data-l="Proyecto">' + esc(l.proyecto) + "</td>" +
           '<td data-l="Seguimiento" class="' + (overdue(l) ? "late" : "") + '">' + fmtDate(l.seguimiento) + '</td><td data-l="Alta">' + fmtDate(l.creado) + "</td></tr>";
       }).join("") + "</tbody></table></div>";
   }
@@ -691,10 +706,12 @@
         try { localStorage.setItem("crm-plegadas", JSON.stringify(S.plegadas)); } catch (err) {}
         renderBoard();
       }
-      if (a === "orden") {
-        S.orden = S.orden === "recientes" ? "antiguas" : "recientes";
-        try { localStorage.setItem("crm-orden", S.orden); } catch (err) {}
-        act.textContent = "Fecha de última nota " + (S.orden === "recientes" ? "↓" : "↑");
+      if (a === "dir") {
+        S.dir = S.dir === "desc" ? "asc" : "desc";
+        storeSort();
+        var lbl = S.dir === "desc" ? "Descendente" : "Ascendente";
+        act.textContent = S.dir === "desc" ? "↓" : "↑";
+        act.setAttribute("aria-label", lbl); act.title = lbl;
         refreshResults();
       }
       if (a === "vista") {
@@ -806,6 +823,7 @@
 
   document.addEventListener("change", function (e) {
     var t = e.target;
+    if (t.id === "f-orden") { S.orden = t.value; storeSort(); refreshResults(); }
     if (t.id === "f-etapa") { S.etapa = t.value; refreshResults(); }
     if (t.id === "f-hoy") { S.hoy = t.checked; refreshResults(); }
     if (t.id === "m-bol") { S.mail.boletin = t.checked; renderMail(); }

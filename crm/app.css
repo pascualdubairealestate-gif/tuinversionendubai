@@ -149,6 +149,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--amber); box-shad
 .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
 .toolbar .search { flex: 1 1 260px; }
 .toolbar select { width: auto; flex: 0 1 200px; }
+.sort-by { display: flex; align-items: center; gap: 8px; flex: 0 1 270px; }
+.sort-by span { font-size: 13px; font-weight: 700; color: var(--mute); white-space: nowrap; }
+.sort-by select { flex: 1 1 auto; min-width: 0; }
+#f-dir { width: 42px; height: 42px; padding: 0; font-size: 17px; }
 .view-toggle { display: inline-flex; gap: 4px; padding: 4px; margin-bottom: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 99px; }
 .view-toggle button { border: 0; background: none; border-radius: 99px; padding: 7px 16px; font-weight: 700; font-size: 13px; color: var(--mute); cursor: pointer; }
 .view-toggle button[aria-pressed="true"] { background: var(--ink); color: #fff; }
