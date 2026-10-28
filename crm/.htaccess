@@ -1,0 +1,15 @@
+# CRM privado: no indexar, nada en caché, solo los ficheros necesarios
+DirectoryIndex index.php
+Options -Indexes
+<IfModule mod_headers.c>
+  Header set X-Robots-Tag "noindex, nofollow"
+  Header set Cache-Control "no-store"
+</IfModule>
+<FilesMatch "^(lib\.php|.*\.md)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Deny from all
+  </IfModule>
+</FilesMatch>

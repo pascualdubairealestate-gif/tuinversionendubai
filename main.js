@@ -15,9 +15,9 @@ window.__PV__ = {
 
   // URL del webhook / endpoint de tu CRM. Vacío = los leads se guardan solo en el navegador (pruebas).
   // Recibe un POST con JSON: { formulario, email, nombre, telefono, ..., pagina, utm_*, fecha }
-  crmEndpoint: "",
+  crmEndpoint: "/crm/api.php?action=lead",
   // "cors" para CRMs que aceptan JSON con CORS; "no-cors" para webhooks tipo Zapier/Make/n8n.
-  crmMode: "no-cors",
+  crmMode: "cors",
 
   // Enlace directo al PDF de la guía (se abre tras dejar el correo). Vacío = solo mensaje de confirmación.
   guideUrl: "",
