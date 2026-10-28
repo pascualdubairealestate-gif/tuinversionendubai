@@ -6,7 +6,7 @@
   var TZ = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "UTC";
   var S = {
     leads: [], stages: {}, csrf: "", notify: "", ics: "",
-    page: "inicio", q: "", origen: "", etapa: "", hoy: false,
+    page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(),
     open: null, dirty: false,
     cal: {}, calErr: "", month: null, day: null,
     tpls: null, docs: null, mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false }
@@ -255,9 +255,20 @@
       '<label class="chk"><input type="checkbox" id="f-hoy"' + (S.hoy ? " checked" : "") + " /> Seguimientos pendientes</label></nav>";
   }
 
+  function savedView() {
+    try { return localStorage.getItem("crm-vista") === "columnas" ? "columnas" : "lista"; } catch (e) { return "lista"; }
+  }
+  function viewToggle() {
+    return '<div class="view-toggle" role="group" aria-label="Forma de ver">' + [["lista", "Lista"], ["columnas", "Columnas"]].map(function (v) {
+      return '<button type="button" data-act="vista" data-v="' + v[0] + '" aria-pressed="' + (S.vista === v[0]) + '">' + v[1] + "</button>";
+    }).join("") + "</div>";
+  }
+
   function renderContacts() {
-    var list = filtered();
-    $("#main").innerHTML = toolbar(true) + '<div id="results">' + contactsTable(list) + "</div>";
+    var cols = S.vista === "columnas";
+    if (cols) S.etapa = "";
+    $("#main").innerHTML = viewToggle() + toolbar(!cols) + '<div id="results"></div>';
+    refreshResults();
   }
 
   function contactsTable(list) {
@@ -282,8 +293,8 @@
     if (l.seguimiento) foot = '<span class="due' + (overdue(l) ? " late" : "") + '">' + ICON.cal + " " + fmtDate(l.seguimiento) + (l.proxima_accion ? " · " + esc(l.proxima_accion) : "") + "</span>";
     else if (l.proxima_accion) foot = '<span class="due">' + esc(l.proxima_accion) + "</span>";
     return '<article class="card" draggable="true" data-id="' + esc(l.id) + '" tabindex="0">' +
-      '<div class="card-top"><span class="avatar">' + esc(initials(l)) + '</span><div class="who"><b>' + esc(l.nombre || "Sin nombre") + "</b><small>" + esc(l.email || l.telefono || "") + "</small></div>" +
-      (num(l.valor) ? '<span class="val">' + money(num(l.valor)) + "</span>" : "") + "</div>" +
+      '<div class="card-top"><span class="avatar">' + esc(initials(l)) + '</span><div class="who"><b>' + esc(l.nombre || "Sin nombre") + "</b><small>" + esc(l.email || l.telefono || "") + "</small></div></div>" +
+      (num(l.valor) ? '<span class="val">' + money(num(l.valor)) + "</span>" : "") +
       (meta.length ? '<p class="meta">' + meta.join(" · ") + "</p>" : "") +
       '<div class="tags">' + tags.join("") + "</div>" + foot + "</article>";
   }
@@ -305,7 +316,8 @@
   }
 
   function refreshResults() {
-    if (S.page === "contactos") $("#results").innerHTML = contactsTable(filtered());
+    if (S.page === "contactos" && S.vista !== "columnas") $("#results").innerHTML = contactsTable(filtered());
+    else if (S.page === "contactos") renderBoard();
     else if (S.page === "ventas") renderBoard();
   }
 
@@ -648,6 +660,11 @@
     if (act) {
       var a = act.getAttribute("data-act");
       if (a === "new") openLead(null);
+      if (a === "vista") {
+        S.vista = act.getAttribute("data-v");
+        try { localStorage.setItem("crm-vista", S.vista); } catch (err) {}
+        renderContacts();
+      }
       if (a === "settings") openSettings();
       if (a === "delete" && S.open && confirm("¿Eliminar este contacto y todo su historial? No se puede deshacer.")) {
         var id = S.open;
