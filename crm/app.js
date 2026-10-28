@@ -20,7 +20,7 @@
     nurturing: "Aún no: seguir en contacto"
   };
   var ORIGENES = ["Web · Guía", "Web · Boletín", "Web · Consultoría", "Web · Dossier", "Instagram", "WhatsApp", "YouTube", "Meta", "Referido", "Evento", "Llamada", "Manual", "Otro"];
-  var PRESUPUESTOS = ["Menos de 250.000 €", "250.000 – 500.000 €", "500.000 – 1.000.000 €", "Más de 1.000.000 €"];
+  var PRESUPUESTOS = ["Por definir", "Menos de 250.000 €", "250.000 – 500.000 €", "500.000 – 1.000.000 €", "Más de 1.000.000 €"];
   var OBJETIVOS = ["Rentabilidad por alquiler", "Revalorización / reventa", "Golden Visa / residencia", "Segunda vivienda", "Crear empresa en Dubái"];
   var DOC_EXT = "pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png,webp,heic,txt,csv,zip,mp4,mov";
 
@@ -784,7 +784,7 @@
       '<div class="grid">' +
       field("nombre", "Nombre", l.nombre) + field("email", "Email", l.email, "email") +
       field("telefono", "Teléfono / WhatsApp", l.telefono, "tel") + field("pais", "País", l.pais) +
-      select("origen", "Origen", l.origen || "Manual", ORIGENES) + field("presupuesto", "Presupuesto", l.presupuesto, "text", true) +
+      select("origen", "Origen", l.origen || "Manual", ORIGENES) + select("presupuesto", "Presupuesto", l.presupuesto || "Por definir", PRESUPUESTOS) +
       field("objetivo", "Objetivo", l.objetivo, "text", true) + field("proyecto", "Proyecto de interés", l.proyecto) +
       field("valor", "Valor operación (€)", l.valor, "text") + field("etiquetas", "Etiquetas", l.etiquetas) +
       field("proxima_accion", "Próxima acción", l.proxima_accion) + field("seguimiento", "Fecha de seguimiento", l.seguimiento, "date") +
@@ -796,7 +796,7 @@
       (l.id ? leadSalesHtml(l.id) : "") +
       (l.id ? '<div class="lead-docs"><header class="panel-h"><h3>Documentos</h3><label class="btn ghost sm">+ Subir<input type="file" id="lead-file" multiple hidden /></label></header><ul class="doc-list" id="lead-doc-list"><li class="muted small">Cargando…</li></ul></div>' : "") +
       (acts ? '<h3>Actividad</h3><ol class="timeline">' + acts + "</ol>" : "") + utm +
-      datalist("presupuesto", PRESUPUESTOS) + datalist("objetivo", OBJETIVOS) +
+      datalist("objetivo", OBJETIVOS) +
       "</form>";
     showDrawer();
     if (!l.id) setTimeout(function () { $("#lead-form [name=nombre]").focus(); }, 60);
