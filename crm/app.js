@@ -69,7 +69,8 @@
   }
   function overdue(l) { return !!l.seguimiento && l.seguimiento <= today() && l.etapa !== "customer"; }
   function leadById(id) { return S.leads.filter(function (x) { return x.id === id; })[0]; }
-  function leadName(id) { var l = leadById(id); return l ? (l.nombre || l.email || "Sin nombre") : ""; }
+  function up(t) { return String(t || "").toLocaleUpperCase("es"); }
+  function leadName(id) { var l = leadById(id); return l ? (up(l.nombre) || l.email || "Sin nombre") : ""; }
   function eventDay(e) { return e.todoElDia ? e.inicio : ymd(new Date(e.inicio)); }
   function gcalLink(title, day, details) {
     var d = (day || today()).replace(/-/g, "");
@@ -191,7 +192,7 @@
       (due.length ? '<h4 class="sub">Seguimientos de contactos</h4><ul class="task-list">' + due.map(function (l) {
         return '<li class="task crm' + (l.seguimiento < from ? " late" : "") + '" data-id="' + esc(l.id) + '" tabindex="0"><span class="t-when">' +
           (l.seguimiento < from ? "Atrasado · " + fmtDate(l.seguimiento) : "Hoy") + '</span><span class="t-what">' + ICON.user + " " +
-          esc(l.nombre || l.email) + (l.proxima_accion ? " — " + esc(l.proxima_accion) : "") + "</span></li>";
+          esc(up(l.nombre) || l.email) + (l.proxima_accion ? " — " + esc(l.proxima_accion) : "") + "</span></li>";
       }).join("") + "</ul>" : "") +
       "</section>" +
       '<div class="home-side">' + statsHtml() +
@@ -201,7 +202,7 @@
       }).join("") + "</div></section>" +
       '<section class="panel"><header class="panel-h"><h3>Últimos contactos</h3><a href="#contactos" class="link">Ver todos →</a></header>' +
       (recent.length ? '<ul class="mini-list">' + recent.map(function (l) {
-        return '<li data-id="' + esc(l.id) + '" tabindex="0"><span class="avatar">' + esc(initials(l)) + '</span><span class="who"><b>' + esc(l.nombre || "Sin nombre") +
+        return '<li data-id="' + esc(l.id) + '" tabindex="0"><span class="avatar">' + esc(initials(l)) + '</span><span class="who"><b>' + esc(up(l.nombre) || "Sin nombre") +
           (l.nuevo ? ' <span class="pill new">Nuevo</span>' : "") + "</b><small>" + esc(l.origen || "") + " · " + fmtDate(l.creado) + '</small></span><span class="stage s-' + esc(l.etapa) + '">' + esc(S.stages[l.etapa] || "") + "</span></li>";
       }).join("") + "</ul>" : '<p class="muted">Aún no hay contactos. Los formularios de la web aparecerán aquí solos.</p>') +
       "</section></div></div>";
@@ -278,7 +279,7 @@
     if (!list.length) return '<p class="empty big">' + (S.leads.length ? "No hay contactos con estos filtros." : "Aún no hay contactos. Añade el primero con «+ Nuevo contacto».") + "</p>";
     return '<div class="table-wrap"><table class="contacts"><thead><tr><th>Nombre</th><th>Etapa</th><th>Origen</th><th>Teléfono</th><th>Proyecto</th><th>Seguimiento</th><th>Alta</th></tr></thead><tbody>' +
       list.map(function (l) {
-        return '<tr data-id="' + esc(l.id) + '" tabindex="0"><td class="c-name"><span class="avatar">' + esc(initials(l)) + "</span><span><b>" + esc(l.nombre || "Sin nombre") + (l.nuevo ? ' <span class="pill new">Nuevo</span>' : "") + "</b><small>" + esc(l.email) + "</small></span></td>" +
+        return '<tr data-id="' + esc(l.id) + '" tabindex="0"><td class="c-name"><span class="avatar">' + esc(initials(l)) + "</span><span><b>" + esc(up(l.nombre) || "Sin nombre") + (l.nuevo ? ' <span class="pill new">Nuevo</span>' : "") + "</b><small>" + esc(l.email) + "</small></span></td>" +
           '<td><span class="stage s-' + esc(l.etapa) + '">' + esc(S.stages[l.etapa] || l.etapa) + '</span></td><td data-l="Origen">' + esc(l.origen) + '</td><td data-l="Teléfono">' + esc(l.telefono) + '</td><td data-l="Proyecto">' + esc(l.proyecto) + "</td>" +
           '<td data-l="Seguimiento" class="' + (overdue(l) ? "late" : "") + '">' + fmtDate(l.seguimiento) + '</td><td data-l="Alta">' + fmtDate(l.creado) + "</td></tr>";
       }).join("") + "</tbody></table></div>";
@@ -296,7 +297,7 @@
     if (l.seguimiento) foot = '<span class="due' + (overdue(l) ? " late" : "") + '">' + ICON.cal + " " + fmtDate(l.seguimiento) + (l.proxima_accion ? " · " + esc(l.proxima_accion) : "") + "</span>";
     else if (l.proxima_accion) foot = '<span class="due">' + esc(l.proxima_accion) + "</span>";
     return '<article class="card" draggable="true" data-id="' + esc(l.id) + '" tabindex="0">' +
-      '<div class="card-top"><span class="avatar">' + esc(initials(l)) + '</span><div class="who"><b>' + esc(l.nombre || "Sin nombre") + "</b><small>" + esc(l.email || l.telefono || "") + "</small></div></div>" +
+      '<div class="card-top"><span class="avatar">' + esc(initials(l)) + '</span><div class="who"><b>' + esc(up(l.nombre) || "Sin nombre") + "</b><small>" + esc(l.email || l.telefono || "") + "</small></div></div>" +
       (num(l.valor) ? '<span class="val">' + money(num(l.valor)) + "</span>" : "") +
       (meta.length ? '<p class="meta">' + meta.join(" · ") + "</p>" : "") +
       '<div class="tags">' + tags.join("") + "</div>" + foot + "</article>";
@@ -437,7 +438,7 @@
       $$("[data-evs]").forEach(function (box) {
         var k = box.getAttribute("data-evs");
         var items = (by[k] || []).map(function (e) { return '<i class="ev g">' + (e.todoElDia ? "" : fmtTime(e.inicio) + " ") + esc(e.titulo) + "</i>"; })
-          .concat((follow[k] || []).map(function (l) { return '<i class="ev c">' + esc(l.nombre || l.email) + "</i>"; }));
+          .concat((follow[k] || []).map(function (l) { return '<i class="ev c">' + esc(up(l.nombre) || l.email) + "</i>"; }));
         box.innerHTML = items.slice(0, 3).join("") + (items.length > 3 ? '<i class="ev more">+' + (items.length - 3) + "</i>" : "");
       });
       renderAgenda(sel, by[sel] || [], follow[sel] || []);
@@ -451,7 +452,7 @@
     if (!box) return;
     box.innerHTML = '<header class="panel-h"><h3>' + esc(dayLabel(day)) + '</h3><a class="btn ghost sm" href="' + gcalLink("", day) + '" target="_blank" rel="noopener">+ Añadir</a></header>' +
       (evs.length || follow.length ? '<ul class="task-list">' + evs.map(eventLi).join("") + follow.map(function (l) {
-        return '<li class="task crm" data-id="' + esc(l.id) + '" tabindex="0"><span class="t-when">Seguimiento</span><span class="t-what">' + ICON.user + " " + esc(l.nombre || l.email) + (l.proxima_accion ? " — " + esc(l.proxima_accion) : "") + "</span></li>";
+        return '<li class="task crm" data-id="' + esc(l.id) + '" tabindex="0"><span class="t-when">Seguimiento</span><span class="t-what">' + ICON.user + " " + esc(up(l.nombre) || l.email) + (l.proxima_accion ? " — " + esc(l.proxima_accion) : "") + "</span></li>";
       }).join("") + "</ul>" : '<p class="muted">Nada programado este día.</p>');
   }
 
@@ -462,7 +463,7 @@
 
   function leadOptions(selected) {
     return '<option value="">Sin contacto</option>' + S.leads.slice().sort(function (a, b) { return (a.nombre || a.email).localeCompare(b.nombre || b.email); }).map(function (l) {
-      return '<option value="' + esc(l.id) + '"' + (l.id === selected ? " selected" : "") + ">" + esc(l.nombre || l.email) + "</option>";
+      return '<option value="' + esc(l.id) + '"' + (l.id === selected ? " selected" : "") + ">" + esc(up(l.nombre) || l.email) + "</option>";
     }).join("");
   }
 
@@ -546,7 +547,7 @@
 
     $(".drawer-panel").innerHTML =
       '<form id="lead-form" autocomplete="off">' +
-      '<header class="d-head"><div><h2 id="d-title">' + esc(l.nombre || (l.id ? "Sin nombre" : "Nuevo contacto")) + "</h2>" +
+      '<header class="d-head"><div><h2 id="d-title">' + esc(up(l.nombre) || (l.id ? "Sin nombre" : "Nuevo contacto")) + "</h2>" +
       (l.id ? '<p class="muted small">' + esc(l.origen || "") + " · alta " + fmtDate(l.creado) + "</p>" : "") + "</div>" +
       '<button type="button" class="btn icon" data-close aria-label="Cerrar">✕</button></header>' +
       (quick ? '<div class="quick">' + quick + "</div>" : "") +
