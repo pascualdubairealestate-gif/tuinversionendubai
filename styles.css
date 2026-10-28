@@ -702,8 +702,8 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
   .badge-pulse, .wa-float::before, .video-play::before { animation: none; }
 }
 
-/* ===== Tema claro: fondo arena (elegido por el cliente) ===== */
-:root { --sand-bg: #d9c7a7; --sand-bg-2: #cfbb98; }
+/* ===== Tema claro: fondo blanco (elegido por el cliente) ===== */
+:root { --sand-bg: #ffffff; --sand-bg-2: #f6f1e8; }
 body, .splash { background: var(--sand-bg); }
 .nav, .hero, .about, .projects, .newsletter, .marquee, .footer, .section-deep, .faq, .emirates {
   --ivory: #0b1424; --mute: #4a5262; --line: rgba(11, 20, 36, .16); --sand: #1b2c4b;
@@ -732,10 +732,10 @@ body, .splash { background: var(--sand-bg); }
 }
 .nav-links a { color: rgba(11, 20, 36, .8); }
 .nav-links a:hover { color: #0b1424; }
-.nav.is-scrolled { background: rgba(217, 199, 167, .95); }
-.problem-item { background: rgba(255, 255, 255, .28); }
+.nav.is-scrolled { background: rgba(255, 255, 255, .94); }
+.problem-item { background: #faf7f1; }
 .problem-item:hover { border-color: rgba(11, 20, 36, .35); }
-.inline-form input { background: rgba(255, 255, 255, .35); }
+.inline-form input { background: #f6f1e8; }
 .inline-form input:focus { background: rgba(255, 255, 255, .55); }
 .hero-sign strong, .hero-lead strong { color: #0b1424; }
 @media (max-width: 960px) { .nav-links { background: var(--sand-bg); } }
