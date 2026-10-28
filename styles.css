@@ -414,8 +414,8 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 .video-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; transition: transform 1s var(--ease-out); }
 .video:hover .video-thumb img { transform: scale(1.05); }
 .video.has-yt-thumb .video-thumb img, .video-yt .video-thumb img { object-position: center; }
-.video-yt .video-meta b { color: var(--amber); }
-.video-yt::after { background: linear-gradient(to top, rgba(7, 13, 24, .88), rgba(7, 13, 24, 0) 42%); }
+.video-yt .video-meta b { color: #fff; }
+.video-yt::after { background: linear-gradient(to top, rgba(4, 8, 15, .92) 0%, rgba(4, 8, 15, .6) 30%, rgba(4, 8, 15, 0) 55%); }
 .video.has-yt-thumb::after { background: linear-gradient(to top, rgba(7, 13, 24, .85), rgba(7, 13, 24, 0) 45%); }
 .video::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(7, 13, 24, .92), rgba(7, 13, 24, .1) 60%); z-index: 0; }
 .video-play {
@@ -432,8 +432,8 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 @keyframes ring { from { transform: scale(.85); opacity: 1; } to { transform: scale(1.35); opacity: 0; } }
 .video-meta { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 24px; display: flex; flex-direction: column; gap: 6px; }
 .video-meta small { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--amber); }
-.video-meta b { font-family: var(--f-display); font-size: clamp(22px, 2vw, 28px); font-weight: 500; line-height: 1.1; }
-.video-main .video-meta b { font-size: clamp(28px, 3vw, 40px); max-width: none; }
+.video-meta b { font-family: var(--f-body); font-size: clamp(17px, 1.5vw, 21px); font-weight: 800; line-height: 1.2; color: #fff; text-shadow: 0 2px 12px rgba(0, 0, 0, .6); letter-spacing: -.005em; }
+.video-main .video-meta b { font-size: clamp(22px, 2.4vw, 32px); max-width: none; }
 @media (min-width: 761px) { .video-main .video-meta b { white-space: nowrap; } }
 .videos-cta { margin-top: 36px; }
 .videos-cta .link-arrow { color: var(--sand); }
