@@ -351,3 +351,55 @@ function ics_events($raw, $fromTs, $toTs, DateTimeZone $local) {
   usort($out, function ($a, $b) { return strcmp($a['inicio'], $b['inicio']); });
   return $out;
 }
+
+/* ---------- Envío de correo por SMTP (Gmail con contraseña de aplicación) ---------- */
+function smtp_header($s) { return '=?UTF-8?B?' . base64_encode($s) . '?='; }
+
+// Envía un correo HTML + texto. Devuelve '' si salió bien o el motivo del fallo.
+function smtp_send(array $cfg, $to, $subject, $html, $text) {
+  $user = $cfg['smtp_user'] ?? ''; $pass = $cfg['smtp_pass'] ?? '';
+  if (!$user || !$pass) return 'Configura tu Gmail en Ajustes';
+  $host = $cfg['smtp_host'] ?? 'smtp.gmail.com'; $port = (int) ($cfg['smtp_port'] ?? 465);
+  $ctx = stream_context_create(['ssl' => ['verify_peer' => true, 'verify_peer_name' => true]]);
+  $fp = @stream_socket_client("ssl://$host:$port", $errno, $errstr, 15, STREAM_CLIENT_CONNECT, $ctx);
+  if (!$fp) return "No se pudo conectar con $host ($errstr)";
+  stream_set_timeout($fp, 20);
+  $read = function () use ($fp) {
+    $all = '';
+    while (($line = fgets($fp, 1024)) !== false) { $all .= $line; if (strlen($line) < 4 || $line[3] === ' ') break; }
+    return $all;
+  };
+  $cmd = function ($c, $ok) use ($fp, $read) {
+    if ($c !== null) fwrite($fp, $c . "\r\n");
+    $r = $read();
+    if ((int) substr($r, 0, 3) !== $ok) throw new RuntimeException(trim($r) ?: 'sin respuesta');
+    return $r;
+  };
+  try {
+    $cmd(null, 220);
+    $cmd('EHLO ' . ($_SERVER['HTTP_HOST'] ?? 'localhost'), 250);
+    $cmd('AUTH LOGIN', 334);
+    $cmd(base64_encode($user), 334);
+    try { $cmd(base64_encode($pass), 235); }
+    catch (RuntimeException $e) { throw new RuntimeException('Gmail no acepta el usuario o la contraseña de aplicación'); }
+    $cmd("MAIL FROM:<$user>", 250);
+    $cmd("RCPT TO:<$to>", 250);
+    $cmd('DATA', 354);
+    $b = 'b' . bin2hex(random_bytes(8));
+    $name = $cfg['smtp_name'] ?? '';
+    $msg = 'From: ' . ($name ? smtp_header($name) . " <$user>" : $user) . "\r\n" .
+      "To: <$to>\r\nSubject: " . smtp_header($subject) . "\r\nDate: " . date('r') . "\r\n" .
+      'Message-ID: <' . bin2hex(random_bytes(12)) . '@' . substr(strrchr($user, '@'), 1) . ">\r\n" .
+      "MIME-Version: 1.0\r\nContent-Type: multipart/alternative; boundary=\"$b\"\r\n\r\n" .
+      "--$b\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($text)) .
+      "--$b\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($html)) .
+      "--$b--\r\n";
+    $cmd($msg . "\r\n.", 250);
+    @fwrite($fp, "QUIT\r\n");
+    fclose($fp);
+    return '';
+  } catch (RuntimeException $e) {
+    @fclose($fp);
+    return $e->getMessage();
+  }
+}

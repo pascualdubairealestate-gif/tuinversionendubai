@@ -415,3 +415,6 @@ tbody tr:last-child td { border-bottom: 0; }
 .pick-list .chk { width: 100%; }
 .pick-list b, .pick-list small { display: block; }
 .pick-list small { color: var(--mute); font-size: 12px; }
+.link-btn { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: var(--amber-ink); cursor: pointer; text-decoration: underline; }
+.m-send { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.m-batch header .quick { display: flex; gap: 6px; flex-wrap: wrap; }

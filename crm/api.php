@@ -90,7 +90,7 @@ if ($action === 'lead') {
 if ($action === 'state') {
   require_auth(false);
   $cfg = config();
-  json_out(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'csrf' => csrf()]);
+  json_out(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'smtp' => $cfg['smtp_user'] ?? '', 'smtp_name' => $cfg['smtp_name'] ?? '', 'csrf' => csrf()]);
 }
 
 if ($action === 'save' && $method === 'POST') {
@@ -156,6 +156,15 @@ if ($action === 'settings' && $method === 'POST') {
       $u = preg_replace('#^webcal://#i', 'https://', $u);
       if ($u !== '' && !preg_match('#^https://[^\s]+$#i', $u)) return ['error' => 'La dirección de Google Calendar debe empezar por https://'];
       $cfg['ics'] = cut($u, 600);
+    }
+    if (array_key_exists('smtp_user', $b)) {
+      $u = strtolower(cut($b['smtp_user'], 160));
+      if ($u !== '' && !filter_var($u, FILTER_VALIDATE_EMAIL)) return ['error' => 'El Gmail no es válido'];
+      $cfg['smtp_user'] = $u;
+      $cfg['smtp_name'] = cut($b['smtp_name'] ?? '', 80);
+      $p = preg_replace('/\s+/', '', (string) ($b['smtp_pass'] ?? '')); // Google la muestra con espacios
+      if ($p !== '') $cfg['smtp_pass'] = cut($p, 64);
+      if ($u === '') unset($cfg['smtp_pass']);
     }
     if (!empty($b['nueva'])) {
       if (!password_verify((string) ($b['actual'] ?? ''), $cfg['hash'])) return ['error' => 'La contraseña actual no es correcta'];
@@ -242,6 +251,39 @@ if ($action === 'tpl_save' && $method === 'POST') {
     return $list;
   });
   json_out(['plantillas' => $list]);
+}
+
+/* ---------- Enviar correo desde el CRM ---------- */
+if ($action === 'mail_send' && $method === 'POST') {
+  require_auth();
+  $b = body();
+  $cfg = config();
+  $to = strtolower(cut($b['to'] ?? '', 160));
+  if ($to === 'yo') $to = $cfg['smtp_user'] ?? '';
+  if (!filter_var($to, FILTER_VALIDATE_EMAIL)) json_out(['error' => 'Email del destinatario no válido'], 422);
+  $subject = cut($b['asunto'] ?? '', 200);
+  $html = (string) ($b['html'] ?? '');
+  $text = cut($b['texto'] ?? '', 20000);
+  if ($subject === '' || ($html === '' && $text === '')) json_out(['error' => 'Falta el asunto o el mensaje'], 422);
+  if (strlen($html) > 200000) json_out(['error' => 'Mensaje demasiado largo'], 422);
+  if (!rate('mail', 300, 86400)) json_out(['error' => 'Límite diario de envíos alcanzado'], 429);
+  $err = smtp_send($cfg, $to, $subject, $html ?: nl2br(htmlspecialchars($text)), $text ?: strip_tags($html));
+  if ($err !== '') json_out(['error' => $err], 502);
+  $lead = null;
+  $id = (string) ($b['lead'] ?? '');
+  if ($id !== '') {
+    $lead = with_lock('leads', function () use ($id, $subject) {
+      $leads = store_read('leads', []);
+      foreach ($leads as $i => $l) if ($l['id'] === $id) {
+        activity($leads[$i], '✉ Email enviado: ' . $subject, 'nota');
+        $leads[$i]['actualizado'] = now_iso();
+        store_write('leads', $leads);
+        return $leads[$i];
+      }
+      return null;
+    });
+  }
+  json_out(['ok' => true, 'lead' => $lead]);
 }
 
 /* ---------- Ventas ---------- */
