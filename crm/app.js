@@ -136,7 +136,7 @@
       S.csrf = j.csrf;
       S.notify = j.notify || "";
       S.ics = j.ics || "";
-      S.smtp = j.smtp || ""; S.smtpName = j.smtp_name || "";
+      S.smtp = j.smtp || ""; S.smtpName = j.smtp_name || ""; S.smtpHost = j.smtp_host || "smtp.gmail.com"; S.smtpPort = j.smtp_port || 465;
       if (silent && S.leads.length > before) toast("Nuevo contacto recibido desde la web");
       if (S.ready && !S.open && (!silent || ["inicio", "contactos", "ventas"].indexOf(S.page) > -1)) render();
     }).catch(function (e) { if (e.message !== "auth") toast("No se pudo cargar el CRM", true); });
@@ -583,7 +583,7 @@
       '<label class="chk"><input type="checkbox" id="m-wa"' + (S.mail.boton ? " checked" : "") + " /> Botón «Escríbeme por WhatsApp»</label></div>" +
       (S.mail.lista.length && !S.mail.boletin ? batchHtml() : "") +
       (S.smtp && !S.mail.boletin && !S.mail.lista.length ? '<div class="m-send"><button class="btn primary" type="button" data-act="mail-send">Enviar ahora</button><span class="muted small">Se envía con diseño desde ' + esc(S.smtp) + "</span></div>" : "") +
-      (!S.smtp ? '<p class="muted small">¿Quieres enviar con un solo botón? <button class="link-btn" type="button" data-act="settings">Conecta tu Gmail en Ajustes</button>.</p>' : "") +
+      (!S.smtp ? '<p class="muted small">¿Quieres enviar con un solo botón? <button class="link-btn" type="button" data-act="settings">Conecta tu correo en Ajustes</button>.</p>' : "") +
       '<div class="m-steps"' + (S.mail.lista.length && !S.mail.boletin ? " hidden" : "") + '><b>' + (S.smtp ? "O copia y pega" : "Enviar con diseño") + ':</b> 1) <button class="btn primary sm" type="button" data-act="mail-design">Copiar correo con diseño</button> 2) <button class="btn ghost sm" type="button" data-act="mail-gmail-blank">Abrir Gmail</button> 3) pega en el mensaje con <kbd>Cmd</kbd>+<kbd>V</kbd> (o Ctrl+V).</div>' +
       '<div class="d-actions"' + (S.mail.lista.length && !S.mail.boletin ? " hidden" : "") + '><button class="btn ghost sm" type="button" data-act="mail-gmail">Gmail solo texto</button><button class="btn ghost sm" type="button" data-act="mail-app">Mi app de correo (texto)</button><button class="btn ghost sm" type="button" data-act="mail-copy">Copiar texto</button></div>' +
       '<p class="muted small">Si el destinatario es un contacto, el envío queda anotado en su historial.</p>' +
@@ -598,7 +598,7 @@
     return '<div class="m-batch"><header><b>Envío uno a uno · ' + done + " de " + n + ' enviados</b><span class="quick">' +
       (S.smtp ? '<button class="btn primary sm" type="button" data-act="batch-all">Enviar a todos (' + n + ")</button>" : "") +
       '<button class="btn ghost sm" type="button" data-act="batch-clear">Vaciar lista</button></span></header>' +
-      '<p class="muted small">' + (S.smtp ? "Cada contacto recibe su propio correo, con su nombre, desde tu Gmail. También puedes enviarlos de uno en uno." : "Para cada contacto: <b>1 · Copiar</b> → <b>2 · Gmail</b> → pega con Cmd+V → Enviar. Cada uno recibe su correo con su nombre.") + "</p><ol>" +
+      '<p class="muted small">' + (S.smtp ? "Cada contacto recibe su propio correo, con su nombre, desde " + esc(S.smtp) + ". También puedes enviarlos de uno en uno." : "Para cada contacto: <b>1 · Copiar</b> → <b>2 · Gmail</b> → pega con Cmd+V → Enviar. Cada uno recibe su correo con su nombre.") + "</p><ol>" +
       S.mail.lista.map(function (em) {
         var l = S.leads.filter(function (x) { return x.email === em; })[0];
         return '<li data-email="' + esc(em) + '" class="' + (S.mail.hechos[em] ? "done" : "") + '"><span class="who"><b>' + esc(l ? up(l.nombre) || em : em) + "</b><small>" + esc(em) + "</small></span>" +
@@ -1034,10 +1034,16 @@
       '<form class="box set-form"><h3>Google Calendar</h3><p class="muted small">En Google Calendar (ordenador): ⚙ Configuración → elige tu calendario → <b>Integrar el calendario</b> → copia la <b>Dirección secreta en formato iCal</b> y pégala aquí. Es privada: no la compartas.</p>' +
       '<label class="f"><span>Dirección secreta iCal</span><input name="ics" type="url" value="' + esc(S.ics) + '" placeholder="https://calendar.google.com/calendar/ical/…/private-…/basic.ics" /></label>' +
       '<button class="btn primary" type="submit">Conectar calendario</button></form>' +
-      '<form class="box set-form"><h3>Enviar correos desde el CRM</h3><p class="muted small">Para enviar con un botón desde tu Gmail. Necesitas una <b>contraseña de aplicación</b> de Google (no tu contraseña normal): myaccount.google.com → Seguridad → Verificación en 2 pasos (actívala) → <b>Contraseñas de aplicaciones</b> → crea una llamada «CRM» y copia las 16 letras.</p>' +
-      '<label class="f"><span>Tu Gmail</span><input name="smtp_user" type="email" value="' + esc(S.smtp) + '" placeholder="tu@gmail.com" autocomplete="off" /></label>' +
+      '<form class="box set-form" id="smtp-form"><h3>Enviar correos desde el CRM</h3><p class="muted small">El CRM envía desde tu propio buzón. Elige dónde tienes el correo: si lo lees en Gmail es <b>Google</b>; si lo lees en el webmail de Hostinger es <b>Hostinger</b>; si es Outlook, <b>Microsoft</b>.</p>' +
+      '<label class="f"><span>Proveedor de tu correo</span><select name="smtp_prov" id="smtp-prov">' +
+      [["google", "Google (Gmail o Google Workspace)"], ["hostinger", "Hostinger (correo de tu dominio)"], ["outlook", "Microsoft (Outlook / Microsoft 365)"], ["otro", "Otro servidor"]].map(function (o) {
+        return '<option value="' + o[0] + '"' + (o[0] === smtpProv() ? " selected" : "") + ">" + o[1] + "</option>";
+      }).join("") + "</select></label>" +
+      '<div class="grid smtp-otro"' + (smtpProv() === "otro" ? "" : " hidden") + '><label class="f"><span>Servidor SMTP</span><input name="smtp_host" value="' + esc(S.smtpHost || "") + '" placeholder="smtp.tudominio.com" /></label><label class="f"><span>Puerto</span><select name="smtp_port"><option' + (S.smtpPort == 465 ? " selected" : "") + '>465</option><option' + (S.smtpPort == 587 ? " selected" : "") + ">587</option></select></label></div>" +
+      '<label class="f"><span>Tu email</span><input name="smtp_user" type="email" value="' + esc(S.smtp) + '" placeholder="tu@tudominio.com" autocomplete="off" /></label>' +
       '<label class="f"><span>Nombre del remitente</span><input name="smtp_name" value="' + esc(S.smtpName || "Pascual Vidal") + '" /></label>' +
-      '<label class="f"><span>Contraseña de aplicación</span><input name="smtp_pass" type="text" autocomplete="off" spellcheck="false" data-lpignore="true" placeholder="' + (S.smtp ? "Guardada · escribe otra para cambiarla" : "xxxx xxxx xxxx xxxx") + '" /></label>' +
+      '<label class="f"><span id="smtp-pass-l">' + smtpPassLabel(smtpProv()) + '</span><input name="smtp_pass" type="text" autocomplete="off" spellcheck="false" data-lpignore="true" placeholder="' + (S.smtp ? "Guardada · escribe otra para cambiarla" : "") + '" /></label>' +
+      '<p class="muted small" id="smtp-help">' + smtpHelp(smtpProv()) + "</p>" +
       '<div class="quick"><button class="btn primary" type="submit">Guardar</button>' + (S.smtp ? '<button class="btn ghost" type="button" data-act="smtp-test">Enviarme una prueba</button>' : "") + "</div></form>" +
       '<form class="box set-form"><h3>Avisos por email</h3><p class="muted small">Recibe un email cada vez que entre un contacto desde la web.</p>' +
       '<label class="f"><span>Email para avisos</span><input name="notify" type="email" value="' + esc(S.notify) + '" placeholder="tu@email.com" /></label>' +
@@ -1052,17 +1058,30 @@
     showDrawer();
   }
 
+  function smtpProv() {
+    var h = S.smtpHost || "smtp.gmail.com";
+    return h === "smtp.gmail.com" ? "google" : h === "smtp.hostinger.com" ? "hostinger" : h === "smtp.office365.com" ? "outlook" : "otro";
+  }
+  function smtpPassLabel(p) { return p === "google" ? "Contraseña de aplicación (16 letras)" : "Contraseña del buzón de correo"; }
+  function smtpHelp(p) {
+    if (p === "google") return "Google no deja usar tu contraseña normal: entra con esa misma cuenta en <b>myaccount.google.com/apppasswords</b> (necesita la verificación en 2 pasos), crea una llamada «CRM» y pega aquí las 16 letras.";
+    if (p === "hostinger") return "Usa la contraseña de ese buzón (la que pones en el webmail de Hostinger). Si no la recuerdas: hPanel → Correos electrónicos → tu buzón → Cambiar contraseña.";
+    if (p === "outlook") return "Usa la contraseña de tu cuenta de Microsoft. Si tienes verificación en 2 pasos, crea una contraseña de aplicación en account.microsoft.com → Seguridad. En Microsoft 365 de empresa, el administrador debe tener activado «SMTP autenticado».";
+    return "Pide a tu proveedor los datos SMTP (servidor y puerto 465 SSL o 587 STARTTLS) y usa la contraseña del buzón.";
+  }
   function submitSettings(form) {
     var data = {};
-    $$("input[name]", form).forEach(function (f) { data[f.name] = f.value.trim(); });
+    $$("input[name], select[name]", form).forEach(function (f) { data[f.name] = f.value.trim(); });
     api("settings", data).then(function (j) {
       if (j.csrf) S.csrf = j.csrf;
       if ("notify" in data) S.notify = data.notify;
       if ("smtp_user" in data) {
         S.smtp = data.smtp_user.toLowerCase(); S.smtpName = data.smtp_name;
+        var HP = { google: ["smtp.gmail.com", 465], hostinger: ["smtp.hostinger.com", 465], outlook: ["smtp.office365.com", 587] }[data.smtp_prov];
+        S.smtpHost = HP ? HP[0] : data.smtp_host; S.smtpPort = HP ? HP[1] : +data.smtp_port;
         openSettings();
         if (S.page === "correo") renderMail();
-        toast(S.smtp ? "Gmail guardado. Pulsa «Enviarme una prueba»." : "Envío desde el CRM desactivado");
+        toast(S.smtp ? "Correo guardado. Pulsa «Enviarme una prueba»." : "Envío desde el CRM desactivado");
         return;
       }
       if ("ics" in data) { S.ics = data.ics; S.cal = {}; S.calErr = ""; render(); }
@@ -1136,7 +1155,7 @@
       if (a === "mail-design") { copyDesign(); return; }
       if (a === "smtp-test") {
         act.disabled = true;
-        api("mail_send", { to: "yo", asunto: "Prueba del CRM", html: '<p style="font-family:Helvetica,Arial,sans-serif">Si lees esto, el CRM ya envía correos desde tu Gmail. ✅</p>', texto: "Si lees esto, el CRM ya envía correos desde tu Gmail." })
+        api("mail_send", { to: "yo", asunto: "Prueba del CRM", html: '<p style="font-family:Helvetica,Arial,sans-serif">Si lees esto, el CRM ya envía correos desde tu buzón. ✅</p>', texto: "Si lees esto, el CRM ya envía correos desde tu buzón." })
           .then(function () { toast("Prueba enviada a " + S.smtp + ". Mira tu bandeja de entrada."); }, function (err) { toast(err.message, true); })
           .then(function () { act.disabled = false; });
         return;
@@ -1321,6 +1340,11 @@
     if (t.id === "m-img") { S.mail.imagen = t.checked ? (S.mail.imagen || EMAIL_IMG) : ""; refreshPreview(); }
     if (t.id === "m-wa") { S.mail.boton = t.checked; refreshPreview(); }
     if (t.id === "pick-etapa" || t.id === "pick-origen") filterPicker();
+    if (t.id === "smtp-prov") {
+      $(".smtp-otro").hidden = t.value !== "otro";
+      $("#smtp-pass-l").textContent = smtpPassLabel(t.value);
+      $("#smtp-help").innerHTML = smtpHelp(t.value);
+    }
     if (t.id === "pick-all") $$(".pick-list li:not([hidden]) input").forEach(function (x) { x.checked = t.checked; });
     if (t.id === "doc-file") uploadFiles(t.files, "");
     if (t.id === "lead-file") uploadFiles(t.files, S.open);

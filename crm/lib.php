@@ -358,10 +358,11 @@ function smtp_header($s) { return '=?UTF-8?B?' . base64_encode($s) . '?='; }
 // Envía un correo HTML + texto. Devuelve '' si salió bien o el motivo del fallo.
 function smtp_send(array $cfg, $to, $subject, $html, $text) {
   $user = $cfg['smtp_user'] ?? ''; $pass = $cfg['smtp_pass'] ?? '';
-  if (!$user || !$pass) return 'Configura tu Gmail en Ajustes';
+  if (!$user || !$pass) return 'Configura tu correo en Ajustes';
   $host = $cfg['smtp_host'] ?? 'smtp.gmail.com'; $port = (int) ($cfg['smtp_port'] ?? 465);
-  $ctx = stream_context_create(['ssl' => ['verify_peer' => true, 'verify_peer_name' => true]]);
-  $fp = @stream_socket_client("ssl://$host:$port", $errno, $errstr, 15, STREAM_CLIENT_CONNECT, $ctx);
+  $tls = $port === 587; // 587 = STARTTLS (Outlook); 465 = SSL directo (Gmail, Hostinger)
+  $ctx = stream_context_create(['ssl' => ['verify_peer' => true, 'verify_peer_name' => true, 'peer_name' => $host]]);
+  $fp = @stream_socket_client(($tls ? 'tcp' : 'ssl') . "://$host:$port", $errno, $errstr, 15, STREAM_CLIENT_CONNECT, $ctx);
   if (!$fp) return "No se pudo conectar con $host ($errstr)";
   stream_set_timeout($fp, 20);
   $read = function () use ($fp) {
@@ -378,14 +379,20 @@ function smtp_send(array $cfg, $to, $subject, $html, $text) {
   try {
     $cmd(null, 220);
     $cmd('EHLO ' . ($_SERVER['HTTP_HOST'] ?? 'localhost'), 250);
+    if ($tls) {
+      $cmd('STARTTLS', 220);
+      if (!stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT)) throw new RuntimeException('No se pudo cifrar la conexión');
+      $cmd('EHLO ' . ($_SERVER['HTTP_HOST'] ?? 'localhost'), 250);
+    }
     $cmd('AUTH LOGIN', 334);
     $cmd(base64_encode($user), 334);
     try { $cmd(base64_encode($pass), 235); }
     catch (RuntimeException $e) {
       $m = $e->getMessage();
-      if (strpos($m, '5.7.9') !== false) throw new RuntimeException('Gmail pide una contraseña de aplicación (16 letras), no tu contraseña normal de Google');
-      if (strpos($m, '5.7.8') !== false) throw new RuntimeException("Gmail no acepta la contraseña de aplicación para $user. Crea una nueva desde esa misma cuenta y pégala en Ajustes");
-      throw new RuntimeException('Gmail rechazó el acceso: ' . substr($m, 0, 160));
+      $g = $host === 'smtp.gmail.com';
+      if ($g && strpos($m, '5.7.9') !== false) throw new RuntimeException('Google pide una contraseña de aplicación (16 letras), no tu contraseña normal');
+      if ($g && strpos($m, '5.7.8') !== false) throw new RuntimeException("Google no acepta $user con esa contraseña de aplicación. Si tu correo no es de Google (Gmail/Workspace), elige otro proveedor en Ajustes");
+      throw new RuntimeException("$host rechazó el usuario o la contraseña de $user: " . substr($m, 0, 140));
     }
     $cmd("MAIL FROM:<$user>", 250);
     $cmd("RCPT TO:<$to>", 250);

@@ -90,7 +90,7 @@ if ($action === 'lead') {
 if ($action === 'state') {
   require_auth(false);
   $cfg = config();
-  json_out(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'smtp' => $cfg['smtp_user'] ?? '', 'smtp_name' => $cfg['smtp_name'] ?? '', 'csrf' => csrf()]);
+  json_out(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'smtp' => $cfg['smtp_user'] ?? '', 'smtp_name' => $cfg['smtp_name'] ?? '', 'smtp_host' => $cfg['smtp_host'] ?? 'smtp.gmail.com', 'smtp_port' => (int) ($cfg['smtp_port'] ?? 465), 'csrf' => csrf()]);
 }
 
 if ($action === 'save' && $method === 'POST') {
@@ -162,9 +162,23 @@ if ($action === 'settings' && $method === 'POST') {
       if ($u !== '' && !filter_var($u, FILTER_VALIDATE_EMAIL)) return ['error' => 'El Gmail no es válido'];
       $cfg['smtp_user'] = $u;
       $cfg['smtp_name'] = cut($b['smtp_name'] ?? '', 80);
-      $p = preg_replace('/\s+/', '', (string) ($b['smtp_pass'] ?? '')); // Google la muestra con espacios
-      if ($p !== '' && !preg_match('/^[a-zA-Z]{16}$/', $p)) return ['error' => 'La contraseña de aplicación son 16 letras (Google la muestra en 4 grupos de 4). No es tu contraseña de Google ni la del CRM'];
-      if ($p !== '') $cfg['smtp_pass'] = strtolower($p);
+      $hosts = ['google' => ['smtp.gmail.com', 465], 'hostinger' => ['smtp.hostinger.com', 465], 'outlook' => ['smtp.office365.com', 587]];
+      $prov = (string) ($b['smtp_prov'] ?? 'google');
+      if ($prov === 'otro') {
+        $h = strtolower(cut($b['smtp_host'] ?? '', 120)); $port = (int) ($b['smtp_port'] ?? 465);
+        if (!preg_match('/^[a-z0-9.-]+\.[a-z]{2,}$/', $h) || !in_array($port, [465, 587], true)) return ['error' => 'Servidor SMTP no válido (ej. smtp.tudominio.com, puerto 465 o 587)'];
+        $cfg['smtp_host'] = $h; $cfg['smtp_port'] = $port;
+      } else {
+        $hp = $hosts[$prov] ?? $hosts['google'];
+        $cfg['smtp_host'] = $hp[0]; $cfg['smtp_port'] = $hp[1];
+      }
+      $p = (string) ($b['smtp_pass'] ?? '');
+      if ($cfg['smtp_host'] === 'smtp.gmail.com') {
+        $p = preg_replace('/\s+/', '', $p); // Google la muestra con espacios
+        if ($p !== '' && !preg_match('/^[a-zA-Z]{16}$/', $p)) return ['error' => 'Con Google, la contraseña de aplicación son 16 letras (4 grupos de 4). No es tu contraseña de Google ni la del CRM'];
+        $p = strtolower($p);
+      }
+      if ($p !== '') $cfg['smtp_pass'] = cut($p, 128);
       if ($u === '') unset($cfg['smtp_pass']);
     }
     if (!empty($b['nueva'])) {
