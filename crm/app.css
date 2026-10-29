@@ -213,7 +213,7 @@ tbody tr:last-child td { border-bottom: 0; }
 /* ---------- Correo ---------- */
 .mail-grid { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 18px; align-items: start; }
 .tpl-list { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 6px; }
-.tpl-list li { display: flex; gap: 6px; align-items: center; }
+.tpl-list li { display: flex; gap: 6px; align-items: center; min-width: 0; }
 .tpl { flex: 1; min-width: 0; text-align: left; border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 10px 12px; cursor: pointer; }
 .tpl b, .tpl small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tpl small { color: var(--mute); font-size: 12px; }
@@ -389,3 +389,12 @@ tbody tr:last-child td { border-bottom: 0; }
 .doc[draggable="true"] { cursor: grab; }
 .doc-folder { width: 140px; flex: none; min-height: 36px; padding: 6px 10px; font-size: 13px; }
 @media (max-width: 860px) { .doc-folder { order: 5; width: 100%; } }
+
+/* ---------- Correo con diseño ---------- */
+.m-opts { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.m-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 14px; border-radius: 12px; background: var(--amber-soft); font-size: 14px; }
+.m-steps kbd { font: 700 12px var(--f-body); padding: 2px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+.m-prev-h { margin-top: 20px; flex-wrap: wrap; }
+.m-preview { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #f6f4f0; max-height: 720px; overflow-y: auto; }
+.m-preview p { margin: 0 0 14px; }
+.m-preview table:not([width]) { width: auto; }

@@ -9,7 +9,7 @@
     page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(), orden: savedSort().por, dir: savedSort().dir, plegadas: savedFolds(),
     open: null, dirty: false,
     cal: {}, calErr: "", month: null, day: null,
-    tpls: null, docs: null, carpetas: [], carpeta: "", newFolder: false, mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false }
+    tpls: null, docs: null, carpetas: [], carpeta: "", newFolder: false, mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false, imagen: "", boton: false }
   };
   var PAGES = { inicio: "Inicio", contactos: "Contactos", ventas: "Ventas", correo: "Correo", calendario: "Calendario", documentos: "Documentos" };
   var STAGE_HINT = {
@@ -22,6 +22,8 @@
   var ORIGENES = ["Web · Guía", "Web · Boletín", "Web · Consultoría", "Web · Dossier", "Instagram", "WhatsApp", "YouTube", "Meta", "Referido", "Evento", "Llamada", "Manual", "Otro"];
   var PRESUPUESTOS = ["Por definir", "Menos de 250.000 €", "250.000 – 500.000 €", "500.000 – 1.000.000 €", "Más de 1.000.000 €"];
   var OBJETIVOS = ["Rentabilidad por alquiler", "Revalorización / reventa", "Golden Visa / residencia", "Segunda vivienda", "Crear empresa en Dubái"];
+  var WA_LINK = "https://wa.me/message/QI3A7Q5BXFTCA1";
+  var EMAIL_IMG = "/assets/img/email-dubai.jpg";
   var DOC_EXT = "pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png,webp,heic,txt,csv,zip,mp4,mov";
 
   /* ---------- Utilidades ---------- */
@@ -576,9 +578,14 @@
       '<label class="chk"><input type="checkbox" id="m-bol"' + (S.mail.boletin ? " checked" : "") + " /> Enviar a todos los suscritos al boletín (" + subs.length + ") en copia oculta</label>" +
       '<label class="f"><span>Asunto</span><input id="m-asunto" value="' + esc(S.mail.asunto) + '" /></label>' +
       '<label class="f"><span>Mensaje</span><textarea id="m-cuerpo" rows="12">' + esc(S.mail.cuerpo) + "</textarea></label>" +
-      '<div class="d-actions"><button class="btn primary" type="button" data-act="mail-gmail">Abrir en Gmail</button><button class="btn ghost" type="button" data-act="mail-app">Abrir en mi app de correo</button><button class="btn ghost" type="button" data-act="mail-copy">Copiar texto</button></div>' +
-      '<p class="muted small">El correo se envía desde tu Gmail. Si el destinatario es un contacto, queda anotado en su historial.</p>' +
-      "</form></section></div>";
+      '<div class="m-opts"><label class="chk"><input type="checkbox" id="m-img"' + (S.mail.imagen ? " checked" : "") + " /> Foto de Dubái</label>" +
+      '<label class="chk"><input type="checkbox" id="m-wa"' + (S.mail.boton ? " checked" : "") + " /> Botón «Escríbeme por WhatsApp»</label></div>" +
+      '<div class="m-steps"><b>Enviar con diseño:</b> 1) <button class="btn primary sm" type="button" data-act="mail-design">Copiar correo con diseño</button> 2) <button class="btn ghost sm" type="button" data-act="mail-gmail-blank">Abrir Gmail</button> 3) pega en el mensaje con <kbd>Cmd</kbd>+<kbd>V</kbd> (o Ctrl+V).</div>' +
+      '<div class="d-actions"><button class="btn ghost sm" type="button" data-act="mail-gmail">Gmail solo texto</button><button class="btn ghost sm" type="button" data-act="mail-app">Mi app de correo (texto)</button><button class="btn ghost sm" type="button" data-act="mail-copy">Copiar texto</button></div>' +
+      '<p class="muted small">Si el destinatario es un contacto, el envío queda anotado en su historial.</p>' +
+      "</form>" +
+      '<header class="panel-h m-prev-h"><h3>Vista previa</h3><small class="muted">Así lo recibe ' + esc(mailTarget().lead ? (mailTarget().lead.nombre || mailTarget().email) : "tu contacto") + '</small></header><div class="m-preview" id="m-preview">' + designHtml(true) + "</div>" +
+      "</section></div>";
   }
 
   function composeUrl(kind) {
@@ -586,12 +593,88 @@
     var subj = fillVars(S.mail.asunto, tg.lead), body = fillVars(S.mail.cuerpo, tg.lead);
     var bcc = S.mail.boletin ? S.leads.filter(function (l) { return l.boletin && l.email; }).map(function (l) { return l.email; }).join(",") : "";
     if (S.mail.boletin) { subj = fillVars(S.mail.asunto, {}); body = fillVars(S.mail.cuerpo, {}).replace(/^Hola ,/m, "Hola,"); }
+    if (kind === "gmail-blank") {
+      return "https://mail.google.com/mail/?view=cm&fs=1" + (S.mail.boletin ? "&bcc=" + encodeURIComponent(bcc) : "&to=" + encodeURIComponent(tg.email)) + "&su=" + encodeURIComponent(subj);
+    }
     if (kind === "gmail") {
       return "https://mail.google.com/mail/?view=cm&fs=1" + (S.mail.boletin ? "&bcc=" + encodeURIComponent(bcc) : "&to=" + encodeURIComponent(tg.email)) +
         "&su=" + encodeURIComponent(subj) + "&body=" + encodeURIComponent(body);
     }
     if (kind === "app") return "mailto:" + (S.mail.boletin ? "?bcc=" + encodeURIComponent(bcc) + "&" : encodeURIComponent(tg.email) + "?") + "subject=" + encodeURIComponent(subj) + "&body=" + encodeURIComponent(body);
     return subj + "\n\n" + body;
+  }
+
+  // Correo con diseño (tablas y estilos en línea, como lo necesitan Gmail y Mail).
+  function linkify(t) {
+    return t.replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)»])/g, '<a href="$1" style="color:#b35f00;">$1</a>');
+  }
+  function mailParts() {
+    var tg = mailTarget(), lead = S.mail.boletin ? {} : tg.lead;
+    var subj = fillVars(S.mail.asunto, lead || {}), body = fillVars(S.mail.cuerpo, lead || {});
+    if (!lead || !lead.nombre) body = body.replace(/^Hola ,/m, "Hola,");
+    return { subj: subj, body: body };
+  }
+  function designHtml(preview) {
+    var f = "font-family:Helvetica,Arial,sans-serif;";
+    var img = S.mail.imagen ? (preview && window.CRM_PREVIEW_IMG ? window.CRM_PREVIEW_IMG : (/^https?:/.test(S.mail.imagen) ? S.mail.imagen : location.origin + S.mail.imagen)) : "";
+    var paras = mailParts().body.replace(/\r/g, "").split(/\n\s*\n/).map(function (p) { return p.trim(); }).filter(Boolean);
+    var foot = "", out = [], waDone = false, imgDone = !img;
+    var btn = '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:4px 0 18px;"><tr><td style="border-radius:999px;background:#25d366;">' +
+      '<a href="' + WA_LINK + '" style="display:inline-block;padding:13px 26px;' + f + 'font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:999px;">Escríbeme por WhatsApp</a></td></tr></table>';
+    var sign = /^(un abrazo|un saludo|saludos|gracias|atentamente)/i;
+    paras.forEach(function (p, i) {
+      if (/^si no quieres recibir/i.test(p)) { foot = p; return; }
+      if (S.mail.boton && !waDone && sign.test(p)) { out.push(btn); waDone = true; }
+      var lines = p.split("\n");
+      var bullets = lines.filter(function (l) { return /^\s*[·\-•]\s+/.test(l); });
+      var html;
+      if (bullets.length && bullets.length >= lines.length - 1) {
+        var head = /^\s*[·\-•]\s+/.test(lines[0]) ? "" : lines[0];
+        html = (head ? '<p style="margin:0 0 10px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#b35f00;font-weight:bold;">' + esc(head.replace(/:$/, "")) + "</p>" : "") +
+          '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.5;color:#0b1424;margin:0 0 16px;">' +
+          bullets.map(function (l) {
+            return '<tr><td width="22" valign="top" style="padding:8px 0;color:#f7931e;font-size:18px;line-height:1.2;">●</td><td valign="top" style="padding:8px 0;border-top:1px solid #eee8de;">' + linkify(esc(l.replace(/^\s*[·\-•]\s+/, ""))) + "</td></tr>";
+          }).join("") + "</table>";
+      } else if (S.mail.boton && !waDone && p.indexOf("wa.me/") > -1) {
+        html = '<p style="margin:0 0 12px;">' + linkify(esc(p.replace(/:?\s*https?:\/\/wa\.me\/\S+/, "."))).replace(/\n/g, "<br>") + "</p>" + btn;
+        waDone = true;
+      } else if (sign.test(p)) {
+        var sl = p.split("\n");
+        html = '<p style="margin:0;">' + esc(sl[0]) + (sl[1] ? "<br><b>" + esc(sl[1]) + "</b>" : "") + (sl.length > 2 ? '<br><span style="color:#5a6474;font-size:13px;">' + sl.slice(2).map(esc).join("<br>") + "</span>" : "") + "</p>";
+      } else {
+        html = '<p style="margin:0 0 14px;">' + linkify(esc(p)).replace(/\n/g, "<br>") + "</p>";
+      }
+      out.push(html);
+      if (!imgDone && (i === 1 || paras.length < 3)) {
+        out.push('<img src="' + esc(img) + '" width="504" alt="Dubái" style="display:block;width:100%;max-width:504px;height:auto;border-radius:10px;border:0;margin:6px 0 18px;" />');
+        imgDone = true;
+      }
+    });
+    if (S.mail.boton && !waDone) out.push(btn);
+    return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f4f0;"><tr><td align="center" style="padding:8px 12px;">' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:14px;"><tr><td style="padding:28px;' + f + 'font-size:16px;line-height:1.6;color:#0b1424;">' +
+      out.join("") + "</td></tr></table>" +
+      (foot ? '<p style="margin:14px 0 6px;' + f + 'font-size:12px;color:#8a919c;">' + esc(foot) + "</p>" : "") +
+      "</td></tr></table>";
+  }
+  function refreshPreview() { var el = $("#m-preview"); if (el) el.innerHTML = designHtml(true); }
+  function copyDesign() {
+    var html = designHtml(false), text = mailParts().body;
+    var fallback = function () {
+      var box = document.createElement("div");
+      box.style.cssText = "position:fixed;left:-9999px;top:0;width:600px";
+      box.innerHTML = html; document.body.appendChild(box);
+      var r = document.createRange(); r.selectNodeContents(box);
+      var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      var ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+      sel.removeAllRanges(); box.remove();
+      return ok;
+    };
+    var done = function () { toast("Copiado con diseño. Ahora abre Gmail y pega (Cmd+V)."); };
+    if (navigator.clipboard && window.ClipboardItem) {
+      navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([html], { type: "text/html" }), "text/plain": new Blob([text], { type: "text/plain" }) })])
+        .then(done, function () { if (fallback()) done(); else toast("No se pudo copiar", true); });
+    } else if (fallback()) done(); else toast("No se pudo copiar", true);
   }
 
   function logMail() {
@@ -609,6 +692,9 @@
       '<label class="f"><span>Nombre de la plantilla</span><input name="nombre" required value="' + esc(t.nombre) + '" /></label>' +
       '<label class="f"><span>Asunto</span><input name="asunto" value="' + esc(t.asunto) + '" /></label>' +
       '<label class="f"><span>Mensaje</span><textarea name="cuerpo" rows="14">' + esc(t.cuerpo) + "</textarea></label>" +
+      '<label class="chk"><input type="checkbox" name="imagen" value="' + esc(t.imagen || EMAIL_IMG) + '"' + (t.imagen ? " checked" : "") + " /> Incluir la foto de Dubái</label>" +
+      '<label class="chk"><input type="checkbox" name="boton"' + (t.boton ? " checked" : "") + " /> Incluir el botón «Escríbeme por WhatsApp»</label>" +
+      '<p class="muted small">Consejos de diseño: deja una línea en blanco entre párrafos; las líneas que empiezan por «· » salen como lista destacada; el párrafo que empieza por «Un abrazo» se convierte en tu firma.</p>' +
       '<div class="d-actions"><button class="btn primary" type="submit">Guardar</button>' + (t.id ? '<button class="btn danger" type="button" data-act="tpl-del">Eliminar</button>' : "") + "</div></form>";
     showDrawer();
   }
@@ -962,6 +1048,13 @@
         location.hash = "correo";
         if (S.page === "correo") renderMail();
       }
+      if (a === "mail-design") { copyDesign(); return; }
+      if (a === "mail-gmail-blank") {
+        if (!S.mail.boletin && !mailTarget().email) { toast("Indica a quién va el correo", true); return; }
+        window.open(composeUrl("gmail-blank"), "_blank", "noopener");
+        logMail();
+        return;
+      }
       if (a === "mail-gmail" || a === "mail-app" || a === "mail-copy") {
         if (!S.mail.boletin && !mailTarget().email) { toast("Indica a quién va el correo", true); return; }
         if (a === "mail-copy") {
@@ -996,6 +1089,7 @@
     if (tpl) {
       var tp = S.tpls.filter(function (x) { return x.id === tpl.getAttribute("data-tpl"); })[0];
       S.mail.tpl = tp.id; S.mail.asunto = tp.asunto; S.mail.cuerpo = tp.cuerpo;
+      S.mail.imagen = tp.imagen || ""; S.mail.boton = !!tp.boton;
       renderMail();
       return;
     }
@@ -1026,10 +1120,10 @@
   });
 
   document.addEventListener("submit", function (e) {
-    var f = e.target;
-    if (f.id === "lead-form") { e.preventDefault(); submitLead(f); }
-    if (f.id === "sale-form") { e.preventDefault(); submitSale(f); }
-    if (f.id === "folder-form") {
+    var f = e.target, fid = f.getAttribute("id"); // no f.id: un campo name="id" lo taparía
+    if (fid === "lead-form") { e.preventDefault(); submitLead(f); }
+    if (fid === "sale-form") { e.preventDefault(); submitSale(f); }
+    if (fid === "folder-form") {
       e.preventDefault();
       var name = $("[name=nombre]", f).value.trim();
       if (!name) return;
@@ -1037,10 +1131,10 @@
       saveFolders(S.carpetas.concat([name])).then(function () { S.newFolder = false; S.carpeta = name; renderDocs(); toast("Carpeta creada"); });
     }
     if (f.classList.contains("set-form")) { e.preventDefault(); submitSettings(f); }
-    if (f.id === "tpl-form") {
+    if (fid === "tpl-form") {
       e.preventDefault();
       var data = {};
-      $$("[name]", f).forEach(function (x) { data[x.name] = x.value; });
+      $$("[name]", f).forEach(function (x) { data[x.name] = x.type === "checkbox" ? (x.checked ? (x.name === "boton" ? true : x.value) : "") : x.value; });
       api("tpl_save", data).then(function (j) { S.tpls = j.plantillas; S.dirty = false; closeDrawer(true); renderMail(); toast("Plantilla guardada"); })
         .catch(function (err) { toast(err.message, true); });
     }
@@ -1057,6 +1151,7 @@
     if (t.id === "m-to") S.mail.to = t.value;
     if (t.id === "m-asunto") S.mail.asunto = t.value;
     if (t.id === "m-cuerpo") S.mail.cuerpo = t.value;
+    if (t.id === "m-to" || t.id === "m-asunto" || t.id === "m-cuerpo") refreshPreview();
   });
 
   document.addEventListener("change", function (e) {
@@ -1072,6 +1167,8 @@
     if (t.id === "f-origen") { S.origen = t.value; refreshResults(); }
     if (t.id === "f-hoy") { S.hoy = t.checked; refreshResults(); }
     if (t.id === "m-bol") { S.mail.boletin = t.checked; renderMail(); }
+    if (t.id === "m-img") { S.mail.imagen = t.checked ? (S.mail.imagen || EMAIL_IMG) : ""; refreshPreview(); }
+    if (t.id === "m-wa") { S.mail.boton = t.checked; refreshPreview(); }
     if (t.id === "doc-file") uploadFiles(t.files, "");
     if (t.id === "lead-file") uploadFiles(t.files, S.open);
     if (t.classList.contains("doc-folder")) moveDoc(t.closest("[data-doc]").getAttribute("data-doc"), t.value);

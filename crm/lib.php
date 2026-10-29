@@ -192,11 +192,18 @@ function docs_dir() {
 }
 
 /* ---------- Plantillas de correo ---------- */
+// Plantilla con diseño para leads de Meta que no contestan por WhatsApp (foto + botón de WhatsApp).
+const META_TEMPLATE = [
+  'id' => 'tmeta', 'nombre' => 'Leads Meta sin respuesta por WhatsApp', 'asunto' => '{nombre}, te escribí por WhatsApp',
+  'cuerpo' => "Hola {nombre},\n\nSoy Pascual Vidal. Hace unos días te interesaste por invertir en Dubái y te escribí por WhatsApp. Puede que el mensaje se perdiera, así que te escribo por aquí.\n\nLo esencial, en un minuto:\n· 10–20 % de entrada en obra nueva; el resto, en plazos.\n· 0 % de impuesto sobre la renta personal en Emiratos.\n· Después de comprar sigo contigo: alquiler, mantenimiento, reventa y Golden Visa.\n\n¿Te viene bien una llamada de 20 minutos esta semana? Vemos tu presupuesto y tu objetivo, y te digo con sinceridad si Dubái encaja contigo. Sin compromiso.\n\nPuedes responder a este correo o escribirme por WhatsApp: https://wa.me/message/QI3A7Q5BXFTCA1\n\nY si ahora no es el momento, respóndeme «más adelante» y te escribo en unos meses.\n\nUn abrazo,\nPascual Vidal\nConsultor inmobiliario en Dubái · RERA #97799\n\nSi no quieres recibir más correos, respóndeme «baja».",
+  'imagen' => '/assets/img/email-dubai.jpg', 'boton' => true,
+];
 function default_templates() {
   return [
     ['id' => 't1', 'nombre' => 'Bienvenida tras descargar la guía', 'asunto' => 'Tu guía para invertir en Dubái', 'cuerpo' => "Hola {nombre},\n\nGracias por descargarte la guía. Espero que te ayude a ver con claridad cómo funciona la compra en Dubái.\n\nSi quieres, te dedico 20 minutos por videollamada para ver tu caso concreto: presupuesto, objetivo y qué zonas encajan contigo.\n\nUn abrazo,\nPascual Vidal\nTu inversión en Dubái"],
     ['id' => 't2', 'nombre' => 'Seguimiento tras la llamada', 'asunto' => 'Resumen de nuestra llamada', 'cuerpo' => "Hola {nombre},\n\nGracias por la llamada de hoy. Te resumo lo que hablamos y los siguientes pasos:\n\n· \n· \n\nCualquier duda, escríbeme por aquí o por WhatsApp.\n\nUn abrazo,\nPascual"],
     ['id' => 't3', 'nombre' => 'Envío de dossier', 'asunto' => 'Dossier de {proyecto}', 'cuerpo' => "Hola {nombre},\n\nTe adjunto el dossier de {proyecto} con planos, precios y plan de pagos.\n\nSi te encaja, te preparo una simulación de rentabilidad con números reales.\n\nUn abrazo,\nPascual"],
+    META_TEMPLATE,
   ];
 }
 

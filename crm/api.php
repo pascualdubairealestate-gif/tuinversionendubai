@@ -218,7 +218,13 @@ if ($action === 'calendar') {
 /* ---------- Plantillas de correo ---------- */
 if ($action === 'templates') {
   require_auth(false);
-  json_out(['plantillas' => store_read('plantillas', default_templates())]);
+  $list = store_read('plantillas', default_templates());
+  // Una sola vez: añade la plantilla de Meta a las listas guardadas antes de que existiera.
+  if (empty(config()['tpl_meta'])) {
+    with_lock('config', function () { $c = config(); $c['tpl_meta'] = 1; store_write('config', $c); });
+    if (!in_array('tmeta', array_column($list, 'id'), true)) { $list[] = META_TEMPLATE; store_write('plantillas', $list); }
+  }
+  json_out(['plantillas' => $list]);
 }
 
 if ($action === 'tpl_save' && $method === 'POST') {
@@ -226,7 +232,8 @@ if ($action === 'tpl_save' && $method === 'POST') {
   $b = body();
   $list = with_lock('plantillas', function () use ($b) {
     $list = store_read('plantillas', default_templates());
-    $t = ['id' => cut($b['id'] ?? '', 20) ?: 't' . bin2hex(random_bytes(4)), 'nombre' => cut($b['nombre'] ?? '', 120) ?: 'Sin nombre', 'asunto' => cut($b['asunto'] ?? '', 200), 'cuerpo' => cut($b['cuerpo'] ?? '', 8000)];
+    $t = ['id' => cut($b['id'] ?? '', 20) ?: 't' . bin2hex(random_bytes(4)), 'nombre' => cut($b['nombre'] ?? '', 120) ?: 'Sin nombre', 'asunto' => cut($b['asunto'] ?? '', 200), 'cuerpo' => cut($b['cuerpo'] ?? '', 8000),
+      'imagen' => preg_match('#^(https://|/)[^\s"<>]+$#', cut($b['imagen'] ?? '', 300)) ? cut($b['imagen'], 300) : '', 'boton' => !empty($b['boton'])];
     $found = false;
     foreach ($list as $i => $x) if ($x['id'] === $t['id']) { $list[$i] = $t; $found = true; }
     if (!empty($b['borrar'])) $list = array_values(array_filter($list, function ($x) use ($t) { return $x['id'] !== $t['id']; }));
