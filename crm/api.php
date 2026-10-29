@@ -163,7 +163,8 @@ if ($action === 'settings' && $method === 'POST') {
       $cfg['smtp_user'] = $u;
       $cfg['smtp_name'] = cut($b['smtp_name'] ?? '', 80);
       $p = preg_replace('/\s+/', '', (string) ($b['smtp_pass'] ?? '')); // Google la muestra con espacios
-      if ($p !== '') $cfg['smtp_pass'] = cut($p, 64);
+      if ($p !== '' && !preg_match('/^[a-zA-Z]{16}$/', $p)) return ['error' => 'La contraseña de aplicación son 16 letras (Google la muestra en 4 grupos de 4). No es tu contraseña de Google ni la del CRM'];
+      if ($p !== '') $cfg['smtp_pass'] = strtolower($p);
       if ($u === '') unset($cfg['smtp_pass']);
     }
     if (!empty($b['nueva'])) {

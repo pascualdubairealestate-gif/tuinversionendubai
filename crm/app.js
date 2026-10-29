@@ -1037,7 +1037,7 @@
       '<form class="box set-form"><h3>Enviar correos desde el CRM</h3><p class="muted small">Para enviar con un botón desde tu Gmail. Necesitas una <b>contraseña de aplicación</b> de Google (no tu contraseña normal): myaccount.google.com → Seguridad → Verificación en 2 pasos (actívala) → <b>Contraseñas de aplicaciones</b> → crea una llamada «CRM» y copia las 16 letras.</p>' +
       '<label class="f"><span>Tu Gmail</span><input name="smtp_user" type="email" value="' + esc(S.smtp) + '" placeholder="tu@gmail.com" autocomplete="off" /></label>' +
       '<label class="f"><span>Nombre del remitente</span><input name="smtp_name" value="' + esc(S.smtpName || "Pascual Vidal") + '" /></label>' +
-      '<label class="f"><span>Contraseña de aplicación</span><input name="smtp_pass" type="password" autocomplete="new-password" placeholder="' + (S.smtp ? "Guardada · escribe otra para cambiarla" : "xxxx xxxx xxxx xxxx") + '" /></label>' +
+      '<label class="f"><span>Contraseña de aplicación</span><input name="smtp_pass" type="text" autocomplete="off" spellcheck="false" data-lpignore="true" placeholder="' + (S.smtp ? "Guardada · escribe otra para cambiarla" : "xxxx xxxx xxxx xxxx") + '" /></label>' +
       '<div class="quick"><button class="btn primary" type="submit">Guardar</button>' + (S.smtp ? '<button class="btn ghost" type="button" data-act="smtp-test">Enviarme una prueba</button>' : "") + "</div></form>" +
       '<form class="box set-form"><h3>Avisos por email</h3><p class="muted small">Recibe un email cada vez que entre un contacto desde la web.</p>' +
       '<label class="f"><span>Email para avisos</span><input name="notify" type="email" value="' + esc(S.notify) + '" placeholder="tu@email.com" /></label>' +

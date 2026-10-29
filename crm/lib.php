@@ -381,7 +381,12 @@ function smtp_send(array $cfg, $to, $subject, $html, $text) {
     $cmd('AUTH LOGIN', 334);
     $cmd(base64_encode($user), 334);
     try { $cmd(base64_encode($pass), 235); }
-    catch (RuntimeException $e) { throw new RuntimeException('Gmail no acepta el usuario o la contraseña de aplicación'); }
+    catch (RuntimeException $e) {
+      $m = $e->getMessage();
+      if (strpos($m, '5.7.9') !== false) throw new RuntimeException('Gmail pide una contraseña de aplicación (16 letras), no tu contraseña normal de Google');
+      if (strpos($m, '5.7.8') !== false) throw new RuntimeException("Gmail no acepta la contraseña de aplicación para $user. Crea una nueva desde esa misma cuenta y pégala en Ajustes");
+      throw new RuntimeException('Gmail rechazó el acceso: ' . substr($m, 0, 160));
+    }
     $cmd("MAIL FROM:<$user>", 250);
     $cmd("RCPT TO:<$to>", 250);
     $cmd('DATA', 354);
