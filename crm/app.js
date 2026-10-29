@@ -289,6 +289,7 @@
       '<label class="sort-by tag-by"><span>Origen:</span><select id="f-origen"><option value="">Todos</option>' + origins.map(function (o) {
         return "<option" + (o === S.origen ? " selected" : "") + ">" + esc(o) + "</option>";
       }).join("") + "</select></label>" +
+      '<button type="button" class="btn ghost sm" data-act="copy-emails">Copiar emails</button>' +
       '<label class="chk"><input type="checkbox" id="f-hoy"' + (S.hoy ? " checked" : "") + " /> Seguimientos pendientes</label></nav>";
   }
 
@@ -1153,6 +1154,20 @@
         if (S.page === "correo") renderMail();
       }
       if (a === "mail-design") { copyDesign(); return; }
+      if (a === "copy-emails") {
+        var mails = [];
+        filtered().forEach(function (l) { var m = (l.email || "").trim(); if (m && mails.indexOf(m) < 0) mails.push(m); });
+        if (!mails.length) { toast("Ningún contacto de esta lista tiene email", true); return; }
+        var txt = mails.join(", ");
+        var okc = function () { toast(mails.length + " emails copiados. Pégalos en «CCO» de Gmail, no en «Para»."); };
+        var fb = function () {
+          var ta = document.createElement("textarea"); ta.value = txt; ta.style.cssText = "position:fixed;left:-9999px"; document.body.appendChild(ta); ta.select();
+          var ok = false; try { ok = document.execCommand("copy"); } catch (err) {} ta.remove();
+          if (ok) okc(); else toast("No se pudo copiar", true);
+        };
+        if (navigator.clipboard) navigator.clipboard.writeText(txt).then(okc, fb); else fb();
+        return;
+      }
       if (a === "smtp-test") {
         act.disabled = true;
         api("mail_send", { to: "yo", asunto: "Prueba del CRM", html: '<p style="font-family:Helvetica,Arial,sans-serif">Si lees esto, el CRM ya envía correos desde tu buzón. ✅</p>', texto: "Si lees esto, el CRM ya envía correos desde tu buzón." })
