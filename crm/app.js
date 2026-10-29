@@ -614,21 +614,24 @@
   function openPicker() {
     S.open = "__pick";
     S.dirty = false;
+    var origins = ORIGENES.slice();
+    S.leads.forEach(function (l) { if (l.origen && origins.indexOf(l.origen) < 0) origins.push(l.origen); });
     var people = S.leads.filter(function (l) { return l.email; }).sort(function (a, b) { return up(a.nombre || a.email).localeCompare(up(b.nombre || b.email), "es"); });
     $(".drawer-panel").innerHTML = '<form id="pick-form"><header class="d-head"><h2 id="d-title">Elegir destinatarios</h2><button type="button" class="btn icon" data-close aria-label="Cerrar">✕</button></header>' +
       '<div class="toolbar"><input class="search" id="pick-q" type="search" placeholder="Buscar…" /><select id="pick-etapa" aria-label="Etapa"><option value="">Todas las etapas</option>' +
-      Object.keys(S.stages).map(function (k) { return '<option value="' + k + '">' + esc(S.stages[k]) + "</option>"; }).join("") + "</select></div>" +
+      Object.keys(S.stages).map(function (k) { return '<option value="' + k + '">' + esc(S.stages[k]) + "</option>"; }).join("") + "</select>" +
+      '<select id="pick-origen" aria-label="Origen"><option value="">Todos los orígenes</option>' + origins.map(function (o) { return "<option>" + esc(o) + "</option>"; }).join("") + "</select></div>" +
       '<label class="chk"><input type="checkbox" id="pick-all" /> Marcar todos los visibles</label>' +
       '<ul class="pick-list">' + people.map(function (l) {
-        return '<li data-etapa="' + esc(l.etapa) + '" data-q="' + esc((l.nombre + " " + l.email + " " + l.etiquetas + " " + l.origen).toLowerCase()) + '"><label class="chk"><input type="checkbox" value="' + esc(l.email) + '"' + (S.mail.lista.indexOf(l.email) > -1 ? " checked" : "") + " /> <span><b>" + esc(up(l.nombre) || l.email) + "</b><small>" + esc(l.email) + " · " + esc(S.stages[l.etapa] || "") + "</small></span></label></li>";
+        return '<li data-etapa="' + esc(l.etapa) + '" data-origen="' + esc(l.origen || "") + '" data-q="' + esc((l.nombre + " " + l.email + " " + l.etiquetas + " " + l.origen).toLowerCase()) + '"><label class="chk"><input type="checkbox" value="' + esc(l.email) + '"' + (S.mail.lista.indexOf(l.email) > -1 ? " checked" : "") + " /> <span><b>" + esc(up(l.nombre) || l.email) + "</b><small>" + esc(l.email) + " · " + esc(S.stages[l.etapa] || "") + (l.origen ? " · " + esc(l.origen) : "") + "</small></span></label></li>";
       }).join("") + "</ul>" +
       '<div class="d-actions"><button class="btn primary" type="submit">Usar los marcados</button></div></form>';
     showDrawer();
   }
   function filterPicker() {
-    var q = ($("#pick-q").value || "").toLowerCase().trim(), et = $("#pick-etapa").value;
+    var q = ($("#pick-q").value || "").toLowerCase().trim(), et = $("#pick-etapa").value, og = $("#pick-origen").value;
     $$(".pick-list li").forEach(function (li) {
-      li.hidden = (q && li.getAttribute("data-q").indexOf(q) < 0) || (et && li.getAttribute("data-etapa") !== et);
+      li.hidden = (q && li.getAttribute("data-q").indexOf(q) < 0) || (et && li.getAttribute("data-etapa") !== et) || (og && li.getAttribute("data-origen") !== og);
     });
   }
 
@@ -1243,7 +1246,7 @@
     if (t.id === "m-bol") { S.mail.boletin = t.checked; renderMail(); }
     if (t.id === "m-img") { S.mail.imagen = t.checked ? (S.mail.imagen || EMAIL_IMG) : ""; refreshPreview(); }
     if (t.id === "m-wa") { S.mail.boton = t.checked; refreshPreview(); }
-    if (t.id === "pick-etapa") filterPicker();
+    if (t.id === "pick-etapa" || t.id === "pick-origen") filterPicker();
     if (t.id === "pick-all") $$(".pick-list li:not([hidden]) input").forEach(function (x) { x.checked = t.checked; });
     if (t.id === "doc-file") uploadFiles(t.files, "");
     if (t.id === "lead-file") uploadFiles(t.files, S.open);
