@@ -150,6 +150,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--amber); box-shad
 .toolbar .search { flex: 1 1 260px; }
 .toolbar select { width: auto; flex: 0 1 200px; }
 .sort-by { display: flex; align-items: center; gap: 8px; flex: 0 1 270px; }
+.tag-by { flex: 0 1 220px; }
 .sort-by span { font-size: 13px; font-weight: 700; color: var(--mute); white-space: nowrap; }
 .sort-by select { flex: 1 1 auto; min-width: 0; }
 #f-dir { width: 42px; height: 42px; padding: 0; font-size: 17px; }

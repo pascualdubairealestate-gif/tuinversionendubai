@@ -283,9 +283,9 @@
       (withStage ? '<select id="f-etapa" aria-label="Etapa"><option value="">Todas las etapas</option>' + Object.keys(S.stages).map(function (k) {
         return '<option value="' + k + '"' + (k === S.etapa ? " selected" : "") + ">" + esc(S.stages[k]) + "</option>";
       }).join("") + "</select>" : "") +
-      '<select id="f-tag" aria-label="Etiqueta"><option value="">Todas las etiquetas</option>' + tags.map(function (t) {
+      '<label class="sort-by tag-by"><span>Etiquetas:</span><select id="f-tag"><option value="">Todas</option>' + tags.map(function (t) {
         return "<option" + (t.toLowerCase() === S.tag.toLowerCase() ? " selected" : "") + ">" + esc(t) + "</option>";
-      }).join("") + "</select>" +
+      }).join("") + "</select></label>" +
       '<label class="chk"><input type="checkbox" id="f-hoy"' + (S.hoy ? " checked" : "") + " /> Seguimientos pendientes</label></nav>";
   }
 
