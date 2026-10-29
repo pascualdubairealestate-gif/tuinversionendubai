@@ -6,7 +6,7 @@
   var TZ = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "UTC";
   var S = {
     leads: [], ventas: [], hitos: {}, stages: {}, csrf: "", notify: "", ics: "",
-    page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(), orden: savedSort().por, dir: savedSort().dir, plegadas: savedFolds(),
+    page: "inicio", q: "", origen: "", etapa: "", tag: "", hoy: false, vista: savedView(), orden: savedSort().por, dir: savedSort().dir, plegadas: savedFolds(),
     open: null, dirty: false,
     cal: {}, calErr: "", month: null, day: null,
     tpls: null, docs: null, carpetas: [], carpeta: "", newFolder: false, mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false }
@@ -254,6 +254,7 @@
     return S.leads.filter(function (l) {
       if (S.origen && l.origen !== S.origen) return false;
       if (S.etapa && l.etapa !== S.etapa) return false;
+      if (S.tag && tagsOf(l).map(function (t) { return t.toLowerCase(); }).indexOf(S.tag.toLowerCase()) < 0) return false;
       if (S.hoy && !overdue(l)) return false;
       if (!q) return true;
       return [l.nombre, l.email, l.telefono, l.proyecto, l.etiquetas, l.pais, l.origen].join(" ").toLowerCase().indexOf(q) > -1;
@@ -264,7 +265,17 @@
     });
   }
 
+  // Etiquetas: texto libre separado por comas ("vip, golden visa").
+  function tagsOf(l) { return String(l.etiquetas || "").split(",").map(function (t) { return t.trim(); }).filter(Boolean); }
+  function allTags() {
+    var seen = {};
+    S.leads.forEach(function (l) { tagsOf(l).forEach(function (t) { var k = t.toLowerCase(); if (!seen[k]) seen[k] = t; }); });
+    return Object.keys(seen).sort(function (a, b) { return a.localeCompare(b, "es"); }).map(function (k) { return seen[k]; });
+  }
+
   function toolbar(withStage) {
+    var tags = allTags();
+    if (S.tag && tags.map(function (t) { return t.toLowerCase(); }).indexOf(S.tag.toLowerCase()) < 0) S.tag = "";
     return '<nav class="toolbar"><input class="search" id="q" type="search" placeholder="Buscar nombre, email, teléfono, proyecto…" value="' + esc(S.q) + '" />' +
       '<label class="sort-by"><span>Ordenar por:</span><select id="f-orden">' + Object.keys(ORDENES).map(function (k) {
         return '<option value="' + k + '"' + (k === S.orden ? " selected" : "") + ">" + ORDENES[k] + "</option>";
@@ -272,6 +283,9 @@
       (withStage ? '<select id="f-etapa" aria-label="Etapa"><option value="">Todas las etapas</option>' + Object.keys(S.stages).map(function (k) {
         return '<option value="' + k + '"' + (k === S.etapa ? " selected" : "") + ">" + esc(S.stages[k]) + "</option>";
       }).join("") + "</select>" : "") +
+      '<select id="f-tag" aria-label="Etiqueta"><option value="">Todas las etiquetas</option>' + tags.map(function (t) {
+        return "<option" + (t.toLowerCase() === S.tag.toLowerCase() ? " selected" : "") + ">" + esc(t) + "</option>";
+      }).join("") + "</select>" +
       '<label class="chk"><input type="checkbox" id="f-hoy"' + (S.hoy ? " checked" : "") + " /> Seguimientos pendientes</label></nav>";
   }
 
@@ -786,7 +800,7 @@
       field("telefono", "Teléfono / WhatsApp", l.telefono, "tel") + field("pais", "País", l.pais) +
       select("origen", "Origen", l.origen || "Manual", ORIGENES) + select("presupuesto", "Presupuesto", l.presupuesto || "Por definir", PRESUPUESTOS) +
       field("objetivo", "Objetivo", l.objetivo, "text", true) + field("proyecto", "Proyecto de interés", l.proyecto) +
-      field("valor", "Valor operación (€)", l.valor, "text") + field("etiquetas", "Etiquetas", l.etiquetas) +
+      field("valor", "Valor operación (€)", l.valor, "text") + field("etiquetas", "Etiquetas (separadas por comas)", l.etiquetas, "text", true) +
       field("proxima_accion", "Próxima acción", l.proxima_accion) + field("seguimiento", "Fecha de seguimiento", l.seguimiento, "date") +
       "</div>" +
       '<label class="chk"><input type="checkbox" name="boletin"' + (l.boletin ? " checked" : "") + " /> Suscrito al boletín semanal</label>" +
@@ -796,7 +810,7 @@
       (l.id ? leadSalesHtml(l.id) : "") +
       (l.id ? '<div class="lead-docs"><header class="panel-h"><h3>Documentos</h3><label class="btn ghost sm">+ Subir<input type="file" id="lead-file" multiple hidden /></label></header><ul class="doc-list" id="lead-doc-list"><li class="muted small">Cargando…</li></ul></div>' : "") +
       (acts ? '<h3>Actividad</h3><ol class="timeline">' + acts + "</ol>" : "") + utm +
-      datalist("objetivo", OBJETIVOS) +
+      datalist("objetivo", OBJETIVOS) + datalist("etiquetas", allTags()) +
       "</form>";
     showDrawer();
     if (!l.id) setTimeout(function () { $("#lead-form [name=nombre]").focus(); }, 60);
@@ -1055,6 +1069,7 @@
       li.classList.toggle("done", !!date.value);
     }
     if (t.id === "f-etapa") { S.etapa = t.value; refreshResults(); }
+    if (t.id === "f-tag") { S.tag = t.value; refreshResults(); }
     if (t.id === "f-hoy") { S.hoy = t.checked; refreshResults(); }
     if (t.id === "m-bol") { S.mail.boletin = t.checked; renderMail(); }
     if (t.id === "doc-file") uploadFiles(t.files, "");
