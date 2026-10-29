@@ -6,7 +6,7 @@
   var TZ = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "UTC";
   var S = {
     leads: [], ventas: [], hitos: {}, stages: {}, csrf: "", notify: "", ics: "",
-    page: "inicio", q: "", origen: "", etapa: "", tag: "", hoy: false, vista: savedView(), orden: savedSort().por, dir: savedSort().dir, plegadas: savedFolds(),
+    page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(), orden: savedSort().por, dir: savedSort().dir, plegadas: savedFolds(),
     open: null, dirty: false,
     cal: {}, calErr: "", month: null, day: null,
     tpls: null, docs: null, carpetas: [], carpeta: "", newFolder: false, mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false }
@@ -254,7 +254,6 @@
     return S.leads.filter(function (l) {
       if (S.origen && l.origen !== S.origen) return false;
       if (S.etapa && l.etapa !== S.etapa) return false;
-      if (S.tag && tagsOf(l).map(function (t) { return t.toLowerCase(); }).indexOf(S.tag.toLowerCase()) < 0) return false;
       if (S.hoy && !overdue(l)) return false;
       if (!q) return true;
       return [l.nombre, l.email, l.telefono, l.proyecto, l.etiquetas, l.pais, l.origen].join(" ").toLowerCase().indexOf(q) > -1;
@@ -274,8 +273,9 @@
   }
 
   function toolbar(withStage) {
-    var tags = allTags();
-    if (S.tag && tags.map(function (t) { return t.toLowerCase(); }).indexOf(S.tag.toLowerCase()) < 0) S.tag = "";
+    // Todos los orígenes de la lista, más los que haya en contactos antiguos.
+    var origins = ORIGENES.slice();
+    S.leads.forEach(function (l) { if (l.origen && origins.indexOf(l.origen) < 0) origins.push(l.origen); });
     return '<nav class="toolbar"><input class="search" id="q" type="search" placeholder="Buscar nombre, email, teléfono, proyecto…" value="' + esc(S.q) + '" />' +
       '<label class="sort-by"><span>Ordenar por:</span><select id="f-orden">' + Object.keys(ORDENES).map(function (k) {
         return '<option value="' + k + '"' + (k === S.orden ? " selected" : "") + ">" + ORDENES[k] + "</option>";
@@ -283,8 +283,8 @@
       (withStage ? '<select id="f-etapa" aria-label="Etapa"><option value="">Todas las etapas</option>' + Object.keys(S.stages).map(function (k) {
         return '<option value="' + k + '"' + (k === S.etapa ? " selected" : "") + ">" + esc(S.stages[k]) + "</option>";
       }).join("") + "</select>" : "") +
-      '<label class="sort-by tag-by"><span>Etiquetas:</span><select id="f-tag"><option value="">Todas</option>' + tags.map(function (t) {
-        return "<option" + (t.toLowerCase() === S.tag.toLowerCase() ? " selected" : "") + ">" + esc(t) + "</option>";
+      '<label class="sort-by tag-by"><span>Origen:</span><select id="f-origen"><option value="">Todos</option>' + origins.map(function (o) {
+        return "<option" + (o === S.origen ? " selected" : "") + ">" + esc(o) + "</option>";
       }).join("") + "</select></label>" +
       '<label class="chk"><input type="checkbox" id="f-hoy"' + (S.hoy ? " checked" : "") + " /> Seguimientos pendientes</label></nav>";
   }
@@ -1069,7 +1069,7 @@
       li.classList.toggle("done", !!date.value);
     }
     if (t.id === "f-etapa") { S.etapa = t.value; refreshResults(); }
-    if (t.id === "f-tag") { S.tag = t.value; refreshResults(); }
+    if (t.id === "f-origen") { S.origen = t.value; refreshResults(); }
     if (t.id === "f-hoy") { S.hoy = t.checked; refreshResults(); }
     if (t.id === "m-bol") { S.mail.boletin = t.checked; renderMail(); }
     if (t.id === "doc-file") uploadFiles(t.files, "");
