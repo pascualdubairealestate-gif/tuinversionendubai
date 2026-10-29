@@ -398,3 +398,20 @@ tbody tr:last-child td { border-bottom: 0; }
 .m-preview { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #f6f4f0; max-height: 720px; overflow-y: auto; }
 .m-preview p { margin: 0 0 14px; }
 .m-preview table:not([width]) { width: auto; }
+.m-to-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.m-to-row input { flex: 1 1 240px; min-width: 0; }
+.m-batch { display: grid; gap: 8px; padding: 12px 14px; border: 1px solid rgba(247, 147, 30, .4); border-radius: 12px; background: var(--amber-soft); }
+.m-batch header { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.m-batch p { margin: 0; }
+.m-batch ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 340px; overflow-y: auto; }
+.m-batch li { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: var(--surface); border-radius: 10px; padding: 8px 10px; }
+.m-batch li .who { flex: 1 1 180px; min-width: 0; }
+.m-batch li .who b, .m-batch li .who small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-batch li .who small { color: var(--mute); font-size: 12px; }
+.m-batch li .ok { color: var(--s-customer); font-weight: 700; font-size: 13px; min-width: 64px; }
+.m-batch li.done { opacity: .75; }
+.pick-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; max-height: 55vh; overflow-y: auto; }
+.pick-list li { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--surface); }
+.pick-list .chk { width: 100%; }
+.pick-list b, .pick-list small { display: block; }
+.pick-list small { color: var(--mute); font-size: 12px; }

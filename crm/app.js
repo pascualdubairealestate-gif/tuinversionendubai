@@ -9,7 +9,7 @@
     page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(), orden: savedSort().por, dir: savedSort().dir, plegadas: savedFolds(),
     open: null, dirty: false,
     cal: {}, calErr: "", month: null, day: null,
-    tpls: null, docs: null, carpetas: [], carpeta: "", newFolder: false, mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false, imagen: "", boton: false }
+    tpls: null, docs: null, carpetas: [], carpeta: "", newFolder: false, mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false, imagen: "", boton: false, lista: [], hechos: {}, forEmail: "" }
   };
   var PAGES = { inicio: "Inicio", contactos: "Contactos", ventas: "Ventas", correo: "Correo", calendario: "Calendario", documentos: "Documentos" };
   var STAGE_HINT = {
@@ -551,7 +551,7 @@
     return String(txt || "").replace(/\{nombre\}/g, first || "").replace(/\{proyecto\}/g, l.proyecto || "el proyecto").replace(/\{nombre_completo\}/g, l.nombre || "");
   }
   function mailTarget() {
-    var v = S.mail.to.trim().toLowerCase();
+    var v = (S.mail.forEmail || (S.mail.lista.length && !S.mail.to.trim() ? S.mail.lista[0] : S.mail.to)).trim().toLowerCase();
     var m = v.match(/<([^>]+)>/);
     var email = (m ? m[1] : v).trim();
     return { email: email, lead: S.leads.filter(function (l) { return l.email && l.email === email; })[0] };
@@ -573,19 +573,63 @@
       }).join("") + '</ul><p class="muted small">Usa <code>{nombre}</code> y <code>{proyecto}</code>: se rellenan con los datos del contacto.</p></section>' +
       '<section class="panel compose"><header class="panel-h"><h3>Redactar</h3></header>' +
       '<form id="mail-form" autocomplete="off">' +
-      '<label class="f"><span>Para</span><input id="m-to" list="dl-contacts" placeholder="Escribe un nombre o email" value="' + esc(S.mail.to) + '"' + (S.mail.boletin ? " disabled" : "") + " /></label>" +
+      '<label class="f"><span>Para</span><span class="m-to-row"><input id="m-to" list="dl-contacts" placeholder="Escribe un nombre o email" value="' + esc(S.mail.to) + '"' + (S.mail.boletin ? " disabled" : "") + ' /><button class="btn ghost sm" type="button" data-act="to-add"' + (S.mail.boletin ? " disabled" : "") + '>+ Añadir a la lista</button><button class="btn ghost sm" type="button" data-act="to-pick"' + (S.mail.boletin ? " disabled" : "") + ">Elegir varios…</button></span></label>" +
       '<datalist id="dl-contacts">' + S.leads.filter(function (l) { return l.email; }).map(function (l) { return "<option value=\"" + esc((l.nombre ? l.nombre + " " : "") + "<" + l.email + ">") + "\"></option>"; }).join("") + "</datalist>" +
       '<label class="chk"><input type="checkbox" id="m-bol"' + (S.mail.boletin ? " checked" : "") + " /> Enviar a todos los suscritos al boletín (" + subs.length + ") en copia oculta</label>" +
       '<label class="f"><span>Asunto</span><input id="m-asunto" value="' + esc(S.mail.asunto) + '" /></label>' +
       '<label class="f"><span>Mensaje</span><textarea id="m-cuerpo" rows="12">' + esc(S.mail.cuerpo) + "</textarea></label>" +
       '<div class="m-opts"><label class="chk"><input type="checkbox" id="m-img"' + (S.mail.imagen ? " checked" : "") + " /> Foto de Dubái</label>" +
       '<label class="chk"><input type="checkbox" id="m-wa"' + (S.mail.boton ? " checked" : "") + " /> Botón «Escríbeme por WhatsApp»</label></div>" +
-      '<div class="m-steps"><b>Enviar con diseño:</b> 1) <button class="btn primary sm" type="button" data-act="mail-design">Copiar correo con diseño</button> 2) <button class="btn ghost sm" type="button" data-act="mail-gmail-blank">Abrir Gmail</button> 3) pega en el mensaje con <kbd>Cmd</kbd>+<kbd>V</kbd> (o Ctrl+V).</div>' +
-      '<div class="d-actions"><button class="btn ghost sm" type="button" data-act="mail-gmail">Gmail solo texto</button><button class="btn ghost sm" type="button" data-act="mail-app">Mi app de correo (texto)</button><button class="btn ghost sm" type="button" data-act="mail-copy">Copiar texto</button></div>' +
+      (S.mail.lista.length && !S.mail.boletin ? batchHtml() : "") +
+      '<div class="m-steps"' + (S.mail.lista.length && !S.mail.boletin ? " hidden" : "") + '><b>Enviar con diseño:</b> 1) <button class="btn primary sm" type="button" data-act="mail-design">Copiar correo con diseño</button> 2) <button class="btn ghost sm" type="button" data-act="mail-gmail-blank">Abrir Gmail</button> 3) pega en el mensaje con <kbd>Cmd</kbd>+<kbd>V</kbd> (o Ctrl+V).</div>' +
+      '<div class="d-actions"' + (S.mail.lista.length && !S.mail.boletin ? " hidden" : "") + '><button class="btn ghost sm" type="button" data-act="mail-gmail">Gmail solo texto</button><button class="btn ghost sm" type="button" data-act="mail-app">Mi app de correo (texto)</button><button class="btn ghost sm" type="button" data-act="mail-copy">Copiar texto</button></div>' +
       '<p class="muted small">Si el destinatario es un contacto, el envío queda anotado en su historial.</p>' +
       "</form>" +
       '<header class="panel-h m-prev-h"><h3>Vista previa</h3><small class="muted">Así lo recibe ' + esc(mailTarget().lead ? (mailTarget().lead.nombre || mailTarget().email) : "tu contacto") + '</small></header><div class="m-preview" id="m-preview">' + designHtml(true) + "</div>" +
       "</section></div>";
+  }
+
+  /* Envío uno a uno: una lista de destinatarios, cada uno con su correo personalizado. */
+  function batchHtml() {
+    var n = S.mail.lista.length, done = S.mail.lista.filter(function (e) { return S.mail.hechos[e]; }).length;
+    return '<div class="m-batch"><header><b>Envío uno a uno · ' + done + " de " + n + ' enviados</b><button class="btn ghost sm" type="button" data-act="batch-clear">Vaciar lista</button></header>' +
+      '<p class="muted small">Para cada contacto: <b>1 · Copiar</b> → <b>2 · Gmail</b> → pega con Cmd+V → Enviar. Cada uno recibe su correo con su nombre.</p><ol>' +
+      S.mail.lista.map(function (em) {
+        var l = S.leads.filter(function (x) { return x.email === em; })[0];
+        return '<li data-email="' + esc(em) + '" class="' + (S.mail.hechos[em] ? "done" : "") + '"><span class="who"><b>' + esc(l ? up(l.nombre) || em : em) + "</b><small>" + esc(em) + "</small></span>" +
+          '<button class="btn primary sm" type="button" data-act="batch-copy">1 · Copiar</button><button class="btn ghost sm" type="button" data-act="batch-gmail">2 · Gmail</button>' +
+          '<span class="ok">' + (S.mail.hechos[em] ? "✓ Abierto" : "") + '</span><button class="btn icon sm" type="button" data-act="batch-remove" aria-label="Quitar">✕</button></li>';
+      }).join("") + "</ol></div>";
+  }
+  function addRecipients(list) {
+    var added = 0;
+    list.forEach(function (em) {
+      em = String(em || "").trim().toLowerCase();
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em) && S.mail.lista.indexOf(em) < 0) { S.mail.lista.push(em); added++; }
+    });
+    return added;
+  }
+  function withRecipient(em, fn) { S.mail.forEmail = em; try { return fn(); } finally { S.mail.forEmail = ""; } }
+
+  function openPicker() {
+    S.open = "__pick";
+    S.dirty = false;
+    var people = S.leads.filter(function (l) { return l.email; }).sort(function (a, b) { return up(a.nombre || a.email).localeCompare(up(b.nombre || b.email), "es"); });
+    $(".drawer-panel").innerHTML = '<form id="pick-form"><header class="d-head"><h2 id="d-title">Elegir destinatarios</h2><button type="button" class="btn icon" data-close aria-label="Cerrar">✕</button></header>' +
+      '<div class="toolbar"><input class="search" id="pick-q" type="search" placeholder="Buscar…" /><select id="pick-etapa" aria-label="Etapa"><option value="">Todas las etapas</option>' +
+      Object.keys(S.stages).map(function (k) { return '<option value="' + k + '">' + esc(S.stages[k]) + "</option>"; }).join("") + "</select></div>" +
+      '<label class="chk"><input type="checkbox" id="pick-all" /> Marcar todos los visibles</label>' +
+      '<ul class="pick-list">' + people.map(function (l) {
+        return '<li data-etapa="' + esc(l.etapa) + '" data-q="' + esc((l.nombre + " " + l.email + " " + l.etiquetas + " " + l.origen).toLowerCase()) + '"><label class="chk"><input type="checkbox" value="' + esc(l.email) + '"' + (S.mail.lista.indexOf(l.email) > -1 ? " checked" : "") + " /> <span><b>" + esc(up(l.nombre) || l.email) + "</b><small>" + esc(l.email) + " · " + esc(S.stages[l.etapa] || "") + "</small></span></label></li>";
+      }).join("") + "</ul>" +
+      '<div class="d-actions"><button class="btn primary" type="submit">Usar los marcados</button></div></form>';
+    showDrawer();
+  }
+  function filterPicker() {
+    var q = ($("#pick-q").value || "").toLowerCase().trim(), et = $("#pick-etapa").value;
+    $$(".pick-list li").forEach(function (li) {
+      li.hidden = (q && li.getAttribute("data-q").indexOf(q) < 0) || (et && li.getAttribute("data-etapa") !== et);
+    });
   }
 
   function composeUrl(kind) {
@@ -658,6 +702,7 @@
       "</td></tr></table>";
   }
   function refreshPreview() { var el = $("#m-preview"); if (el) el.innerHTML = designHtml(true); }
+  function batchRow(act) { return act.closest("[data-email]").getAttribute("data-email"); }
   function copyDesign() {
     var html = designHtml(false), text = mailParts().body;
     var fallback = function () {
@@ -1049,6 +1094,24 @@
         if (S.page === "correo") renderMail();
       }
       if (a === "mail-design") { copyDesign(); return; }
+      if (a === "to-add") {
+        var raw = S.mail.to, mm = raw.match(/<([^>]+)>/), em1 = (mm ? mm[1] : raw).trim();
+        if (!addRecipients([em1])) { toast("Escribe un email válido o elige un contacto", true); return; }
+        S.mail.to = ""; renderMail(); return;
+      }
+      if (a === "to-pick") { openPicker(); return; }
+      if (a === "batch-clear") { S.mail.lista = []; S.mail.hechos = {}; renderMail(); return; }
+      if (a === "batch-remove") { var er = batchRow(act); S.mail.lista = S.mail.lista.filter(function (x) { return x !== er; }); renderMail(); return; }
+      if (a === "batch-copy") { withRecipient(batchRow(act), copyDesign); return; }
+      if (a === "batch-gmail") {
+        var eg = batchRow(act);
+        window.open(withRecipient(eg, function () { return composeUrl("gmail-blank"); }), "_blank", "noopener");
+        withRecipient(eg, logMail);
+        S.mail.hechos[eg] = true;
+        var li2 = act.closest("li"); li2.classList.add("done"); $(".ok", li2).textContent = "✓ Abierto";
+        var hd = $(".m-batch header b"); if (hd) hd.textContent = "Envío uno a uno · " + S.mail.lista.filter(function (x) { return S.mail.hechos[x]; }).length + " de " + S.mail.lista.length + " enviados";
+        return;
+      }
       if (a === "mail-gmail-blank") {
         if (!S.mail.boletin && !mailTarget().email) { toast("Indica a quién va el correo", true); return; }
         window.open(composeUrl("gmail-blank"), "_blank", "noopener");
@@ -1115,6 +1178,7 @@
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && S.open !== null) closeDrawer();
+    if (e.key === "Enter" && e.target.id === "m-to" && e.target.value.trim()) { e.preventDefault(); var b2 = $("[data-act=to-add]"); if (b2) b2.click(); }
     if (e.key === "Enter" && e.target.matches && e.target.matches("[data-sale]")) openSale(e.target.getAttribute("data-sale"));
     else if (e.key === "Enter" && e.target.matches && e.target.matches(".card, tr[data-id], li[data-id]")) openLead(e.target.getAttribute("data-id"));
   });
@@ -1123,6 +1187,15 @@
     var f = e.target, fid = f.getAttribute("id"); // no f.id: un campo name="id" lo taparía
     if (fid === "lead-form") { e.preventDefault(); submitLead(f); }
     if (fid === "sale-form") { e.preventDefault(); submitSale(f); }
+    if (fid === "pick-form") {
+      e.preventDefault();
+      var chosen = $$(".pick-list input:checked", f).map(function (x) { return x.value; });
+      var unc = $$(".pick-list input:not(:checked)", f).map(function (x) { return x.value; });
+      S.mail.lista = S.mail.lista.filter(function (x) { return unc.indexOf(x) < 0; });
+      addRecipients(chosen);
+      closeDrawer(true); renderMail();
+      toast(S.mail.lista.length + " en la lista de envío");
+    }
     if (fid === "folder-form") {
       e.preventDefault();
       var name = $("[name=nombre]", f).value.trim();
@@ -1142,7 +1215,7 @@
 
   document.addEventListener("input", function (e) {
     var t = e.target;
-    if (t.closest(".drawer") && t.type !== "file") S.dirty = true;
+    if (t.closest(".drawer") && t.type !== "file" && !t.closest("#pick-form")) S.dirty = true;
     if (t.id === "q" || t.id === "q-docs") {
       S.q = t.value;
       if (t.id === "q") refreshResults();
@@ -1152,6 +1225,7 @@
     if (t.id === "m-asunto") S.mail.asunto = t.value;
     if (t.id === "m-cuerpo") S.mail.cuerpo = t.value;
     if (t.id === "m-to" || t.id === "m-asunto" || t.id === "m-cuerpo") refreshPreview();
+    if (t.id === "pick-q") filterPicker();
   });
 
   document.addEventListener("change", function (e) {
@@ -1169,6 +1243,8 @@
     if (t.id === "m-bol") { S.mail.boletin = t.checked; renderMail(); }
     if (t.id === "m-img") { S.mail.imagen = t.checked ? (S.mail.imagen || EMAIL_IMG) : ""; refreshPreview(); }
     if (t.id === "m-wa") { S.mail.boton = t.checked; refreshPreview(); }
+    if (t.id === "pick-etapa") filterPicker();
+    if (t.id === "pick-all") $$(".pick-list li:not([hidden]) input").forEach(function (x) { x.checked = t.checked; });
     if (t.id === "doc-file") uploadFiles(t.files, "");
     if (t.id === "lead-file") uploadFiles(t.files, S.open);
     if (t.classList.contains("doc-folder")) moveDoc(t.closest("[data-doc]").getAttribute("data-doc"), t.value);
