@@ -27,7 +27,19 @@ window.__PV__ = {
   // Canal de YouTube
   youtubeChannel: "https://www.youtube.com/@pascual.dubairealestate",
   // IDs de tus vídeos, en el mismo orden que las tarjetas (lo que va tras "v=" en la URL)
-  youtube: ["", "", ""]
+  youtube: ["", "", ""],
+
+  // Google Ads: tu ID de cuenta (Herramientas → Conversiones → «Instalar la etiqueta tú mismo», empieza por AW-).
+  // Vacío = no se carga nada de Google ni aparece el aviso de cookies.
+  googleAdsId: "",
+  // Etiqueta de cada conversión (lo que va tras la barra en «send_to»: AW-123456789/AbC-dEfGh).
+  googleAdsLabels: {
+    consultoria: "",   // formulario de consultoría o dossier enviado
+    guia: "",          // guía descargada o alta en noticias
+    whatsapp: ""       // clic en cualquier botón de WhatsApp
+  },
+  // Google Analytics 4 (opcional, empieza por G-)
+  ga4Id: ""
 };
 
 (function () {
@@ -46,6 +58,71 @@ window.__PV__ = {
     var o = { event: event };
     for (var k in data) o[k] = data[k];
     window.dataLayer.push(o);
+    measure(event, data || {});
+  }
+
+  /* ---------- Google Ads / Analytics con consentimiento ---------- */
+  var tagsOn = false;
+  function gtag() { window.dataLayer = window.dataLayer || []; window.dataLayer.push(arguments); }
+  function tagsConfigured() { return !!(CFG.googleAdsId || CFG.ga4Id); }
+  function getConsent() { try { return localStorage.getItem("pv_consent"); } catch (e) { return null; } }
+  function loadTags() {
+    if (tagsOn || !tagsConfigured()) return;
+    tagsOn = true;
+    window.gtag = gtag;
+    gtag("consent", "default", { ad_storage: "granted", ad_user_data: "granted", ad_personalization: "granted", analytics_storage: "granted" });
+    var sc = document.createElement("script");
+    sc.async = true;
+    sc.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(CFG.googleAdsId || CFG.ga4Id);
+    document.head.appendChild(sc);
+    gtag("js", new Date());
+    if (CFG.googleAdsId) gtag("config", CFG.googleAdsId);
+    if (CFG.ga4Id) gtag("config", CFG.ga4Id);
+  }
+  function conversion(label) {
+    if (CFG.googleAdsId && label) gtag("event", "conversion", { send_to: CFG.googleAdsId + "/" + label });
+  }
+  function measure(event, data) {
+    if (!tagsOn) return;
+    var L = CFG.googleAdsLabels || {};
+    if (event === "lead_submit") {
+      var f = data.formulario;
+      conversion(f === "guia" || f === "newsletter" ? L.guia : L.consultoria);
+      if (CFG.ga4Id) gtag("event", "generate_lead", { formulario: f });
+    } else if (event === "whatsapp_click") {
+      conversion(L.whatsapp);
+      if (CFG.ga4Id) gtag("event", "whatsapp_click");
+    }
+  }
+  function initConsent() {
+    $$("[data-cookie-settings]").forEach(function (a) {
+      a.hidden = !tagsConfigured();
+      a.addEventListener("click", function (e) { e.preventDefault(); showBanner(); });
+    });
+    if (!tagsConfigured()) return;
+    var c = getConsent();
+    if (c === "si") loadTags();
+    else if (c !== "no") showBanner();
+  }
+  function showBanner() {
+    if ($("[data-cookie-banner]")) return;
+    var b = document.createElement("div");
+    b.className = "cookie-banner";
+    b.setAttribute("data-cookie-banner", "");
+    b.setAttribute("role", "dialog");
+    b.setAttribute("aria-label", "Aviso de cookies");
+    b.innerHTML = '<p>Usamos cookies de Google para medir qué anuncios funcionan. Solo se activan si aceptas. <a href="/cookies/">Más información</a></p>' +
+      '<div class="cookie-actions"><button class="btn btn-sm cookie-no" type="button" data-c="no">Rechazar</button><button class="btn btn-sm cookie-yes" type="button" data-c="si">Aceptar</button></div>';
+    document.body.appendChild(b);
+    $$("[data-c]", b).forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var v = btn.getAttribute("data-c");
+        try { localStorage.setItem("pv_consent", v); } catch (e) {}
+        if (v === "si") loadTags();
+        else if (tagsOn) location.reload(); // retirar el consentimiento: recargar sin etiquetas
+        b.remove();
+      });
+    });
   }
   var canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
@@ -372,6 +449,7 @@ window.__PV__ = {
 
   /* ---------- Popup de la guía a los 7 segundos ---------- */
   function initGuidePopup() {
+    if (document.body.hasAttribute("data-no-guide-popup")) return;
     var seen = false;
     try { seen = sessionStorage.getItem("pv_guide_seen") || localStorage.getItem("pv_guide_done"); } catch (e) {}
     if (seen) return;
@@ -540,6 +618,7 @@ window.__PV__ = {
     safe(initForms, "forms");
     safe(initGuidePopup, "guide");
     safe(initYear, "year");
+    safe(initConsent, "consent");
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();

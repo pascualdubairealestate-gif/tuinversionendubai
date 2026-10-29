@@ -4,7 +4,7 @@ import json, re, sys, html as H
 
 ROOT = sys.argv[1] if len(sys.argv) > 1 else "."
 SITE = "https://tuinversionendubai.com"
-V = "20261031b"
+V = "20261031c"
 DATE = "2026-10-28"
 DATE_TXT = "28 de octubre de 2026"
 
@@ -28,7 +28,7 @@ favicon = re.search(r'<link rel="icon"[^>]*>', src).group(0)
 AUTHOR = {"@type": "Person", "name": "Pascual Vidal", "url": SITE + "/#sobre-mi"}
 
 
-def page(path, title, desc, body, ld, og_image="/assets/img/pascual-dubai.webp", og_type="article"):
+def page(path, title, desc, body, ld, og_image="/assets/img/pascual-dubai.webp", og_type="article", body_attrs=""):
     url = SITE + path
     return f"""<!doctype html>
 <html lang="es" class="no-js">
@@ -56,7 +56,7 @@ def page(path, title, desc, body, ld, og_image="/assets/img/pascual-dubai.webp",
 {json.dumps(ld, ensure_ascii=False, indent=1)}
   </script>
 </head>
-<body class="blog-page">
+<body class="blog-page"{body_attrs}>
 
   {nav}
 
@@ -371,7 +371,7 @@ pages["_privacidad"] = legal_page("privacidad", "Política de privacidad",
     ("Con quién los compartimos",
      p("No vendemos tus datos. Para prestar el servicio usamos proveedores que los tratan por cuenta nuestra:") +
      ul("<strong>Hostinger</strong> (alojamiento de la web y del sistema donde guardamos los contactos).",
-        "<strong>Google</strong> (correo electrónico, calendario y tipografías de la web).", "<strong>Meta / WhatsApp</strong>, si nos contactas por WhatsApp.",
+        "<strong>Google</strong> (correo electrónico, calendario, tipografías de la web y, solo si aceptas las cookies de medición, Google Ads y Analytics).", "<strong>Meta / WhatsApp</strong>, si nos contactas por WhatsApp.",
         "<strong>YouTube</strong>, solo si reproduces un vídeo incrustado.") +
      p("Si decides invertir, y siempre con tu conocimiento, podremos compartir los datos necesarios con promotores, notarías, bancos o el Dubai Land Department para tramitar la operación.")),
     ("Transferencias internacionales", p("El responsable desarrolla su actividad en Dubái (Emiratos Árabes Unidos), país sin decisión de adecuación de la Comisión Europea, por lo que tus datos se consultan y gestionan desde allí. Al enviarnos tus datos para recibir nuestros servicios, consientes esta transferencia, que es necesaria para atender tu solicitud. Algunos proveedores (como Google o Meta) pueden tratar datos en Estados Unidos con las garantías que ofrecen sus propias políticas.")),
@@ -383,21 +383,49 @@ pages["_cookies"] = legal_page("cookies", "Política de cookies",
     "Qué cookies y tecnologías similares usa esta web y cómo puedes gestionarlas.", [
     ("Qué son las cookies", p("Son pequeños archivos que una web guarda en tu navegador. Tecnologías parecidas, como el almacenamiento local del navegador, cumplen funciones similares.")),
     ("Qué usa esta web",
-     p("Esta web <strong>no usa cookies publicitarias ni de analítica</strong>. Solo guarda en tu navegador estos datos técnicos, necesarios para que funcione bien:") +
+     p("<strong>Sin tu permiso, esta web no usa cookies publicitarias ni de analítica.</strong> Siempre guarda en tu navegador estos datos técnicos, necesarios para que funcione bien:") +
      '      <div class="table-scroll"><table><thead><tr><th>Nombre</th><th>Para qué</th><th>Duración</th></tr></thead><tbody>'
      '<tr><td>pv_guide_seen</td><td>No volver a mostrarte el aviso de la guía en la misma visita</td><td>Hasta cerrar el navegador</td></tr>'
      '<tr><td>pv_guide_done</td><td>Recordar que ya pediste la guía</td><td>Hasta que lo borres</td></tr>'
      '<tr><td>pv_utm</td><td>Recordar desde qué campaña llegaste, para atender bien tu consulta</td><td>Hasta cerrar el navegador</td></tr>'
      '<tr><td>pv_leads</td><td>Copia de seguridad de tus envíos por si falla la conexión</td><td>Hasta que lo borres</td></tr>'
+     '<tr><td>pv_consent</td><td>Recordar si aceptaste o rechazaste las cookies de medición</td><td>Hasta que lo borres</td></tr>'
      '</tbody></table></div>\n' +
      p("Al ser estrictamente necesarios para el servicio que pides, no requieren tu consentimiento.")),
+    ("Cookies de medición de Google (solo si aceptas)",
+     p("Si aceptas en el aviso de cookies, activamos <strong>Google Ads</strong> (y, si está configurado, <strong>Google Analytics</strong>) para saber qué anuncios traen visitas y contactos, sin identificarte por tu nombre. Google puede instalar cookies como <em>_gcl_au</em>, <em>_ga</em> o <em>_ga_*</em>, con una duración de entre 90 días y 2 años.",
+       "Si las rechazas, no se carga nada de Google en esta web. Puedes cambiar de opinión cuando quieras desde el enlace <strong>«Configurar cookies»</strong> del pie de página. Más información en la política de privacidad de Google (policies.google.com/privacy).")),
     ("Servicios de terceros",
      ul("<strong>Vídeos de YouTube:</strong> no se cargan hasta que pulsas reproducir, y usan el modo de privacidad mejorada de YouTube (youtube-nocookie.com). Al reproducirlos, YouTube puede guardar sus propias cookies.",
         "<strong>Tipografías de Google Fonts:</strong> se descargan de los servidores de Google, que recibe tu dirección IP, pero no instalan cookies.",
         "<strong>WhatsApp e Instagram:</strong> solo si pulsas sus enlaces, ya en sus propias webs.")),
     ("Cómo gestionarlas", p("Puedes borrar estos datos o bloquearlos desde la configuración de tu navegador (Chrome, Safari, Firefox, Edge…). Si los bloqueas, la web seguirá funcionando, aunque podrías ver el aviso de la guía más de una vez.")),
-    ("Cambios", p("Si en el futuro añadimos herramientas de analítica o publicidad, te pediremos permiso antes con un aviso de cookies y actualizaremos esta página.")),
+    ("Cambios", p("Si añadimos otras herramientas de analítica o publicidad, te pediremos permiso antes y actualizaremos esta página.")),
 ])
+
+# ---------------------------------------------------------------- página de aterrizaje para anuncios
+contact = absolutize(grab('    <section class="contact section section-light" id="contacto">', '</section>'))
+home_faq = dict(re.findall(r'<summary><span>(.*?)</span>.*?</summary>\s*<p>(.*?)</p>', src, re.S))
+lp_faqs = [(q, home_faq[q]) for q in ["¿Puedo comprar sin viajar a Dubái?", "¿Cuánto dinero necesito para invertir en Dubái?", "¿Qué pasa con mi propiedad cuando no estoy en Dubái?", "¿Qué impuestos pago al invertir en Dubái?"] if q in home_faq]
+lp_faq_html = "".join(f'<details class="faq-item"><summary><span>{q}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><p>{a}</p></details>' for q, a in lp_faqs)
+steps = [("Antes", "Elegimos bien", "Analizamos tu objetivo y tu presupuesto, comparamos zonas y promotores y hacemos los números reales de cada propiedad."),
+         ("Durante", "Compras tranquilo", "Reserva, contratos, pagos y registro en el Dubai Land Department. Te represento en todo, aunque no viajes."),
+         ("Después", "No te quedas solo", "Entrega de llaves, amueblado, alquiler vacacional o anual, mantenimiento, reventa y Golden Visa.")]
+steps_html = "".join(f'<div class="lp-step"><span>0{i}</span><small class="eyebrow"><span class="dot"></span>{a}</small><h3>{b}</h3><p>{c}</p></div>' for i, (a, b, c) in enumerate(steps, 1))
+lp_body = f"""    <section class="lp-hero container">
+      <p class="eyebrow"><span class="dot"></span>Consultor inmobiliario español en Dubái · RERA #97799</p>
+      <h1>Invierte en Dubái con alguien que <em>sigue contigo</em> después de comprar</h1>
+      <p class="article-lead">Hay muchos comerciales y pocos consultores. Te ayudo a elegir la propiedad adecuada con números reales y me ocupo de todo lo que viene después: alquiler, mantenimiento, reventa y Golden Visa. En español.</p>
+      <div class="lp-trust"><img src="/assets/img/dubai-land-department.webp" alt="Dubai Land Department" width="140" height="34" /><span><b>+90</b> operaciones gestionadas</span><span><b>12 meses</b> al año viviendo en Dubái</span><span><b>0 %</b> impuesto sobre la renta personal en EAU</span></div>
+    </section>
+{contact}
+    <section class="lp-block container"><h2>Cómo trabajo contigo</h2><div class="lp-steps">{steps_html}</div></section>
+    <section class="lp-block container"><h2>Preguntas frecuentes</h2><div class="article-faq">{lp_faq_html}</div></section>"""
+lp_ld = {"@context": "https://schema.org", "@type": "WebPage", "name": "Consultoría gratuita para invertir en Dubái", "url": SITE + "/consultoria/", "inLanguage": "es"}
+lp_doc = page("/consultoria/", "Consultoría gratuita para invertir en Dubái · Pascual Vidal",
+              "Reserva una llamada gratuita de 20 minutos con un consultor inmobiliario español en Dubái. Te acompaño antes, durante y después de la compra.",
+              lp_body, lp_ld, og_type="website", body_attrs=" data-no-guide-popup")
+pages["_consultoria"] = ("/consultoria/", lp_doc.replace('<meta name="theme-color"', '<meta name="robots" content="noindex, follow" />\n  <meta name="theme-color"', 1))
 
 import os
 for key, (path, doc) in pages.items():
