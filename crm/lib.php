@@ -183,6 +183,18 @@ function h($s) { return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8'); }
 
 /* ---------- Documentos ---------- */
 const DOC_EXT = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'webp', 'heic', 'txt', 'csv', 'zip', 'mp4', 'mov'];
+// Intenta sacar el precio del nombre del archivo: "Unit 1204 - AED 1,250,000.pdf", "1.2M", "850000"… ('' si no hay).
+function price_from_name($name) {
+  $n = pathinfo($name, PATHINFO_FILENAME);
+  $best = 0;
+  if (preg_match_all('/(\d+(?:[.,]\d+)?)\s*(?:m|mn|mill(?:ones?|ion)?)\b/i', $n, $m)) {
+    foreach ($m[1] as $x) $best = max($best, (int) round((float) str_replace(',', '.', $x) * 1000000));
+  }
+  if (preg_match_all('/(?<![\d.,])\d{1,3}(?:[.,]\d{3})+(?![\d])|\d{5,}/', $n, $m)) {
+    foreach ($m[0] as $x) $best = max($best, (int) preg_replace('/\D/', '', $x));
+  }
+  return $best >= 10000 ? (string) $best : '';
+}
 const DEFAULT_FOLDERS = ['DUBANA', 'GUÍAS', 'OQOODs', 'SPAs'];
 const DOC_MAX = 25 * 1024 * 1024;
 function docs_dir() {

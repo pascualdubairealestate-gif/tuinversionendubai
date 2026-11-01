@@ -342,7 +342,14 @@ if ($action === 'docs') {
   require_auth(false);
   $folders = store_read('carpetas', DEFAULT_FOLDERS);
   if ($folders === ['OQOODs', 'SPAs', 'DUBANA', 'GUÍAS']) $folders = DEFAULT_FOLDERS; // orden antiguo → nuevo
-  json_out(['docs' => store_read('docs', []), 'carpetas' => $folders]);
+  // Documentos subidos antes de existir el precio: lo intenta sacar del nombre una sola vez.
+  $docs = with_lock('docs', function () {
+    $d = store_read('docs', []); $changed = false;
+    foreach ($d as $i => $x) if (!array_key_exists('precio', $x)) { $d[$i]['precio'] = price_from_name($x['nombre']); $changed = true; }
+    if ($changed) store_write('docs', $d);
+    return $d;
+  });
+  json_out(['docs' => $docs, 'carpetas' => $folders]);
 }
 
 if ($action === 'upload' && $method === 'POST') {
@@ -357,7 +364,7 @@ if ($action === 'upload' && $method === 'POST') {
   if ($f['size'] > DOC_MAX) json_out(['error' => 'Máximo 25 MB por archivo'], 422);
   $id = 'd' . bin2hex(random_bytes(8));
   if (!move_uploaded_file($f['tmp_name'], docs_dir() . '/' . $id)) json_out(['error' => 'No se pudo guardar'], 500);
-  $doc = ['id' => $id, 'nombre' => $name, 'ext' => $ext, 'tamano' => (int) $f['size'], 'lead' => cut($_POST['lead'] ?? '', 40), 'carpeta' => cut($_POST['carpeta'] ?? '', 60), 'creado' => now_iso()];
+  $doc = ['id' => $id, 'nombre' => $name, 'ext' => $ext, 'tamano' => (int) $f['size'], 'lead' => cut($_POST['lead'] ?? '', 40), 'carpeta' => cut($_POST['carpeta'] ?? '', 60), 'precio' => price_from_name($name), 'creado' => now_iso()];
   with_lock('docs', function () use ($doc) { $d = store_read('docs', []); $d[] = $doc; store_write('docs', $d); });
   json_out(['doc' => $doc]);
 }
@@ -393,6 +400,7 @@ if ($action === 'doc_update' && $method === 'POST') {
       else {
         if (array_key_exists('lead', $b)) $d[$i]['lead'] = cut($b['lead'], 40);
         if (array_key_exists('carpeta', $b)) $d[$i]['carpeta'] = cut($b['carpeta'], 60);
+        if (array_key_exists('precio', $b)) $d[$i]['precio'] = substr(preg_replace('/\D/', '', (string) $b['precio']), 0, 15);
       }
     }
     $d = array_values($d);

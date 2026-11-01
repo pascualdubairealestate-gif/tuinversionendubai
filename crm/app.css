@@ -418,3 +418,5 @@ tbody tr:last-child td { border-bottom: 0; }
 .link-btn { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: var(--amber-ink); cursor: pointer; text-decoration: underline; }
 .m-send { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .m-batch header .quick { display: flex; gap: 6px; flex-wrap: wrap; }
+.doc-price { width: 120px; flex: none; min-height: 36px; padding: 6px 10px; font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 860px) { .doc-price { order: 5; width: 100%; text-align: left; } }

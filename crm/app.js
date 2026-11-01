@@ -9,7 +9,7 @@
     page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(), orden: savedSort().por, dir: savedSort().dir, plegadas: savedFolds(),
     open: null, dirty: false,
     cal: {}, calErr: "", month: null, day: null,
-    tpls: null, docs: null, carpetas: [], carpeta: "", newFolder: false, mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false, imagen: "", boton: false, lista: [], hechos: {}, forEmail: "" }
+    tpls: null, docs: null, carpetas: [], carpeta: "", newFolder: false, docSort: "fecha", docDir: "desc", mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false, imagen: "", boton: false, lista: [], hechos: {}, forEmail: "" }
   };
   var PAGES = { inicio: "Inicio", contactos: "Contactos", ventas: "Ventas", correo: "Correo", calendario: "Calendario", documentos: "Documentos" };
   var STAGE_HINT = {
@@ -847,7 +847,7 @@
       (compact ? "" : (d.lead && leadName(d.lead) ? " · " + esc(leadName(d.lead)) : "")) + "</small></span>" +
       (compact ? "" : '<select class="doc-folder" aria-label="Carpeta"><option value="">Sin carpeta</option>' + S.carpetas.map(function (c) {
         return "<option" + (c === d.carpeta ? " selected" : "") + ">" + esc(c) + "</option>";
-      }).join("") + '</select><select class="doc-lead" aria-label="Contacto vinculado">' + leadOptions(d.lead) + "</select>") +
+      }).join("") + '</select><input class="doc-price" inputmode="numeric" aria-label="Precio total" placeholder="Precio" value="' + esc(d.precio ? (+d.precio).toLocaleString("es-ES") : "") + '" /><select class="doc-lead" aria-label="Contacto vinculado">' + leadOptions(d.lead) + "</select>") +
       '<a class="btn icon sm" href="' + url + '&dl=1" aria-label="Descargar">↓</a><button class="btn icon sm" data-act="doc-del" aria-label="Eliminar">✕</button></li>';
   }
 
@@ -870,12 +870,24 @@
         : '<button type="button" class="folder add" data-act="folder-new">+ Nueva carpeta</button>') + "</div>";
     var where = cur && cur !== "__none" ? cur : "";
     var list = S.docs.filter(function (d) { return inFolder(d, cur) && (!q || (d.nombre + " " + leadName(d.lead) + " " + (d.carpeta || "")).toLowerCase().indexOf(q) > -1); })
-      .sort(function (a, b) { return b.creado.localeCompare(a.creado); });
+      .sort(function (a, b) {
+        var k = S.docDir === "asc" ? 1 : -1;
+        if (S.docSort === "nombre") return k * a.nombre.localeCompare(b.nombre, "es", { numeric: true });
+        if (S.docSort === "precio") {
+          if (!a.precio || !b.precio) return a.precio ? -1 : b.precio ? 1 : 0; // sin precio, al final
+          return k * (+a.precio - +b.precio);
+        }
+        return k * a.creado.localeCompare(b.creado);
+      });
+    var dirLbl = S.docDir === "asc" ? "Ascendente" : "Descendente";
     $("#main").innerHTML =
       '<label class="drop" id="dropzone"><input type="file" id="doc-file" multiple accept="' + DOC_EXT.split(",").map(function (e) { return "." + e; }).join(",") + '" hidden />' +
       ICON.file + "<b>Arrastra archivos aquí o pulsa para subir" + (where ? " a «" + esc(where) + "»" : "") + "</b><small>Contratos, dossiers, pasaportes, planos… PDF, Word, Excel, imágenes · máx. 25 MB</small></label>" +
       folders +
       '<nav class="toolbar"><input class="search" id="q-docs" type="search" placeholder="Buscar documento, contacto o carpeta…" value="' + esc(S.q) + '" />' +
+      '<label class="sort-by"><span>Ordenar por:</span><select id="doc-sort">' + [["fecha", "Fecha de subida"], ["nombre", "Nombre"], ["precio", "Precio"]].map(function (o) {
+        return '<option value="' + o[0] + '"' + (o[0] === S.docSort ? " selected" : "") + ">" + o[1] + "</option>";
+      }).join("") + '</select></label><button type="button" class="btn ghost icon" data-act="doc-dir" aria-label="' + dirLbl + '" title="' + dirLbl + '">' + (S.docDir === "asc" ? "↑" : "↓") + "</button>" +
       (where ? '<button type="button" class="btn danger sm" data-act="folder-del">Eliminar carpeta «' + esc(where) + "»</button>" : "") + "</nav>" +
       (list.length ? '<ul class="doc-list">' + list.map(function (d) { return docRow(d); }).join("") + "</ul>" : '<p class="empty big">' + (S.docs.length ? (cur ? "Esta carpeta está vacía. Sube archivos arriba o arrastra documentos a la carpeta." : "Ningún documento coincide.") : "Todavía no has subido documentos.") + "</p>");
   }
@@ -1102,6 +1114,7 @@
     if (act) {
       var a = act.getAttribute("data-act");
       if (a === "new") openLead(null);
+      if (a === "doc-dir") { S.docDir = S.docDir === "asc" ? "desc" : "asc"; renderDocs(); return; }
       if (a === "folder") { S.carpeta = act.getAttribute("data-folder"); renderDocs(); }
       if (a === "folder-new") { S.newFolder = true; renderDocs(); $("#folder-form [name=nombre]").focus(); }
       if (a === "folder-cancel") { S.newFolder = false; renderDocs(); }
@@ -1363,6 +1376,13 @@
     if (t.id === "pick-all") $$(".pick-list li:not([hidden]) input").forEach(function (x) { x.checked = t.checked; });
     if (t.id === "doc-file") uploadFiles(t.files, "");
     if (t.id === "lead-file") uploadFiles(t.files, S.open);
+    if (t.id === "doc-sort") { S.docSort = t.value; S.docDir = t.value === "fecha" ? "desc" : "asc"; renderDocs(); }
+    if (t.classList.contains("doc-price")) {
+      var pid = t.closest("[data-doc]").getAttribute("data-doc"), raw = t.value.trim(), mm2 = raw.match(/(\d+(?:[.,]\d+)?)\s*m/i);
+      var val = mm2 ? String(Math.round(parseFloat(mm2[1].replace(",", ".")) * 1e6)) : raw.replace(/\D/g, "");
+      api("doc_update", { id: pid, precio: val }).then(function (j) { S.docs = j.docs; toast(val ? "Precio guardado" : "Precio borrado"); renderDocs(); })
+        .catch(function (err) { toast(err.message, true); });
+    }
     if (t.classList.contains("doc-folder")) moveDoc(t.closest("[data-doc]").getAttribute("data-doc"), t.value);
     if (t.classList.contains("doc-lead")) {
       var id = t.closest("[data-doc]").getAttribute("data-doc");
