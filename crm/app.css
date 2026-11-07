@@ -17,6 +17,7 @@
   --s-opportunity: #f7931e;
   --s-customer: #1f9d63;
   --s-nurturing: #8a5cd1;
+  --s-discarded: #9aa1ab;
   --r: 14px;
   --f-display: "Cormorant Garamond", Georgia, serif;
   --f-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -134,6 +135,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--amber); box-shad
 .s-opportunity { --sc: var(--s-opportunity); }
 .s-customer { --sc: var(--s-customer); }
 .s-nurturing { --sc: var(--s-nurturing); }
+.s-discarded { --sc: var(--s-discarded); }
 .bar i, .dot { background: var(--sc); }
 .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
 .stage { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--sc); background: color-mix(in srgb, var(--sc) 12%, transparent); white-space: nowrap; }

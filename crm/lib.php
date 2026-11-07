@@ -12,6 +12,7 @@ const STAGES = [
   'opportunity' => 'Opportunity',
   'customer'    => 'Customer',
   'nurturing'   => 'Nurturing',
+  'discarded'   => 'Discarded',
 ];
 const FIELDS = [
   'nombre' => 120, 'email' => 160, 'telefono' => 40, 'pais' => 60, 'origen' => 60,

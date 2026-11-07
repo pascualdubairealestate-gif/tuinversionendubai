@@ -17,7 +17,8 @@
     qualified: "Presupuesto y plazo claros",
     opportunity: "Proyecto concreto / reserva",
     customer: "Ha comprado",
-    nurturing: "Aún no: seguir en contacto"
+    nurturing: "Aún no: seguir en contacto",
+    discarded: "Descartado: no sigue adelante"
   };
   var ORIGENES = ["Web · Guía", "Web · Boletín", "Web · Consultoría", "Web · Dossier", "Instagram", "WhatsApp", "YouTube", "Meta", "Referido", "Evento", "Llamada", "Manual", "Otro"];
   var PRESUPUESTOS = ["Por definir", "Menos de 250.000 €", "250.000 – 500.000 €", "500.000 – 1.000.000 €", "Más de 1.000.000 €"];
@@ -83,7 +84,7 @@
     if (d.length === 9 && /^[67]/.test(d)) d = "34" + d; // móvil español sin prefijo
     return d.length >= 8 ? "https://wa.me/" + d : "";
   }
-  function overdue(l) { return !!l.seguimiento && l.seguimiento <= today() && l.etapa !== "customer"; }
+  function overdue(l) { return !!l.seguimiento && l.seguimiento <= today() && l.etapa !== "customer" && l.etapa !== "discarded"; }
   function leadById(id) { return S.leads.filter(function (x) { return x.id === id; })[0]; }
   function up(t) { return String(t || "").toLocaleUpperCase("es"); }
   function leadName(id) { var l = leadById(id); return l ? (up(l.nombre) || l.email || "Sin nombre") : ""; }
