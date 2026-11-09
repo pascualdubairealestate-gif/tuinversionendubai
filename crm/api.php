@@ -280,9 +280,11 @@ if ($action === 'calendar') {
   $from = DateTime::createFromFormat('Y-m-d H:i:s', ($_GET['from'] ?? '') . ' 00:00:00', $tz) ?: new DateTime('today -1 day', $tz);
   $to = DateTime::createFromFormat('Y-m-d H:i:s', ($_GET['to'] ?? '') . ' 23:59:59', $tz) ?: new DateTime('+45 days', $tz);
   if ($to->getTimestamp() - $from->getTimestamp() > 400 * 86400) json_out(['error' => 'rango'], 422);
-  $raw = ics_source($url);
-  if ($raw === null) json_out(['eventos' => [], 'conectado' => true, 'error' => 'No se pudo leer tu Google Calendar. Revisa la dirección iCal en Ajustes.']);
-  json_out(['eventos' => ics_events($raw, $from->getTimestamp(), $to->getTimestamp(), $tz), 'conectado' => true]);
+  $src = ics_source($url, !empty($_GET['fresh']));
+  if ($src === null) json_out(['eventos' => [], 'conectado' => true, 'error' => 'No se pudo leer tu Google Calendar. Revisa la dirección iCal en Ajustes.']);
+  [$raw, $t, $stale] = $src;
+  json_out(['eventos' => ics_events($raw, $from->getTimestamp(), $to->getTimestamp(), $tz), 'conectado' => true, 'leido' => date('c', $t),
+    'aviso' => $stale ? 'Google Calendar no responde ahora: ves la copia de las ' . (new DateTime('@' . $t))->setTimezone($tz)->format('H:i') . '.' : '']);
 }
 
 /* ---------- Plantillas de correo ---------- */

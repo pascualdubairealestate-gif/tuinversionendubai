@@ -47,7 +47,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     } else { rate('login', 8, 900); $error = 'Contraseña incorrecta.'; }
   }
 }
-$v = '20261109a';
+$v = '20261109b';
 ?><!doctype html>
 <html lang="es">
 <head>

@@ -234,13 +234,16 @@ function http_get($url) {
   return $body === false ? null : $body;
 }
 
-function ics_source($url) {
+// Descarga el iCal de Google con una copia de 60 s (o sin copia si $fresh).
+// Devuelve [contenido, momento de la descarga, si es una copia antigua porque Google no respondió] o null.
+function ics_source($url, $fresh = false) {
   $cache = store_read('icscache', []);
-  if (($cache['url'] ?? '') === $url && time() - ($cache['t'] ?? 0) < 300) return $cache['body'];
+  $mine = ($cache['url'] ?? '') === $url;
+  if ($mine && !$fresh && time() - ($cache['t'] ?? 0) < 60) return [$cache['body'], $cache['t'], false];
   $body = http_get($url);
-  if ($body === null || strpos($body, 'BEGIN:VCALENDAR') === false) return (($cache['url'] ?? '') === $url) ? ($cache['body'] ?? null) : null;
+  if ($body === null || strpos($body, 'BEGIN:VCALENDAR') === false) return $mine && !empty($cache['body']) ? [$cache['body'], $cache['t'], true] : null;
   store_write('icscache', ['url' => $url, 't' => time(), 'body' => $body]);
-  return $body;
+  return [$body, time(), false];
 }
 
 function ics_tz($name) {

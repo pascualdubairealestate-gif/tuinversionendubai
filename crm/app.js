@@ -144,13 +144,14 @@
     }).catch(function (e) { if (e.message !== "auth") toast("No se pudo cargar el CRM", true); });
   }
 
-  // Eventos de Google Calendar por rango, con caché en memoria (el servidor cachea 5 min).
+  // Eventos de Google Calendar por rango. En memoria 2 min; force = pedir a Google ahora mismo (sin copia).
   function loadCal(from, to, force) {
-    var key = from + "_" + to;
-    if (S.cal[key] && !force) return Promise.resolve(S.cal[key]);
-    return api("calendar&from=" + from + "&to=" + to + "&tz=" + encodeURIComponent(TZ)).then(function (j) {
-      S.calErr = j.error || "";
-      S.cal[key] = { eventos: j.eventos || [], conectado: !!j.conectado };
+    var key = from + "_" + to, c0 = S.cal[key];
+    if (c0 && !force && Date.now() - c0.at < 120000) return Promise.resolve(c0);
+    return api("calendar&from=" + from + "&to=" + to + "&tz=" + encodeURIComponent(TZ) + (force ? "&fresh=1" : "")).then(function (j) {
+      S.calErr = j.error || j.aviso || "";
+      S.calRead = j.leido || "";
+      S.cal[key] = { eventos: j.eventos || [], conectado: !!j.conectado, at: Date.now() };
       return S.cal[key];
     }).catch(function (e) { S.calErr = e.message; return { eventos: [], conectado: !!S.ics }; });
   }
@@ -792,6 +793,7 @@
       '<div class="cal-head"><div class="cal-nav"><button class="btn icon" data-act="cal-prev" aria-label="Mes anterior">‹</button><h2>' + esc(title.charAt(0).toUpperCase() + title.slice(1)) +
       '</h2><button class="btn icon" data-act="cal-next" aria-label="Mes siguiente">›</button><button class="btn ghost sm" data-act="cal-today">Hoy</button></div>' +
       '<div class="cal-tools"><span class="legend"><i class="lg-g"></i>Google Calendar <i class="lg-c"></i>Seguimientos</span>' +
+      (S.ics ? '<button class="btn ghost sm" type="button" data-act="cal-refresh" title="Volver a leer tu Google Calendar">↻ Actualizar</button><small class="muted" id="cal-read"></small>' : "") +
       '<a class="btn primary sm" href="' + gcalLink("", sel) + '" target="_blank" rel="noopener">+ Evento en Google Calendar</a></div></div>' +
       (!S.ics ? '<div class="connect"><p><b>Conecta tu Google Calendar</b> para ver aquí tus citas y tareas.</p><button class="btn primary sm" data-act="settings">Conectar</button></div>' : "") +
       (/\/public\//.test(S.ics) ? '<div class="connect"><p><b>Solo ves «Busy» porque has pegado la dirección pública.</b> En Google Calendar → Integrar el calendario, copia la <b>Dirección secreta en formato iCal</b> (contiene «private-») y pégala en Ajustes.</p><button class="btn primary sm" data-act="settings">Cambiar</button></div>' : "") +
@@ -820,7 +822,15 @@
       renderAgenda(sel, by[sel] || [], follow[sel] || []);
     };
     paint([]);
-    if (S.ics) loadCal(from, to).then(function (c) { if (S.page === "calendario" && S.month === m) { paint(c.eventos); if (S.calErr) toast(S.calErr, true); } });
+    if (S.ics) loadCal(from, to, S.calForce).then(function (c) {
+      S.calForce = false;
+      if (S.page === "calendario" && S.month === m) {
+        paint(c.eventos);
+        var rd = $("#cal-read");
+        if (rd && S.calRead) rd.textContent = "Leído a las " + new Date(S.calRead).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+        if (S.calErr) toast(S.calErr, true);
+      }
+    });
   }
 
   function renderAgenda(day, evs, follow) {
@@ -1285,6 +1295,7 @@
       }
       if (a === "cal-prev" || a === "cal-next") { S.month = new Date(S.month.getFullYear(), S.month.getMonth() + (a === "cal-next" ? 1 : -1), 1); renderCalendar(); }
       if (a === "cal-today") { S.month = null; S.day = today(); renderCalendar(); }
+      if (a === "cal-refresh") { S.cal = {}; S.calForce = true; renderCalendar(); toast("Leyendo tu Google Calendar…"); }
       if (a === "doc-del") {
         var li = act.closest("[data-doc]");
         if (confirm("¿Eliminar este documento? No se puede deshacer.")) {
@@ -1489,4 +1500,10 @@
   load().then(function () { S.ready = true; go(location.hash.slice(1) || "inicio"); });
   // Cada minuto mira si han entrado contactos nuevos (no molesta si tienes una ficha abierta).
   setInterval(function () { if (!document.hidden && S.open === null) load(true); }, 60000);
+  // Al volver a la pestaña, vuelve a leer Google Calendar si lo que se ve tiene más de 2 minutos.
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden || !S.ics || S.open !== null || ["inicio", "calendario"].indexOf(S.page) < 0) return;
+    var old = Object.keys(S.cal).some(function (k) { return Date.now() - S.cal[k].at > 120000; });
+    if (old) { S.cal = {}; render(); }
+  });
 })();
