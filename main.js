@@ -20,7 +20,7 @@ window.__PV__ = {
   crmMode: "cors",
 
   // Enlace directo al PDF de la guía (se abre tras dejar el correo). Vacío = solo mensaje de confirmación.
-  guideUrl: "",
+  guideUrl: "/assets/guia-7-errores-invertir-dubai.pdf",
   // Segundos hasta que aparece el popup de la guía
   guideDelay: 7,
 
@@ -567,7 +567,7 @@ window.__PV__ = {
         var done = function () {
           if (btn) { btn.disabled = false; btn.innerHTML = label; }
           var texts = {
-            guia: "¡Hecho! Revisa tu correo: la guía va de camino.",
+            guia: "¡Hecho! Aquí tienes tu guía.",
             newsletter: "¡Bienvenido! Recibirás el primer boletín el lunes.",
             consultoria: "Gracias. Te escribo en menos de 24 h para agendar la llamada.",
             dossier: "Perfecto. Te envío el dossier por email y WhatsApp."
@@ -576,8 +576,13 @@ window.__PV__ = {
           form.reset();
           if (type === "guia") {
             try { localStorage.setItem("pv_guide_done", "1"); } catch (err) {}
-            if (CFG.guideUrl) window.open(CFG.guideUrl, "_blank", "noopener");
-            setTimeout(function () { var m = form.closest(".modal"); if (m && !m.hidden) closeModal(m); toast(texts.guia); }, 1800);
+            if (CFG.guideUrl) {
+              // Enlace visible además de abrirla: algunos navegadores bloquean la ventana nueva tras el envío.
+              if (msg) msg.innerHTML = '¡Hecho! <a href="' + CFG.guideUrl + '" target="_blank" rel="noopener" download>Abrir la guía (PDF) →</a>';
+              window.open(CFG.guideUrl, "_blank", "noopener");
+            } else {
+              setTimeout(function () { var m = form.closest(".modal"); if (m && !m.hidden) closeModal(m); toast(texts.guia); }, 1800);
+            }
           }
           if (type === "dossier") {
             setTimeout(function () { var m = form.closest(".modal"); if (m && !m.hidden) closeModal(m); toast(texts.dossier); }, 1800);

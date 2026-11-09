@@ -492,6 +492,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 .form-note { width: 100%; margin: 4px 0 0 6px; font-size: 13px; color: var(--mute); }
 .form-msg { width: 100%; margin: 6px 0 0; font-size: 14px; font-weight: 600; min-height: 1em; }
 .form-msg.ok { color: var(--wa); }
+.form-msg a { color: var(--amber); text-decoration: underline; font-weight: 800; }
 .form-msg.err { color: #e8907a; }
 .sources { margin-top: 44px; }
 .sources small { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--mute); }
