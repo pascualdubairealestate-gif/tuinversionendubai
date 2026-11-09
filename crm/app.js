@@ -190,10 +190,11 @@
     return '<section class="stats">' + [
       ["Contactos", L.length, ""],
       ["Nuevos esta semana", nuevos, ""],
-      ["En negociación", money(abierto), "Qualified + Opportunity"],
+      ["En negociación", money(abierto), "Qualified + Opportunity", money(Math.round(abierto * 0.04))],
       ["Clientes", clientes, conv + "% de conversión"]
     ].map(function (s) {
-      return '<div class="stat"><span>' + s[0] + "</span><b>" + esc(s[1]) + "</b>" + (s[2] ? "<small>" + esc(s[2]) + "</small>" : "") + "</div>";
+      return '<div class="stat"><span>' + s[0] + "</span><b>" + esc(s[1]) + "</b>" + (s[2] ? "<small>" + esc(s[2]) + "</small>" : "") +
+        (s[3] ? '<p class="pot">Potencial comisión (4 %) <strong>' + esc(s[3]) + "</strong></p>" : "") + "</div>";
     }).join("") + "</section>";
   }
 
