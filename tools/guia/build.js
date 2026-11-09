@@ -1,10 +1,10 @@
-// Genera assets/guia-7-errores-invertir-dubai.pdf a partir de tools/guia/guia.html
+// Genera assets/guia-10-pasos-invertir-dubai.pdf a partir de tools/guia/guia.html
 // Uso: node tools/guia/build.js   (necesita Playwright con Chromium)
 const { chromium } = require('playwright');
 const path = require('path');
 (async () => {
   const html = path.join(__dirname, 'guia.html');
-  const out = path.join(__dirname, '..', '..', 'assets', 'guia-7-errores-invertir-dubai.pdf');
+  const out = path.join(__dirname, '..', '..', 'assets', 'guia-10-pasos-invertir-dubai.pdf');
   const b = await chromium.launch();
   const p = await b.newPage();
   await p.goto('file://' + html, { waitUntil: 'networkidle' });

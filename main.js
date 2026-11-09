@@ -20,7 +20,7 @@ window.__PV__ = {
   crmMode: "cors",
 
   // Enlace directo al PDF de la guía (se abre tras dejar el correo). Vacío = solo mensaje de confirmación.
-  guideUrl: "/assets/guia-7-errores-invertir-dubai.pdf",
+  guideUrl: "/assets/guia-10-pasos-invertir-dubai.pdf",
   // Segundos hasta que aparece el popup de la guía
   guideDelay: 7,
 

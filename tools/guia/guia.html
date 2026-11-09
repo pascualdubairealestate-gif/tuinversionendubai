@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8" />
-<title>Los 7 errores que cometen los inversores españoles en Dubái · Pascual Vidal</title>
+<title>Los 10 pasos para tu inversión en Dubái con éxito · Pascual Vidal</title>
 <!-- Guía en PDF. Se genera con tools/guia/build.sh (Chromium imprime este HTML en A4). -->
 <link rel="stylesheet" href="fonts/local.css" />
 <style>
@@ -50,7 +50,7 @@
   table.compact td { padding: 1.7mm 2mm; }
   td.n, th.n { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
   tr.total td { border-bottom: 0; border-top: 1.5px solid var(--ink); font-weight: 800; }
-  td b { display: block; }
+  td:first-child b { display: block; }
   .tag { display: inline-block; font-size: 7.2pt; font-weight: 800; padding: .5mm 2mm; border-radius: 9mm; background: var(--ivory-2); margin: .6mm .6mm 0 0; white-space: nowrap; }
   .tag.o { background: #fde3c2; color: #8a4a00; }
   .note { font-size: 8.2pt; color: var(--mute); margin-top: 2.5mm; }
@@ -74,10 +74,15 @@
 
   /* Índice */
   .toc { list-style: none; margin: 6mm 0 0; padding: 0; counter-reset: e; display: grid; gap: 0; }
-  .toc li { counter-increment: e; display: grid; grid-template-columns: 14mm 1fr; align-items: baseline; padding: 3mm 0; border-bottom: 1px solid var(--line); }
+  .toc li { counter-increment: e; display: grid; grid-template-columns: 14mm 1fr; align-items: baseline; padding: 2mm 0; border-bottom: 1px solid var(--line); }
   .toc li::before { content: counter(e, decimal-leading-zero); font: 600 18pt var(--f-display); color: var(--amber); }
   .toc b { font-size: 11pt; }
   .toc span { display: block; color: var(--mute); font-size: 9pt; }
+
+  /* Pasos numerados dentro de una página */
+  ol.steps { list-style: none; margin: 4mm 0; padding: 0; counter-reset: st; display: grid; gap: 3mm; }
+  ol.steps li { counter-increment: st; position: relative; padding-left: 12mm; }
+  ol.steps li::before { content: counter(st); position: absolute; left: 0; top: -.6mm; width: 7.5mm; height: 7.5mm; border-radius: 50%; background: var(--navy); color: var(--ivory); font: 700 9.5pt/7.5mm var(--f-body); text-align: center; }
 
   /* Checklist */
   .qgroup { margin-bottom: 6mm; }
@@ -98,114 +103,110 @@
 </head>
 <body>
 
-<!-- 1 · Portada -->
+<!-- Portada -->
 <section class="page dark cover">
   <div class="img"></div>
   <p class="year">Guía gratuita · Edición 2026</p>
   <div class="in">
     <div class="brand"><div class="arch">PV</div><div><span>Pascual Vidal</span><small>Tu inversión en Dubái</small></div></div>
-    <h1>Los 7 errores que cometen los inversores <em>españoles</em> en Dubái</h1>
-    <p class="sub">Zonas, costes reales, off-plan frente a terminado, planes de pago y qué preguntar antes de firmar.</p>
+    <h1>Los 10 pasos para tu inversión en Dubái <em>con éxito</em></h1>
+    <p class="sub">Del agente con licencia RERA a la entrega de llaves: estrategia, reserva, planes de pago, contrato, Oqood, obra, entrega, inspección y alquiler.</p>
   </div>
   <div class="who"><b>Pascual Vidal</b>Consultor inmobiliario español en Dubái · RERA #97799</div>
 </section>
 
-<!-- 2 · Introducción e índice -->
+<!-- Introducción e índice -->
 <section class="page">
   <p class="kicker">Antes de empezar</p>
-  <h2>Dubái premia al que llega preparado</h2>
-  <p class="lead">Cada semana hablo con españoles que quieren invertir en Dubái. La mayoría tiene buen olfato: Dubái no cobra impuesto sobre la renta personal, la demanda de vivienda sigue creciendo y se compra con planes de pago cómodos. Pero casi todos están a punto de cometer alguno de estos siete errores.</p>
-  <p>Ninguno es grave si lo ves a tiempo. Todos salen caros si lo descubres después de firmar. Esta guía está escrita para que llegues a la primera conversación con un promotor o un agente sabiendo qué mirar, qué cuesta de verdad y qué preguntar.</p>
+  <h2>Comprar en Dubái es sencillo si sabes el orden</h2>
+  <p class="lead">Dubái no cobra impuesto sobre la renta personal, la demanda de vivienda sigue creciendo y se compra con planes de pago cómodos. El proceso es muy seguro y está muy regulado, pero tiene sus propias reglas y su propio vocabulario: EOI, escrow, SPA, Oqood, BCC, snagging…</p>
+  <p>Esta guía te lleva de la mano por los diez pasos de una compra, desde que eliges a tu agente hasta que alquilas o vendes. En cada paso verás qué pasa, qué pagas y qué tienes que comprobar.</p>
   <ol class="toc">
-    <li><div><b>Ir solo o elegir mal a tu agente</b><span>Por qué ir directo a la constructora es ir a que te vendan lo que tienen.</span></div></li>
-    <li><div><b>Mirar solo el precio y no los costes reales</b><span>Lo que pagas además del precio: entre un 6 % y un 10 %.</span></div></li>
-    <li><div><b>Elegir la zona por moda y no por objetivo</b><span>Las zonas principales, sus precios, rentabilidades y planes de pago.</span></div></li>
-    <li><div><b>Confundir off-plan con terminado</b><span>Ventajas, riesgos y cómo está protegido tu dinero.</span></div></li>
-    <li><div><b>Escoger el plan de pago sin hacer números</b><span>80/20, 60/40, post-entrega, 1 % mensual… y cuál te conviene.</span></div></li>
-    <li><div><b>Creerse la rentabilidad del folleto</b><span>De la rentabilidad bruta a la neta, con un ejemplo real.</span></div></li>
-    <li><div><b>Olvidarse de Hacienda y de la letra pequeña</b><span>IRPF, modelo 720, Golden Visa y herencia.</span></div></li>
+    <li><div><b>Elegir un agente con licencia RERA</b><span>Por qué no conviene ir directo a la constructora.</span></div></li>
+    <li><div><b>Definir tu estrategia de inversión</b><span>Objetivo, presupuesto real y la zona que encaja contigo.</span></div></li>
+    <li><div><b>Reservar una unidad, paso a paso</b><span>Qué firmas, qué pagas y qué compruebas antes.</span></div></li>
+    <li><div><b>Entender las EOI y los lanzamientos</b><span>Cómo conseguir las mejores unidades de un proyecto nuevo.</span></div></li>
+    <li><div><b>Planes de pago, cuentas escrow y tasas de la DLD</b><span>Cuánto pagas, cuándo y cómo está protegido tu dinero.</span></div></li>
+    <li><div><b>Firmar el SPA y recibir tu Oqood</b><span>El contrato y el registro oficial a tu nombre.</span></div></li>
+    <li><div><b>Pagos de obra y seguimiento</b><span>Cómo pagar cada plazo y vigilar el avance.</span></div></li>
+    <li><div><b>La entrega de llaves (BCC)</b><span>Qué ocurre cuando el edificio está terminado.</span></div></li>
+    <li><div><b>Inspeccionar tu propiedad (snagging)</b><span>Detectar defectos antes de aceptar las llaves.</span></div></li>
+    <li><div><b>Posventa, alquiler y reventa</b><span>Rentabilizar tu inversión y, cuando quieras, venderla.</span></div></li>
   </ol>
-  <p class="note" style="margin-top:5mm">Al final tienes una lista de 15 preguntas para hacer antes de firmar. Imprímela y llévala a cada reunión.</p>
   <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>2</span></div>
 </section>
 
-<!-- 3 · Error 1 -->
+<!-- Paso 1 -->
 <section class="page">
-  <p class="kicker">Error 1</p>
-  <h2>Ir solo, o elegir mal a tu agente</h2>
-  <p class="lead">El error más caro y el más común: ir directamente a la oficina de ventas de una constructora porque «así me ahorro el intermediario».</p>
-  <p>En la oficina de un promotor te atiende un <b>comercial</b>. Su trabajo es vender <b>el stock de su empresa</b>, y lo hace bien: te enseñará lo mejor de su proyecto, pero nunca te dirá que el edificio de enfrente es más barato por metro, que su anterior proyecto se entregó con un año de retraso o que en esa zona hay demasiada oferta para alquilar. Vayas a la oficina que vayas, saldrás con un piso de ese promotor.</p>
+  <p class="kicker">Paso 1</p>
+  <h2>Elegir un agente con licencia RERA</h2>
+  <p class="lead">El primer paso es también el que más dinero te puede ahorrar: con quién vas a comprar.</p>
+  <p>Muchos inversores van directamente a la oficina de ventas de una constructora porque creen que así se ahorran al intermediario. Allí les atiende un <b>comercial</b>, cuyo trabajo es vender <b>el stock de su empresa</b>, y lo hace bien: te enseñará lo mejor de su proyecto, pero nunca te dirá que el edificio de enfrente es más barato por metro, que su último proyecto se entregó con retraso o que en esa zona hay demasiada oferta para alquilar.</p>
   <div class="quote">Un comercial te vende lo que tiene. Un buen agente te ayuda a elegir entre todo lo que hay.</div>
-  <p>Además, en obra nueva <b>el precio suele ser el mismo</b> compres directamente o a través de un agente registrado: la comisión del agente la paga normalmente el promotor. Ir solo no te ahorra dinero; te quita a la persona que compara, negocia y te avisa de los riesgos.</p>
+  <p>Además, en obra nueva <b>el precio suele ser el mismo</b> compres directamente o con un agente registrado, porque su comisión la paga normalmente el promotor. Ir solo no te ahorra dinero: te quita a la persona que compara, negocia y te avisa de los riesgos.</p>
   <div class="two">
     <div class="box">
-      <h3>Cómo elegir bien a tu agente</h3>
+      <h3>Cómo comprobar que tiene licencia</h3>
       <ul class="clean">
-        <li><b>Está registrado:</b> tiene número RERA/BRN y lo puedes comprobar en la app oficial de la DLD (Dubai REST).</li>
-        <li><b>Trabaja con muchos promotores</b>, no con uno solo, y te compara proyectos y zonas.</li>
-        <li><b>Te habla de riesgos</b>, no solo de rentabilidad.</li>
-        <li><b>Te acompaña después:</b> registro, entrega, inspección, alquiler y Golden Visa.</li>
-        <li><b>Habla tu idioma</b> y entiende lo que te importa como inversor español.</li>
+        <li>Pídele su número de agente (<b>BRN</b>) y el de la agencia (<b>ORN</b>), emitidos por RERA, el regulador inmobiliario de Dubái.</li>
+        <li>Compruébalos en la app oficial de la DLD, <b>Dubai REST</b>.</li>
+        <li>Asegúrate de que trabaja con <b>muchos promotores</b>, no con uno solo.</li>
+        <li>Que te hable de riesgos, no solo de rentabilidad, y que te acompañe <b>después</b> de comprar.</li>
       </ul>
     </div>
     <div class="box amber">
       <h3>Señales de alarma</h3>
       <ul class="clean x">
         <li>Prisas: «solo quedan dos unidades, decide hoy».</li>
-        <li>Te pide transferir dinero a una cuenta que <b>no</b> es la cuenta escrow del proyecto.</li>
-        <li>Promete rentabilidades «garantizadas» altas sin decir quién las garantiza ni por cuánto tiempo.</li>
-        <li>No te da el número de proyecto en la DLD ni el contrato antes de pagar la reserva.</li>
-        <li>Solo te enseña proyectos de un promotor.</li>
+        <li>Te pide transferir a una cuenta que <b>no</b> es la escrow del proyecto.</li>
+        <li>Promete rentabilidades «garantizadas» altas sin decir quién las garantiza.</li>
+        <li>No te da el número del proyecto en la DLD antes de reservar.</li>
       </ul>
     </div>
   </div>
   <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>3</span></div>
 </section>
 
-<!-- 4 · Error 2 -->
+<!-- Paso 2 -->
 <section class="page">
-  <p class="kicker">Error 2</p>
-  <h2>Mirar solo el precio y no los costes reales</h2>
-  <p class="lead">El precio del anuncio no es lo que pagas. Al comprar en Dubái hay que sumar entre un <b>6 % y un 7 %</b> si pagas al contado, y entre un <b>7 % y un 10 %</b> si usas hipoteca.</p>
-  <h3>Ejemplo: piso terminado de AED 1.500.000 (reventa)</h3>
-  <table>
-    <tr><th>Concepto</th><th>Cómo se calcula</th><th class="n">AED aprox.</th></tr>
-    <tr><td><b>Tasa de transmisión (DLD)</b></td><td>4 % del precio. La paga el comprador.</td><td class="n">60.000</td></tr>
-    <tr><td><b>Oficina de registro (trustee)</b></td><td>AED 4.000 + IVA (AED 2.000 + IVA si el precio es menor de AED 500.000)</td><td class="n">4.200</td></tr>
-    <tr><td><b>Escritura y gastos administrativos</b></td><td>Importe fijo de la DLD</td><td class="n">≈ 580</td></tr>
-    <tr><td><b>Comisión de la agencia</b></td><td>Habitual en reventa: 2 % + IVA</td><td class="n">31.500</td></tr>
-    <tr class="total"><td>Total al contado</td><td>≈ 6,4 % del precio</td><td class="n">≈ 96.300</td></tr>
-  </table>
-  <p class="note">Con hipoteca, suma: registro de la hipoteca (0,25 % del préstamo + AED 290), tasación (unos AED 2.500–3.500) y la comisión del banco (hasta un 1 % del préstamo).</p>
+  <p class="kicker">Paso 2</p>
+  <h2>Definir tu estrategia de inversión</h2>
+  <p class="lead">No existe «la mejor zona» ni «el mejor proyecto». Existe el que encaja con <b>lo que quieres conseguir</b>, con <b>tu presupuesto real</b> y con <b>tus plazos</b>.</p>
   <div class="two">
     <div class="box">
-      <h3>Si compras sobre plano (off-plan)</h3>
+      <h3>1. ¿Qué buscas?</h3>
       <ul class="clean">
-        <li>Pagas el <b>4 % de la DLD</b> al registrar el contrato (en el sistema Oqood), normalmente al firmar.</li>
-        <li>El promotor cobra una tasa de gestión (de unos cientos a pocos miles de AED).</li>
-        <li>La comisión del agente la paga, por lo general, el promotor.</li>
-        <li>Algunos promotores pagan parte de la DLD como promoción: pregúntalo.</li>
+        <li><b>Renta mensual:</b> alquiler de larga estancia en zonas con mucha demanda.</li>
+        <li><b>Revalorización:</b> comprar sobre plano en zonas que están creciendo.</li>
+        <li><b>Alquiler vacacional:</b> más ingresos, pero más gestión.</li>
+        <li><b>Vivir o pasar temporadas</b>, o conseguir la <b>Golden Visa</b> (inversión desde AED 2 millones).</li>
       </ul>
     </div>
     <div class="box">
-      <h3>Lo que pagas cada año</h3>
-      <ul class="clean">
-        <li><b>Cuota de servicio</b> (comunidad): se paga por pie cuadrado y varía mucho, de edificios sencillos a torres de lujo. Pide la cifra exacta del edificio.</li>
-        <li><b>Gestión del alquiler:</b> unos 5–8 % en larga estancia y 15–25 % en vacacional.</li>
-        <li><b>Mantenimiento y seguro</b> del piso.</li>
-        <li>Al entregar: depósito de luz y agua (DEWA) y, si alquilas, <b>amueblar</b>.</li>
-      </ul>
+      <h3>2. ¿Cuánto vas a invertir de verdad?</h3>
+      <p>Al precio súmale un <b>6–7 %</b> si pagas al contado y un <b>7–10 %</b> con hipoteca: la tasa de la DLD (4 %), el registro y, en reventa, la comisión de la agencia.</p>
+      <p style="margin:0">Piensa también en la moneda: el dírham (AED) va ligado al dólar y tú inviertes en euros.</p>
     </div>
   </div>
-  <p class="note">Cifras orientativas (noviembre de 2026). Comprueba siempre los importes vigentes con la DLD y tu agente.</p>
+  <div class="box">
+    <h3>3. ¿Sobre plano o terminado?</h3>
+    <table>
+      <tr><th style="width:22%"></th><th style="width:40%">Sobre plano (off-plan)</th><th>Terminado</th></tr>
+      <tr><td><b>Cómo pagas</b></td><td>En plazos durante la obra y a la entrega.</td><td>Todo al firmar (contado o hipoteca).</td></tr>
+      <tr><td><b>Precio</b></td><td>Normalmente menor por pie cuadrado.</td><td>Mayor, pero ves lo que compras.</td></tr>
+      <tr><td><b>Ingresos</b></td><td>Empiezan cuando te entregan las llaves.</td><td>Alquilas desde el primer día.</td></tr>
+      <tr><td><b>Lo que vigilar</b></td><td>Retrasos en la obra y el historial del promotor.</td><td>Estado del piso y cuotas pendientes.</td></tr>
+    </table>
+  </div>
+  <p class="note">En la página siguiente tienes las zonas principales con sus precios, rentabilidades y planes de pago habituales.</p>
   <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>4</span></div>
 </section>
 
-<!-- 5 · Error 3 (zonas) -->
+<!-- Paso 2 · zonas -->
 <section class="page">
-  <p class="kicker">Error 3</p>
-  <h2>Elegir la zona por moda y no por tu objetivo</h2>
-  <p class="lead" style="font-size:12pt">No existe «la mejor zona de Dubái». Existe la mejor zona <b>para lo que tú quieres</b>: renta cada mes, revalorización, alquiler vacacional o vivir con tu familia.</p>
+  <p class="kicker">Paso 2 · Las zonas</p>
+  <h2>Qué zona encaja con tu objetivo</h2>
+  <p class="lead" style="font-size:12pt">Precios, rentabilidad y los planes de pago que más se ven en obra nueva en cada zona principal.</p>
   <table class="compact">
     <tr><th style="width:22%">Zona</th><th style="width:24%">Para qué encaja</th><th class="n" style="width:12%">AED/ft² aprox.</th><th class="n" style="width:10%">Rent. bruta</th><th>Planes de pago habituales en obra nueva</th></tr>
     <tr><td><b>JVC · JVT · Arjan</b></td><td>Renta con ticket de entrada bajo</td><td class="n">1.000–1.600</td><td class="n">7–9 %</td><td><span class="tag o">1 % mensual</span><span class="tag">60/40</span><span class="tag o">post-entrega 2–4 años</span></td></tr>
@@ -229,168 +230,256 @@
   <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>5</span></div>
 </section>
 
-<!-- 6 · Error 4 -->
+<!-- Paso 3 -->
 <section class="page">
-  <p class="kicker">Error 4</p>
-  <h2>Confundir off-plan con terminado</h2>
-  <p class="lead">Comprar sobre plano (off-plan) y comprar un piso terminado son dos inversiones distintas, con riesgos distintos. Elige con la cabeza, no por el folleto.</p>
-  <table>
-    <tr><th style="width:24%"></th><th style="width:38%">Off-plan (sobre plano)</th><th>Terminado</th></tr>
-    <tr><td><b>Cómo pagas</b></td><td>En plazos durante la obra y a la entrega.</td><td>Todo al firmar (contado o hipoteca).</td></tr>
-    <tr><td><b>Precio</b></td><td>Normalmente menor por pie cuadrado.</td><td>Mayor, pero ves exactamente lo que compras.</td></tr>
-    <tr><td><b>Ingresos</b></td><td>No cobras alquiler hasta la entrega.</td><td>Alquilas desde el primer día.</td></tr>
-    <tr><td><b>Revalorización</b></td><td>Potencial durante la obra, si la zona y el promotor acompañan.</td><td>Depende ya del mercado de reventa.</td></tr>
-    <tr><td><b>Riesgos</b></td><td>Retrasos en la entrega; acabados distintos a lo esperado.</td><td>Estado del piso, cuotas pendientes del vendedor.</td></tr>
-    <tr><td><b>Vender antes</b></td><td>Solo con permiso (NOC) del promotor y, normalmente, tras pagar un 30–40 % (lo fija tu contrato).</td><td>Cuando quieras.</td></tr>
-  </table>
-  <div class="two" style="margin-top:4mm">
-    <div class="box">
-      <h3>Cómo está protegido tu dinero</h3>
-      <p>En Dubái, todo proyecto sobre plano debe tener una <b>cuenta escrow</b> (cuenta de garantía) supervisada por las autoridades: el promotor solo cobra a medida que avanza la obra (Ley 8 de 2007).</p>
-      <p style="margin:0">Tu contrato se registra en la DLD (sistema <b>Oqood</b>): queda a tu nombre aunque el edificio no exista todavía.</p>
-    </div>
-    <div class="box amber">
-      <h3>Comprueba antes de pagar la reserva</h3>
-      <ul class="clean">
-        <li>Número del proyecto en la DLD/RERA.</li>
-        <li>Que pagas <b>siempre</b> a la cuenta escrow del proyecto, nunca a terceros.</li>
-        <li>Historial del promotor: ¿entregó a tiempo sus últimos proyectos?</li>
-        <li>Avance real de la obra (lo puedes ver en la app de la DLD).</li>
-        <li>Qué dice el contrato si hay retraso.</li>
-      </ul>
-    </div>
+  <p class="kicker">Paso 3</p>
+  <h2>Reservar una unidad, paso a paso</h2>
+  <p class="lead">Cuando ya sabes qué quieres, la reserva es rápida. Lo importante es comprobar las cosas <b>antes</b> de pagar.</p>
+  <ol class="steps">
+    <li><b>Elige la unidad.</b> Revisa el plano, la orientación, la planta, las vistas, la superficie (neta o con terraza) y qué incluye: cocina equipada, armarios, plaza de parking.</li>
+    <li><b>Pide la oferta por escrito.</b> Precio final, plan de pago con fechas e importes, fecha prevista de entrega y cuota de servicio estimada.</li>
+    <li><b>Comprueba el proyecto.</b> Número del proyecto en la DLD/RERA, cuenta escrow a nombre del proyecto e historial del promotor.</li>
+    <li><b>Envía tus documentos.</b> Normalmente basta con el pasaporte, tu dirección y tu email. Si compras con una sociedad, piden también sus escrituras.</li>
+    <li><b>Firma el formulario de reserva</b> (Reservation o Booking Form). Bloquea la unidad a tu nombre y recoge las condiciones principales.</li>
+    <li><b>Paga la entrada.</b> Suele ser del 5 % al 20 % del precio, más el 4 % de la DLD, siempre por transferencia a la <b>cuenta escrow del proyecto</b>, nunca a terceros. Guarda el justificante.</li>
+    <li><b>Recibe el recibo y el SPA.</b> El promotor te envía el recibo oficial y, en unos días o semanas, el contrato de compraventa (paso 6).</li>
+  </ol>
+  <div class="box amber">
+    <h3>Antes de pagar la reserva</h3>
+    <p style="margin:0">Pregunta qué pasa con tu dinero si al final no firmas el contrato: en muchos casos la reserva <b>no se devuelve</b> una vez firmado el formulario. Que te lo confirmen por escrito.</p>
   </div>
   <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>6</span></div>
 </section>
 
-<!-- 7 · Error 5 (planes de pago) -->
+<!-- Paso 4 -->
 <section class="page">
-  <p class="kicker">Error 5</p>
-  <h2>Escoger el plan de pago sin hacer números</h2>
-  <p class="lead">El plan de pago decide cuánto dinero necesitas y cuándo. Un buen piso con un plan que no encaja con tu liquidez es una mala inversión.</p>
-  <table>
-    <tr><th style="width:24%">Tipo de plan</th><th style="width:44%">Cómo funciona</th><th>Para quién</th></tr>
-    <tr><td><b>Ligado a obra</b><br>80/20 · 70/30 · 60/40</td><td>Pagas una entrada (10–20 %) y luego por hitos de construcción. El resto (20–40 %) a la entrega de llaves.</td><td>Tienes ahorro o piensas hipotecar al entregar.</td></tr>
-    <tr><td><b>50/50</b></td><td>La mitad durante la obra y la mitad a la entrega.</td><td>Quieres repartir el esfuerzo entre hoy y la entrega.</td></tr>
-    <tr><td><b>Post-entrega</b><br>(ej. 50/50 con 3 años)</td><td>Parte del precio (30–60 %) se paga en cuotas durante 2–5 años <b>después</b> de recibir las llaves.</td><td>Quieres alquilar y que el alquiler ayude a pagar las cuotas. Suele tener un precio algo mayor.</td></tr>
-    <tr><td><b>1 % mensual</b></td><td>Tras la entrada, pagas un 1 % del precio cada mes hasta la entrega (y a veces después).</td><td>Prefieres una cuota fija y previsible, como un ahorro mensual.</td></tr>
-    <tr><td><b>Contado con descuento</b></td><td>Algunos promotores rebajan el precio si pagas antes o todo de golpe.</td><td>Tienes liquidez y quieres el mejor precio.</td></tr>
-    <tr><td><b>Terminado con hipoteca</b></td><td>Los no residentes suelen conseguir un 50–60 % de financiación; los residentes, hasta el 80 % en su primera vivienda (por debajo de AED 5 millones).</td><td>Quieres ingresos desde el primer día con menos capital.</td></tr>
-  </table>
-  <h3>Ejemplo: piso de AED 1.000.000, entrega en 3 años</h3>
-  <table>
-    <tr><th>Momento</th><th class="n">Plan 60/40 ligado a obra</th><th class="n">Plan post-entrega 50/50</th></tr>
-    <tr><td>Firma: entrada + 4 % DLD</td><td class="n">10 % + 4 % = 140.000</td><td class="n">10 % + 4 % = 140.000</td></tr>
-    <tr><td>Durante la obra (3 años)</td><td class="n">50 % = 500.000</td><td class="n">40 % = 400.000</td></tr>
-    <tr><td>Entrega de llaves</td><td class="n">40 % = 400.000</td><td class="n">—</td></tr>
-    <tr><td>Después de la entrega</td><td class="n">—</td><td class="n">50 % en 3 años ≈ 13.900/mes</td></tr>
-  </table>
-  <p class="note">Ejemplo ilustrativo. Ten en cuenta también el cambio de moneda: el dírham (AED) va ligado al dólar, y tú pagas en euros.</p>
+  <p class="kicker">Paso 4</p>
+  <h2>Entender las EOI y los lanzamientos</h2>
+  <p class="lead">En los proyectos con mucha demanda, las mejores unidades se adjudican antes del lanzamiento oficial. Para entrar en ese reparto se usa la <b>EOI</b>.</p>
+  <p>Una <b>EOI</b> (Expression of Interest, «expresión de interés») es una señal que pagas antes del lanzamiento para ponerte en la cola de un proyecto. <b>No te asegura una unidad concreta</b>: te da prioridad cuando el promotor empieza a asignar.</p>
+  <div class="two">
+    <div class="box">
+      <h3>Cómo funciona</h3>
+      <ul class="clean">
+        <li>Tu agente te avisa de un lanzamiento y te da la información previa: tipologías, precios orientativos y plan de pago.</li>
+        <li>Pagas el importe de la EOI. Cada promotor fija el suyo, normalmente unas decenas de miles de AED.</li>
+        <li>El día del lanzamiento, el promotor asigna las unidades por orden de llegada, por sorteo o según su criterio.</li>
+        <li>Si te asignan la unidad, la EOI <b>se descuenta de la entrada</b> y sigues con la reserva (paso 3).</li>
+        <li>Si no te asignan ninguna, o no te gusta lo que te ofrecen, normalmente <b>te la devuelven</b>.</li>
+      </ul>
+    </div>
+    <div class="box amber">
+      <h3>Para que la EOI te sirva</h3>
+      <ul class="clean">
+        <li>Ten claro <b>antes</b> qué tipología, planta y orientación quieres, y una segunda opción.</li>
+        <li>Pide por escrito las <b>condiciones de devolución</b>: en algunos lanzamientos muy demandados no es reembolsable.</li>
+        <li>Paga solo a cuentas del promotor, con recibo.</li>
+        <li>Un buen agente conoce el proyecto antes de que salga y sabe qué unidades merecen la pena.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="quote">En un buen lanzamiento, la diferencia entre la mejor y la peor unidad del mismo edificio puede ser mayor que la diferencia entre dos zonas.</div>
   <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>7</span></div>
 </section>
 
-<!-- 8 · Error 6 -->
+<!-- Paso 5 -->
 <section class="page">
-  <p class="kicker">Error 6</p>
-  <h2>Creerse la rentabilidad del folleto</h2>
-  <p class="lead">Los folletos hablan de rentabilidad <b>bruta</b>: alquiler anual dividido por precio. Lo que llega a tu cuenta es la rentabilidad <b>neta</b>, después de gastos y de los meses sin inquilino.</p>
-  <h3>Ejemplo: piso de AED 1.000.000 alquilado a larga estancia</h3>
+  <p class="kicker">Paso 5</p>
+  <h2>Planes de pago, cuentas escrow y tasas de la DLD</h2>
+  <p class="lead">El plan de pago decide cuánto dinero necesitas y cuándo. Elige el que encaja con tu liquidez, no solo el que parece más cómodo.</p>
   <table>
-    <tr><th>Concepto</th><th class="n">AED al año</th></tr>
-    <tr><td>Alquiler anual (7,5 % bruto)</td><td class="n">75.000</td></tr>
-    <tr><td>Cuota de servicio (700 ft² × AED 18)</td><td class="n">− 12.600</td></tr>
-    <tr><td>Gestión del alquiler (5 %)</td><td class="n">− 3.750</td></tr>
-    <tr><td>Mantenimiento y seguro</td><td class="n">− 3.000</td></tr>
-    <tr><td>Un mes sin inquilino al año</td><td class="n">− 6.250</td></tr>
-    <tr class="total"><td>Ingreso neto</td><td class="n">49.400</td></tr>
+    <tr><th style="width:24%">Tipo de plan</th><th style="width:46%">Cómo funciona</th><th>Para quién</th></tr>
+    <tr><td><b>Ligado a obra</b><br>80/20 · 70/30 · 60/40</td><td>Entrada del 10–20 % y pagos por hitos de construcción. El resto, a la entrega.</td><td>Tienes ahorro o vas a hipotecar al entregar.</td></tr>
+    <tr><td><b>50/50</b></td><td>La mitad durante la obra y la mitad a la entrega.</td><td>Quieres repartir el esfuerzo.</td></tr>
+    <tr><td><b>Post-entrega</b></td><td>Parte del precio (30–60 %) se paga en cuotas durante 2–5 años <b>después</b> de la entrega.</td><td>Quieres que el alquiler ayude a pagar. Suele costar algo más.</td></tr>
+    <tr><td><b>1 % mensual</b></td><td>Tras la entrada, un 1 % del precio cada mes hasta la entrega (a veces después).</td><td>Prefieres una cuota fija y previsible.</td></tr>
+    <tr><td><b>Terminado con hipoteca</b></td><td>No residentes: financiación habitual del 50–60 %. Residentes: hasta el 80 % en su primera vivienda (por debajo de AED 5 millones).</td><td>Quieres ingresos desde el primer día.</td></tr>
   </table>
   <div class="two" style="margin-top:4mm">
     <div class="box">
-      <h3>Rentabilidad real</h3>
-      <p>49.400 ÷ 1.000.000 = <b>4,9 % neta</b> sobre el precio. Si sumas los gastos de compra (unos AED 60.000), baja al <b>4,7 %</b>.</p>
-      <p style="margin:0">Sigue siendo una buena rentabilidad, y sin impuesto sobre el alquiler en Dubái. Pero no es el 7,5 % del folleto.</p>
+      <h3>La cuenta escrow</h3>
+      <p>Todo proyecto sobre plano en Dubái debe tener una <b>cuenta de garantía (escrow)</b> supervisada por las autoridades. El promotor solo cobra a medida que avanza la obra (Ley 8 de 2007).</p>
+      <p style="margin:0"><b>Paga siempre a esa cuenta.</b> El dinero que pagas a cualquier otra cuenta no tiene esta protección.</p>
     </div>
-    <div class="box amber">
-      <h3>Vacacional y «garantizadas»</h3>
+    <div class="box">
+      <h3>Las tasas</h3>
       <ul class="clean">
-        <li>El alquiler vacacional da más bruto, pero la gestión cuesta 15–25 %, hay que amueblar y la ocupación varía por temporada.</li>
-        <li>Necesitas permiso de holiday home, y no todos los edificios lo permiten.</li>
-        <li>Una rentabilidad «garantizada» suele estar incluida en el precio. Pregunta quién la garantiza, por cuántos años y qué pasa después.</li>
+        <li><b>4 % del precio</b> a la DLD, normalmente al registrar el contrato.</li>
+        <li>Tasas administrativas del registro (unos cientos de AED) y del promotor.</li>
+        <li>En obra nueva, la comisión del agente la paga normalmente el promotor.</li>
+        <li>Algunos promotores pagan parte de la DLD como promoción: pregúntalo.</li>
       </ul>
     </div>
   </div>
-  <p class="note">Ejemplo ilustrativo: la cuota de servicio y el alquiler reales dependen del edificio. Pide siempre cifras de pisos similares <b>ya alquilados</b>, no proyecciones.</p>
+  <p class="note">Cifras orientativas a noviembre de 2026. Confirma siempre los importes vigentes con la DLD y tu agente.</p>
   <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>8</span></div>
 </section>
 
-<!-- 9 · Error 7 -->
+<!-- Paso 6 -->
 <section class="page">
-  <p class="kicker">Error 7</p>
-  <h2>Olvidarse de Hacienda y de la letra pequeña</h2>
-  <p class="lead">En Dubái no hay impuesto sobre la renta personal. Pero si sigues siendo <b>residente fiscal en España</b>, Hacienda española sí cuenta con tu inversión.</p>
-  <div class="two">
-    <div class="box">
-      <h3>Si eres residente fiscal en España</h3>
-      <ul class="clean">
-        <li>Tributas por tu <b>renta mundial</b>: el alquiler de tu piso en Dubái se declara en el IRPF.</li>
-        <li>Si el piso está vacío o lo usas tú, puede tocar declarar una <b>imputación de rentas</b>.</li>
-        <li>Al vender, la ganancia también se declara en el IRPF.</li>
-        <li><b>Modelo 720</b>: si tus inmuebles en el extranjero superan los 50.000 €, debes informar de ellos (es una declaración informativa, no un impuesto).</li>
-        <li>España y Emiratos tienen un convenio para evitar la doble imposición: revisa con tu asesor cómo te afecta.</li>
-      </ul>
-    </div>
-    <div class="box">
-      <h3>Golden Visa ≠ dejar de ser residente fiscal</h3>
-      <p>La Golden Visa de 10 años (inversión inmobiliaria desde AED 2 millones) te permite residir en los EAU. <b>No te convierte automáticamente</b> en no residente fiscal en España: para eso cuentan los días que pasas en España (más de 183) y dónde está el centro de tus intereses.</p>
-      <h3>La herencia</h3>
-      <p style="margin:0">Registra un testamento válido en Dubái (por ejemplo, en el registro de testamentos del DIFC). Sin él, el proceso para tus herederos puede ser largo.</p>
-    </div>
+  <p class="kicker">Paso 6</p>
+  <h2>Firmar el SPA y recibir tu Oqood</h2>
+  <p class="lead">El <b>SPA</b> (Sale and Purchase Agreement) es el contrato de compraventa. El <b>Oqood</b> es el registro oficial de ese contrato en la DLD: la prueba de que la unidad es tuya aunque el edificio aún no exista.</p>
+  <h3>El SPA: qué revisar antes de firmar</h3>
+  <table>
+    <tr><th style="width:32%">Punto</th><th>Qué comprobar</th></tr>
+    <tr><td><b>Datos de la unidad</b></td><td>Número de unidad, planta, superficie (neta o con terraza) y lo que incluye.</td></tr>
+    <tr><td><b>Precio y plan de pago</b></td><td>Que coincidan exactamente con la oferta: importes, fechas y hitos de obra.</td></tr>
+    <tr><td><b>Fecha de entrega</b></td><td>Fecha prevista, margen de retraso permitido y qué recibes si se supera.</td></tr>
+    <tr><td><b>Si tú te retrasas</b></td><td>Intereses o penalizaciones por pagar tarde, y cuándo puede el promotor cancelar.</td></tr>
+    <tr><td><b>Reventa antes de la entrega</b></td><td>Qué porcentaje tienes que haber pagado (suele ser un 30–40 %) y qué tasas cobra el promotor por el permiso (NOC).</td></tr>
+    <tr><td><b>Cuotas de servicio</b></td><td>Estimación por pie cuadrado al año.</td></tr>
+  </table>
+  <p style="margin-top:4mm">La firma suele hacerse <b>en línea</b>, sin viajar a Dubái. Si algo no está en el contrato, no existe: pide que se añada antes de firmar.</p>
+  <div class="box navy">
+    <h3>El Oqood</h3>
+    <p>Con el SPA firmado y pagado el 4 % de la DLD, el promotor registra tu compra en el sistema <b>Oqood</b> de la DLD y recibes el <b>certificado Oqood</b>. Comprueba que tu nombre, la unidad y el precio son correctos.</p>
+    <p style="margin:0">Guárdalo bien: lo necesitas para revender antes de la entrega, para algunos trámites de residencia y, al final, para convertirlo en tu escritura (paso 8). También puedes ver tu compra en la app <b>Dubai REST</b>.</p>
   </div>
-  <div class="box amber">
-    <h3>La letra pequeña del contrato (SPA)</h3>
-    <p style="margin:0">Lee con calma: fecha de entrega y penalizaciones por retraso, qué pasa si tú te retrasas en un pago, superficie (neta o con terraza), acabados incluidos, cuándo puedes revender y las cuotas de servicio estimadas. Si algo no está por escrito, no existe.</p>
-  </div>
-  <p class="note">Información general, no asesoramiento fiscal ni legal. Cada caso es distinto: consulta con un asesor fiscal en España antes de invertir.</p>
   <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>9</span></div>
 </section>
 
-<!-- 10 · Checklist -->
+<!-- Paso 7 -->
 <section class="page">
-  <p class="kicker">Antes de firmar</p>
-  <h2>15 preguntas que tienes que hacer</h2>
-  <p class="lead">Llévalas a cada reunión. Si alguien no puede responderlas con claridad, es una señal.</p>
-  <div class="qgroup"><h4>El proyecto y el promotor</h4><ul class="checks">
-    <li><b>¿Cuál es el número del proyecto en la DLD y la cuenta escrow?</b></li>
-    <li><b>¿Qué ha entregado antes este promotor y con cuánto retraso?</b></li>
-    <li><b>¿Qué fecha de entrega pone el contrato y qué pasa si se retrasa?</b></li>
-    <li><b>¿Qué incluye el piso?</b><small>Cocina equipada, electrodomésticos, armarios, plaza de parking.</small></li>
-    <li><b>¿La superficie es neta o incluye terraza?</b></li>
-  </ul></div>
-  <div class="qgroup"><h4>El dinero</h4><ul class="checks">
-    <li><b>¿Cuánto pago en total, con todos los gastos?</b><small>DLD, gestión, comisiones, amueblado.</small></li>
-    <li><b>¿Cuál es el plan de pago exacto, con fechas e importes?</b></li>
-    <li><b>¿Qué pasa si me retraso en un pago?</b></li>
-    <li><b>¿Cuánto es la cuota de servicio por ft² al año?</b></li>
-    <li><b>¿Qué alquiler real tienen pisos parecidos ya terminados en la zona?</b><small>Alquileres firmados, no del folleto.</small></li>
-  </ul></div>
-  <div class="qgroup"><h4>La salida y el después</h4><ul class="checks">
-    <li><b>¿Cuándo puedo revender y con qué costes?</b><small>Porcentaje pagado, NOC y tasas.</small></li>
-    <li><b>¿Se permite alquiler vacacional en el edificio?</b></li>
-    <li><b>¿Esta compra me da acceso a la Golden Visa?</b></li>
-    <li><b>¿Cómo tributaré en España por este piso?</b></li>
-    <li><b>¿Quién me acompaña en la entrega, la inspección y el alquiler?</b></li>
-  </ul></div>
+  <p class="kicker">Paso 7</p>
+  <h2>Pagos de obra y seguimiento del avance</h2>
+  <p class="lead">Durante la construcción pagarás cada plazo según el calendario de tu SPA. Es una etapa tranquila si llevas el control.</p>
+  <div class="two">
+    <div class="box">
+      <h3>Cómo pagar cada plazo</h3>
+      <ul class="clean">
+        <li>El promotor te avisa antes de cada pago, por fecha o cuando la obra alcanza un hito (por ejemplo, el 30 % construido).</li>
+        <li>Paga <b>siempre a la cuenta escrow</b> que figura en tu SPA y pide el recibo de cada pago.</li>
+        <li>Para cambiar euros a dírhams, compara tu banco con servicios de transferencia internacional: la diferencia de cambio puede ser notable.</li>
+        <li>Guarda todos los justificantes. Te harán falta para Hacienda en España y para una futura venta.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3>Cómo seguir la obra</h3>
+      <ul class="clean">
+        <li>En la app <b>Dubai REST</b> puedes consultar el porcentaje de avance del proyecto registrado en la DLD.</li>
+        <li>Los promotores envían informes, fotos y vídeos de la obra.</li>
+        <li>Tu agente puede visitar la obra y contarte cómo va en realidad.</li>
+        <li>Si el avance va claramente por detrás del calendario, pregunta pronto: es mejor saberlo que llevarse la sorpresa.</li>
+      </ul>
+    </div>
+  </div>
+  <h3>Ejemplo: piso de AED 1.000.000 con plan 60/40, entrega en 3 años</h3>
+  <table>
+    <tr><th>Momento</th><th class="n">Pago</th><th class="n">Acumulado</th></tr>
+    <tr><td>Reserva: entrada + 4 % de la DLD</td><td class="n">10 % + 4 % = 140.000</td><td class="n">10 %</td></tr>
+    <tr><td>Durante la obra, en hitos (por ejemplo, 5 pagos de 10 %)</td><td class="n">500.000</td><td class="n">60 %</td></tr>
+    <tr><td>Entrega de llaves</td><td class="n">400.000</td><td class="n">100 %</td></tr>
+  </table>
+  <p class="note">Ejemplo ilustrativo; los hitos exactos los marca tu SPA.</p>
   <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>10</span></div>
 </section>
 
-<!-- 11 · Sobre mí y llamada -->
+<!-- Paso 8 -->
+<section class="page">
+  <p class="kicker">Paso 8</p>
+  <h2>La entrega de llaves (BCC)</h2>
+  <p class="lead">La entrega empieza cuando el edificio obtiene el <b>BCC</b> (Building Completion Certificate), el certificado oficial de que la obra está terminada y se puede habitar. Entonces el promotor te envía el aviso de entrega.</p>
+  <ol class="steps">
+    <li><b>Recibes el aviso de entrega</b> con el importe pendiente: el último pago del plan (salvo si tu plan es post-entrega) y, normalmente, cuotas de servicio por adelantado.</li>
+    <li><b>Pagas el resto</b> a la cuenta escrow, o tu banco transfiere la hipoteca si financias.</li>
+    <li><b>Inspeccionas la propiedad</b> antes de aceptarla (paso 9).</li>
+    <li><b>Firmas el acta de entrega</b> y recibes las llaves, tarjetas de acceso y manuales.</li>
+    <li><b>Conectas los suministros:</b> luz y agua (DEWA) y, en muchas zonas, el aire acondicionado centralizado.</li>
+    <li><b>Recibes tu escritura (title deed):</b> el Oqood se convierte en el título de propiedad definitivo de la DLD. Suele tardar algunas semanas. Con un plan post-entrega, la escritura llega cuando terminas de pagar.</li>
+  </ol>
+  <div class="box amber">
+    <h3>Ojo con los tiempos</h3>
+    <p style="margin:0">Desde el aviso de entrega sueles tener un plazo corto para pagar lo pendiente. Si vas a pedir hipoteca, empieza a moverla <b>meses antes</b>, no cuando llegue el aviso.</p>
+  </div>
+  <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>11</span></div>
+</section>
+
+<!-- Paso 9 -->
+<section class="page">
+  <p class="kicker">Paso 9</p>
+  <h2>Inspeccionar tu propiedad (snagging)</h2>
+  <p class="lead">El <b>snagging</b> es la inspección de la vivienda antes de aceptarla, para detectar defectos y que el promotor los arregle. Es mucho más fácil conseguir una reparación <b>antes</b> de firmar el acta de entrega que después.</p>
+  <div class="two">
+    <div class="box">
+      <h3>Cómo hacerlo bien</h3>
+      <ul class="clean">
+        <li>Contrata una <b>empresa de inspección</b> independiente si no puedes ir tú. Revisan con herramientas lo que a simple vista no se ve: humedad, instalaciones, aislamiento.</li>
+        <li>Haz una <b>lista por estancias</b>, con fotos y descripción de cada defecto.</li>
+        <li>Entrega la lista al promotor y pide una <b>fecha de reparación</b> por escrito.</li>
+        <li>Vuelve a revisar (de-snagging) antes de firmar. Si algo queda pendiente, que conste en el acta con fecha.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3>Qué revisar</h3>
+      <ul class="clean">
+        <li>Paredes, techos y suelos: grietas, juntas, nivelación, manchas.</li>
+        <li>Puertas, ventanas y cerramientos: que cierren bien y sin filtraciones.</li>
+        <li>Fontanería: presión, desagües, fugas bajo lavabos.</li>
+        <li>Electricidad: enchufes, luces, cuadro eléctrico.</li>
+        <li>Aire acondicionado: que enfríe en todas las estancias.</li>
+        <li>Cocina y baños: electrodomésticos, sellados y alicatado.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="box navy">
+    <h3>Tus garantías después de la entrega</h3>
+    <p style="margin:0">Según la normativa de Dubái (Ley 6 de 2019), el promotor responde de los <b>defectos estructurales durante 10 años</b> y de los defectos en las <b>instalaciones durante 1 año</b> desde la entrega. Avisa de cualquier fallo por escrito y cuanto antes.</p>
+  </div>
+  <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>12</span></div>
+</section>
+
+<!-- Paso 10 -->
+<section class="page">
+  <p class="kicker">Paso 10</p>
+  <h2>Posventa, alquiler y reventa</h2>
+  <p class="lead">Con las llaves en la mano empieza la parte que te da rentabilidad. Aquí es donde un buen acompañamiento marca la diferencia.</p>
+  <div class="two">
+    <div class="box">
+      <h3>Alquilar</h3>
+      <ul class="clean">
+        <li><b>Larga estancia:</b> contrato registrado en <b>Ejari</b>, normalmente por un año. Gestión del 5–8 % del alquiler.</li>
+        <li><b>Vacacional:</b> necesita permiso de holiday home y amueblar. Da más ingresos brutos, pero la gestión cuesta un 15–25 % y la ocupación varía por temporada.</li>
+        <li>Calcula la rentabilidad <b>neta</b>: un 7,5 % bruto puede quedarse en un 5 % después de cuotas de servicio, gestión y meses vacíos.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3>Revender</h3>
+      <ul class="clean">
+        <li><b>Antes de la entrega:</b> con permiso del promotor (NOC), normalmente tras pagar un 30–40 %. El comprador paga el 4 % de la DLD.</li>
+        <li><b>Terminado:</b> se firma un acuerdo de venta (formulario F de la DLD), el promotor emite el NOC y se transfiere en una oficina de registro.</li>
+        <li>Un buen agente te dice el precio real de venta, no el de los anuncios.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="two">
+    <div class="box">
+      <h3>Golden Visa y herencia</h3>
+      <ul class="clean">
+        <li>Con una inversión desde <b>AED 2 millones</b> puedes solicitar la Golden Visa de 10 años. Confirma los requisitos vigentes para tu caso.</li>
+        <li>Registra un <b>testamento</b> válido en Dubái (por ejemplo, en el registro del DIFC) para que tus herederos no tengan problemas.</li>
+      </ul>
+    </div>
+    <div class="box amber">
+      <h3>Si sigues siendo residente fiscal en España</h3>
+      <ul class="clean">
+        <li>Declaras en el <b>IRPF</b> el alquiler, o una imputación de rentas si el piso está vacío, y la ganancia si vendes.</li>
+        <li>Presentas el <b>modelo 720</b> si tus inmuebles en el extranjero superan los 50.000 €.</li>
+        <li>La Golden Visa <b>no</b> te convierte en no residente fiscal en España. Consulta con tu asesor fiscal.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>13</span></div>
+</section>
+
+<!-- Sobre mí y llamada -->
 <section class="page dark back">
   <p class="kicker">Siguiente paso</p>
   <div style="display:flex; gap:9mm; align-items:flex-start; margin-top:4mm">
     <div class="photo"></div>
     <div>
-      <h2 style="color:var(--ivory)">Hablemos de tu caso</h2>
-      <p class="lead" style="color:#d6dce6">Soy Pascual Vidal, consultor inmobiliario español en Dubái (RERA #97799). Acompaño a inversores hispanohablantes desde la elección de zona hasta la entrega de llaves, el alquiler y la Golden Visa.</p>
+      <h2 style="color:var(--ivory)">Te acompaño en los 10 pasos</h2>
+      <p class="lead" style="color:#d6dce6">Soy Pascual Vidal, consultor inmobiliario español en Dubái (RERA #97799). Acompaño a inversores hispanohablantes desde la elección de zona hasta la entrega de llaves, el alquiler, la reventa y la Golden Visa.</p>
       <p class="mute">Trabajo con los principales promotores de Dubái, Abu Dhabi y Ras Al Khaimah, así que te comparo opciones reales en vez de venderte un solo proyecto.</p>
     </div>
   </div>
@@ -407,8 +496,8 @@
     <tr><td><b style="color:var(--ivory)">WhatsApp</b></td><td>wa.me/message/QI3A7Q5BXFTCA1</td></tr>
     <tr><td><b style="color:var(--ivory)">YouTube</b></td><td>@pascual.dubairealestate</td></tr>
   </table>
-  <p class="note" style="color:#8f9bb0; margin-top:8mm">Esta guía es informativa y refleja el mercado a noviembre de 2026. Precios, rentabilidades, tasas y condiciones cambian: compruébalos siempre antes de invertir. No constituye asesoramiento fiscal, legal ni financiero.</p>
-  <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>11</span></div>
+  <p class="note" style="color:#8f9bb0; margin-top:8mm">Esta guía es informativa y refleja el mercado a noviembre de 2026. Precios, rentabilidades, tasas, plazos y condiciones cambian y dependen de cada promotor: compruébalos siempre antes de invertir. No constituye asesoramiento fiscal, legal ni financiero.</p>
+  <div class="foot"><span>Tu inversión en Dubái · Pascual Vidal</span><span>14</span></div>
 </section>
 
 </body>
