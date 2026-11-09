@@ -23,6 +23,48 @@ function require_auth($write = true) {
   }
 }
 
+/* ---------- Calendario de seguimientos para suscribirse desde Google Calendar ---------- */
+// Público pero con clave secreta en la URL (la que se ve en Ajustes); sin ella, 404.
+if ($action === 'feed') {
+  $key = (string) ($_GET['k'] ?? '');
+  $real = config()['feed_key'] ?? '';
+  if (!$real || !hash_equals($real, $key)) { http_response_code(404); exit; }
+  $esc = function ($t) { return str_replace(["\\", ';', ',', "\r", "\n"], ['\\\\', '\\;', '\\,', '', '\\n'], (string) $t); };
+  $fold = function ($line) {
+    $out = ''; while (strlen($line) > 74) { $cut = 74; while ($cut > 0 && (ord($line[$cut]) & 0xC0) === 0x80) $cut--; $out .= substr($line, 0, $cut) . "\r\n "; $line = substr($line, $cut); }
+    return $out . $line . "\r\n";
+  };
+  $host = $_SERVER['HTTP_HOST'] ?? 'crm';
+  $stamp = gmdate('Ymd\THis\Z');
+  $o = $fold('BEGIN:VCALENDAR') . $fold('VERSION:2.0') . $fold('PRODID:-//Tu inversion en Dubai//CRM//ES') . $fold('CALSCALE:GREGORIAN') .
+    $fold('X-WR-CALNAME:CRM · Seguimientos') . $fold('X-WR-TIMEZONE:Asia/Dubai') . $fold('REFRESH-INTERVAL;VALUE=DURATION:PT1H') . $fold('X-PUBLISHED-TTL:PT1H');
+  foreach (store_read('leads', []) as $l) {
+    $d = $l['seguimiento'] ?? '';
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $d) || ($l['etapa'] ?? '') === 'discarded') continue;
+    $name = trim(($l['nombre'] ?? '') ?: ($l['email'] ?? 'Contacto'));
+    $acc = trim($l['proxima_accion'] ?? '');
+    $notes = array_values(array_filter($l['actividad'] ?? [], function ($a) { return ($a['tipo'] ?? '') === 'nota'; }));
+    $last = $notes ? end($notes)['texto'] : '';
+    $desc = implode("\n", array_filter([
+      $acc ? "Próxima acción: $acc" : '', ($l['telefono'] ?? '') ? 'Tel: ' . $l['telefono'] : '', ($l['email'] ?? '') ? 'Email: ' . $l['email'] : '',
+      ($l['proyecto'] ?? '') ? 'Proyecto: ' . $l['proyecto'] : '', 'Etapa: ' . (STAGES[$l['etapa'] ?? ''] ?? ''), $last ? "Última nota: $last" : '',
+      'https://' . $host . crm_base(),
+    ]));
+    $next = date('Ymd', strtotime($d . ' +1 day'));
+    $o .= $fold('BEGIN:VEVENT') . $fold('UID:' . $l['id'] . '-seguimiento@' . $host) . $fold('DTSTAMP:' . $stamp) .
+      $fold('LAST-MODIFIED:' . gmdate('Ymd\THis\Z', strtotime($l['actualizado'] ?? 'now'))) .
+      $fold('DTSTART;VALUE=DATE:' . str_replace('-', '', $d)) . $fold('DTEND;VALUE=DATE:' . $next) .
+      $fold('SUMMARY:' . $esc(mb_strtoupper($name, 'UTF-8') . ($acc ? ' — ' . $acc : ' — Seguimiento'))) .
+      $fold('DESCRIPTION:' . $esc($desc)) . $fold('TRANSP:TRANSPARENT') . $fold('END:VEVENT');
+  }
+  $o .= $fold('END:VCALENDAR');
+  header('Content-Type: text/calendar; charset=utf-8');
+  header('Content-Disposition: inline; filename="crm-seguimientos.ics"');
+  header('Cache-Control: no-cache, max-age=0');
+  echo $o;
+  exit;
+}
+
 /* ---------- Entrada pública: formularios de la web ---------- */
 if ($action === 'lead') {
   if ($method === 'OPTIONS') { http_response_code(204); exit; }
@@ -90,7 +132,10 @@ if ($action === 'lead') {
 if ($action === 'state') {
   require_auth(false);
   $cfg = config();
-  json_out(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'smtp' => $cfg['smtp_user'] ?? '', 'smtp_name' => $cfg['smtp_name'] ?? '', 'smtp_host' => $cfg['smtp_host'] ?? 'smtp.gmail.com', 'smtp_port' => (int) ($cfg['smtp_port'] ?? 465), 'csrf' => csrf()]);
+  if (empty($cfg['feed_key'])) {
+    $cfg = with_lock('config', function () { $c = config(); if (empty($c['feed_key'])) { $c['feed_key'] = bin2hex(random_bytes(16)); store_write('config', $c); } return $c; });
+  }
+  json_out(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'feed' => $cfg['feed_key'] ?? '', 'smtp' => $cfg['smtp_user'] ?? '', 'smtp_name' => $cfg['smtp_name'] ?? '', 'smtp_host' => $cfg['smtp_host'] ?? 'smtp.gmail.com', 'smtp_port' => (int) ($cfg['smtp_port'] ?? 465), 'csrf' => csrf()]);
 }
 
 if ($action === 'save' && $method === 'POST') {
@@ -181,6 +226,7 @@ if ($action === 'settings' && $method === 'POST') {
       if ($p !== '') $cfg['smtp_pass'] = cut($p, 128);
       if ($u === '') unset($cfg['smtp_pass']);
     }
+    if (!empty($b['feed_reset'])) $cfg['feed_key'] = bin2hex(random_bytes(16));
     if (!empty($b['nueva'])) {
       if (!password_verify((string) ($b['actual'] ?? ''), $cfg['hash'])) return ['error' => 'La contraseña actual no es correcta'];
       if (strlen((string) $b['nueva']) < 10) return ['error' => 'La nueva contraseña necesita al menos 10 caracteres'];
@@ -191,7 +237,7 @@ if ($action === 'settings' && $method === 'POST') {
     return ['ok' => true];
   });
   if (!empty($res['ok']) && !empty($b['nueva'])) login_session();
-  json_out($res + ['csrf' => csrf()], empty($res['ok']) ? 422 : 200);
+  json_out($res + ['csrf' => csrf(), 'feed' => config()['feed_key'] ?? ''], empty($res['ok']) ? 422 : 200);
 }
 
 if ($action === 'export') {

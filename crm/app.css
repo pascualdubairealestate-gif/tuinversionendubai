@@ -422,3 +422,8 @@ tbody tr:last-child td { border-bottom: 0; }
 .m-batch header .quick { display: flex; gap: 6px; flex-wrap: wrap; }
 .doc-price { width: 120px; flex: none; min-height: 36px; padding: 6px 10px; font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
 @media (max-width: 860px) { .doc-price { order: 5; width: 100%; text-align: left; } }
+.steps-list { margin: 10px 0 8px; padding-left: 20px; display: grid; gap: 4px; color: var(--mute); }
+.gcal-offer { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border-radius: 12px; background: var(--amber-soft); border: 1px solid rgba(247, 147, 30, .4); }
+.gcal-offer svg { color: var(--amber-ink); flex: none; }
+.gcal-offer span { flex: 1 1 200px; min-width: 0; font-size: 14px; }
+.gcal-offer small { display: block; color: var(--mute); font-size: 12px; }

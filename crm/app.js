@@ -137,6 +137,7 @@
       S.csrf = j.csrf;
       S.notify = j.notify || "";
       S.ics = j.ics || "";
+      S.feed = j.feed || "";
       S.smtp = j.smtp || ""; S.smtpName = j.smtp_name || ""; S.smtpHost = j.smtp_host || "smtp.gmail.com"; S.smtpPort = j.smtp_port || 465;
       if (silent && S.leads.length > before) toast("Nuevo contacto recibido desde la web");
       if (S.ready && !S.open && (!silent || ["inicio", "contactos", "ventas"].indexOf(S.page) > -1)) render();
@@ -943,6 +944,7 @@
     var l = id ? leadById(id) : null;
     if (id && !l) return;
     l = l || { id: "", etapa: "lead", actividad: [], origen: "Manual" };
+    if (S.gcalOffer && S.gcalOffer !== l.id) S.gcalOffer = "";
     S.open = l.id || "__new";
     S.dirty = false;
     var wa = waLink(l.telefono);
@@ -966,6 +968,9 @@
       (l.id ? '<p class="muted small">' + esc(l.origen || "") + " · alta " + fmtDate(l.creado) + "</p>" : "") + "</div>" +
       '<button type="button" class="btn icon" data-close aria-label="Cerrar">✕</button></header>' +
       (quick ? '<div class="quick">' + quick + "</div>" : "") +
+      (l.id && S.gcalOffer === l.id && l.seguimiento ? '<div class="gcal-offer">' + ICON.cal + "<span><b>Seguimiento el " + esc(fmtDate(l.seguimiento)) + "</b>" + (l.proxima_accion ? " · " + esc(l.proxima_accion) : "") +
+        '<small>Saldrá solo en tu Google Calendar en unas horas. ¿Lo quieres ya?</small></span><a class="btn primary sm" target="_blank" rel="noopener" href="' +
+        gcalLink(up(l.nombre || l.email) + " — " + (l.proxima_accion || "Seguimiento"), l.seguimiento, [l.proxima_accion, l.telefono, l.email, l.proyecto].filter(Boolean).join(" · ")) + '">Añadir a Google Calendar</a></div>' : "") +
       '<div class="segs" role="group" aria-label="Etapa">' + stages + "</div>" +
       '<input type="hidden" name="etapa" value="' + esc(l.etapa) + '" />' +
       '<div class="grid">' +
@@ -1011,7 +1016,7 @@
     var d = $("#drawer");
     d.classList.remove("is-on");
     document.body.classList.remove("lock");
-    S.open = null; S.dirty = false;
+    S.open = null; S.dirty = false; S.gcalOffer = "";
     setTimeout(function () { if (!d.classList.contains("is-on")) d.hidden = true; }, 250);
   }
 
@@ -1032,9 +1037,12 @@
     if (!patch.nombre && !patch.email && !patch.telefono) { toast("Pon al menos nombre, email o teléfono", true); return; }
     var btn = $("button[type=submit]", form);
     btn.disabled = true;
+    var before = leadById(S.open) || {};
+    var dateChanged = patch.seguimiento && (patch.seguimiento !== before.seguimiento || patch.proxima_accion !== before.proxima_accion);
     saveLead(S.open && S.open.charAt(0) !== "_" ? S.open : "", patch).then(function (lead) {
       S.dirty = false;
       toast("Guardado");
+      S.gcalOffer = dateChanged ? lead.id : "";
       openLead(lead.id);
     }).catch(function (e) { toast(e.message, true); btn.disabled = false; });
   }
@@ -1048,6 +1056,10 @@
       '<form class="box set-form"><h3>Google Calendar</h3><p class="muted small">En Google Calendar (ordenador): ⚙ Configuración → elige tu calendario → <b>Integrar el calendario</b> → copia la <b>Dirección secreta en formato iCal</b> y pégala aquí. Es privada: no la compartas.</p>' +
       '<label class="f"><span>Dirección secreta iCal</span><input name="ics" type="url" value="' + esc(S.ics) + '" placeholder="https://calendar.google.com/calendar/ical/…/private-…/basic.ics" /></label>' +
       '<button class="btn primary" type="submit">Conectar calendario</button></form>' +
+      '<div class="box"><h3>Tus seguimientos en Google Calendar</h3><p class="muted small">Cada contacto con <b>fecha de seguimiento</b> aparece en este calendario privado. Añádelo una vez en Google Calendar y se actualizará solo.</p>' +
+      '<div class="m-to-row"><input id="feed-url" readonly value="' + esc(feedUrl()) + '" aria-label="Dirección del calendario" /><button class="btn primary sm" type="button" data-act="feed-copy">Copiar</button></div>' +
+      '<ol class="steps-list small"><li>Pulsa <b>Copiar</b>.</li><li>En Google Calendar (ordenador): a la izquierda, junto a «Otros calendarios», pulsa <b>+</b> → <b>Desde URL</b>.</li><li>Pega la dirección y pulsa <b>Añadir calendario</b>. Aparecerá como «CRM · Seguimientos».</li></ol>' +
+      '<p class="muted small">Google lo refresca cada pocas horas (no al instante). Para que salga ya, usa el botón «Añadir a Google Calendar» de cada contacto. No compartas esta dirección; si se filtra, <button class="link-btn" type="button" data-act="feed-reset">genera una nueva</button>.</p></div>' +
       '<form class="box set-form" id="smtp-form"><h3>Enviar correos desde el CRM</h3><p class="muted small">El CRM envía desde tu propio buzón. Elige dónde tienes el correo: si lo lees en Gmail es <b>Google</b>; si lo lees en el webmail de Hostinger es <b>Hostinger</b>; si es Outlook, <b>Microsoft</b>.</p>' +
       '<label class="f"><span>Proveedor de tu correo</span><select name="smtp_prov" id="smtp-prov">' +
       [["google", "Google (Gmail o Google Workspace)"], ["hostinger", "Hostinger (correo de tu dominio)"], ["outlook", "Microsoft (Outlook / Microsoft 365)"], ["otro", "Otro servidor"]].map(function (o) {
@@ -1083,6 +1095,7 @@
     if (p === "outlook") return "Usa la contraseña de tu cuenta de Microsoft. Si tienes verificación en 2 pasos, crea una contraseña de aplicación en account.microsoft.com → Seguridad. En Microsoft 365 de empresa, el administrador debe tener activado «SMTP autenticado».";
     return "Pide a tu proveedor los datos SMTP (servidor y puerto 465 SSL o 587 STARTTLS) y usa la contraseña del buzón.";
   }
+  function feedUrl() { return S.feed ? location.origin + location.pathname.replace(/[^/]*$/, "") + "api.php?action=feed&k=" + S.feed : ""; }
   function submitSettings(form) {
     var data = {};
     $$("input[name], select[name]", form).forEach(function (f) { data[f.name] = f.value.trim(); });
@@ -1168,6 +1181,17 @@
         if (S.page === "correo") renderMail();
       }
       if (a === "mail-design") { copyDesign(); return; }
+      if (a === "feed-copy") {
+        var fu = $("#feed-url");
+        var fok = function () { toast("Dirección copiada. Pégala en Google Calendar → Otros calendarios → + → Desde URL."); };
+        if (navigator.clipboard) navigator.clipboard.writeText(fu.value).then(fok, function () { fu.select(); document.execCommand("copy"); fok(); });
+        else { fu.select(); document.execCommand("copy"); fok(); }
+        return;
+      }
+      if (a === "feed-reset" && confirm("¿Generar una dirección nueva? La antigua dejará de funcionar y tendrás que volver a añadirla en Google Calendar.")) {
+        api("settings", { feed_reset: 1 }).then(function (j) { S.csrf = j.csrf || S.csrf; S.feed = j.feed; openSettings(); toast("Dirección nueva creada. Vuelve a añadirla en Google Calendar."); }, function (err) { toast(err.message, true); });
+        return;
+      }
       if (a === "copy-emails") {
         var mails = [];
         filtered().forEach(function (l) { var m = (l.email || "").trim(); if (m && mails.indexOf(m) < 0) mails.push(m); });
