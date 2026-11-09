@@ -268,12 +268,14 @@
   }
 
   // Muestrario para cambiar el color de un evento a mano («Auto» = según las palabras de Ajustes).
+  // Botón con el color actual; al pulsarlo se abren los colores (círculos) para elegir otro.
   function colorPicker(e) {
     var own = (S.evcol || {})[e.serie] || "", cur = evColor(e);
-    return '<span class="ev-pick" data-serie="' + esc(e.serie || "") + '"><i class="cr-dot" style="background:' + (cur ? cur[0] : "#2f7de1") + '"></i>' +
-      '<select class="ev-color-sel" aria-label="Color del evento"><option value="">Automático</option>' + Object.keys(PALETA).map(function (k) {
-        return '<option value="' + k + '"' + (own === k ? " selected" : "") + ">" + k.charAt(0).toUpperCase() + k.slice(1) + "</option>";
-      }).join("") + "</select></span>";
+    return '<span class="ev-pick" data-serie="' + esc(e.serie || "") + '"><button type="button" class="ev-cur" data-act="ev-open" aria-haspopup="true" aria-expanded="false" title="Cambiar color">' +
+      '<i style="background:' + (cur ? cur[0] : "#2f7de1") + '"></i><span aria-hidden="true">▾</span></button>' +
+      '<span class="ev-menu" role="menu" hidden>' + Object.keys(PALETA).map(function (k) {
+        return '<button type="button" class="sw' + (own === k ? " on" : "") + '" role="menuitemradio" aria-checked="' + (own === k) + '" data-act="ev-color" data-c="' + k + '" style="background:' + PALETA[k][0] + '" title="' + k + '" aria-label="' + k + '"></button>';
+      }).join("") + '<button type="button" class="sw auto' + (own ? "" : " on") + '" role="menuitemradio" aria-checked="' + !own + '" data-act="ev-color" data-c="" title="Automático (según las palabras de Ajustes)" aria-label="Automático">A</button></span></span>';
   }
   function eventLi(e, pick) {
     var past = !e.todoElDia && new Date(e.fin).getTime() < Date.now();
@@ -1262,6 +1264,7 @@
 
   document.addEventListener("click", function (e) {
     var t = e.target;
+    if (!t.closest(".ev-pick")) $$(".ev-menu").forEach(function (m) { m.hidden = true; });
     if (t.closest("[data-close]")) { closeDrawer(); return; }
     var act = t.closest("[data-act]");
     if (act) {
@@ -1320,6 +1323,21 @@
         if (S.page === "correo") renderMail();
       }
       if (a === "mail-design") { copyDesign(); return; }
+      if (a === "ev-open") {
+        var menu = act.nextElementSibling, open = menu.hidden;
+        $$(".ev-menu").forEach(function (m) { m.hidden = true; });
+        $$(".ev-cur").forEach(function (b) { b.setAttribute("aria-expanded", "false"); });
+        menu.hidden = !open; act.setAttribute("aria-expanded", String(open));
+        return;
+      }
+      if (a === "ev-color") {
+        var serie = act.closest("[data-serie]").getAttribute("data-serie"), col = act.getAttribute("data-c");
+        S.evcol = S.evcol || {};
+        if (col) S.evcol[serie] = col; else delete S.evcol[serie];
+        renderCalendar();
+        api("ev_color", { serie: serie, color: col }).then(function (j) { S.evcol = j.evcolores || {}; toast(col ? "Color cambiado (también en sus repeticiones)" : "Color automático"); }, function (err) { toast(err.message, true); });
+        return;
+      }
       if (a === "color-add") { $("#color-rules").insertAdjacentHTML("beforeend", colorRuleRow({ p: "", c: "morado" })); $("#color-rules li:last-child .cr-p").focus(); return; }
       if (a === "color-del") { var rli = act.closest("li"); rli.parentNode.removeChild(rli); S.dirty = true; return; }
       if (a === "feed-copy") {
@@ -1551,13 +1569,6 @@
     if (t.id === "m-img") { S.mail.imagen = t.checked ? (S.mail.imagen || EMAIL_IMG) : ""; refreshPreview(); }
     if (t.id === "m-wa") { S.mail.boton = t.checked; refreshPreview(); }
     if (t.id === "pick-etapa" || t.id === "pick-origen") filterPicker();
-    if (t.classList.contains("ev-color-sel")) {
-      var serie = t.closest("[data-serie]").getAttribute("data-serie"), col = t.value;
-      S.evcol = S.evcol || {};
-      if (col) S.evcol[serie] = col; else delete S.evcol[serie];
-      renderCalendar();
-      api("ev_color", { serie: serie, color: col }).then(function (j) { S.evcol = j.evcolores || {}; toast(col ? "Color cambiado (también en sus repeticiones)" : "Color automático"); }, function (err) { toast(err.message, true); });
-    }
     if (t.classList.contains("cr-c")) t.parentNode.querySelector(".cr-dot").style.background = PALETA[t.value][0];
     if (t.id === "smtp-prov") {
       $(".smtp-otro").hidden = t.value !== "otro";
