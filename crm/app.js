@@ -8,7 +8,7 @@
     leads: [], ventas: [], hitos: {}, stages: {}, csrf: "", notify: "", ics: "",
     page: "inicio", q: "", origen: "", etapa: "", hoy: false, vista: savedView(), orden: savedSort().por, dir: savedSort().dir, plegadas: savedFolds(),
     open: null, dirty: false,
-    cal: {}, calErr: "", month: null, day: null,
+    cal: {}, calErr: "", month: null, day: null, calView: savedCalView(),
     tpls: null, docs: null, carpetas: [], carpeta: "", newFolder: false, docSort: "fecha", docDir: "desc", mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false, imagen: "", boton: false, lista: [], hechos: {}, forEmail: "" }
   };
   var PAGES = { inicio: "Inicio", contactos: "Contactos", ventas: "Ventas", correo: "Correo", calendario: "Calendario", documentos: "Documentos" };
@@ -804,7 +804,117 @@
   }
 
   /* ---------- Calendario ---------- */
+  function savedCalView() {
+    try { return localStorage.getItem("crm-calvista") === "semana" ? "semana" : "mes"; } catch (e) { return "mes"; }
+  }
+  function calViewToggle() {
+    return '<div class="view-toggle cal-view" role="group" aria-label="Vista">' + [["mes", "Mes"], ["semana", "Semana"]].map(function (v) {
+      return '<button type="button" data-act="cal-view" data-v="' + v[0] + '" aria-pressed="' + (S.calView === v[0]) + '">' + v[1] + "</button>";
+    }).join("") + "</div>";
+  }
+  function calNotices() {
+    return (!S.ics ? '<div class="connect"><p><b>Conecta tu Google Calendar</b> para ver aquí tus citas y tareas.</p><button class="btn primary sm" data-act="settings">Conectar</button></div>' : "") +
+      (/\/public\//.test(S.ics) ? '<div class="connect"><p><b>Solo ves «Busy» porque has pegado la dirección pública.</b> En Google Calendar → Integrar el calendario, copia la <b>Dirección secreta en formato iCal</b> (contiene «private-») y pégala en Ajustes.</p><button class="btn primary sm" data-act="settings">Cambiar</button></div>' : "");
+  }
+  function calTools(sel) {
+    return '<div class="cal-tools">' + calViewToggle() + '<span class="legend"><i class="lg-g"></i>Google Calendar <i class="lg-c"></i>Seguimientos</span>' +
+      (S.ics ? '<button class="btn ghost sm" type="button" data-act="cal-refresh" title="Volver a leer tu Google Calendar">↻ Actualizar</button><small class="muted" id="cal-read"></small>' : "") +
+      '<a class="btn primary sm" href="' + gcalLink("", sel) + '" target="_blank" rel="noopener">+ Evento en Google Calendar</a></div>';
+  }
+  function followUps() {
+    var follow = {};
+    S.leads.forEach(function (l) { if (l.seguimiento && l.etapa !== "customer" && l.etapa !== "discarded") (follow[l.seguimiento] = follow[l.seguimiento] || []).push(l); });
+    return follow;
+  }
+  function eventsByDay(evs) {
+    var by = {};
+    evs.forEach(function (e) {
+      var d0 = eventDay(e), d1 = e.todoElDia ? e.fin : d0;
+      for (var d = parseDay(d0), n = 0; ymd(d) <= d1 && n < 40; d = addDays(d, 1), n++) (by[ymd(d)] = by[ymd(d)] || []).push(e);
+    });
+    return by;
+  }
+  function loadCalInto(from, to, check, paint) {
+    if (!S.ics) return;
+    loadCal(from, to, S.calForce).then(function (c) {
+      S.calForce = false;
+      if (S.page !== "calendario" || !check()) return;
+      paint(c.eventos);
+      var rd = $("#cal-read");
+      if (rd && S.calRead) rd.textContent = "Leído a las " + new Date(S.calRead).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+      if (S.calErr) toast(S.calErr, true);
+    });
+  }
+
+  /* Vista semanal: lunes a domingo, de 08:00 a 24:00, con las horas a la izquierda. */
+  var WK_FROM = 8, WK_TO = 24, WK_H = 48; // horas visibles y alto de cada hora en px
+  function renderWeek() {
+    var sel = S.day || today();
+    var mon = addDays(parseDay(sel), -((parseDay(sel).getDay() + 6) % 7));
+    var days = []; for (var i = 0; i < 7; i++) days.push(addDays(mon, i));
+    var from = ymd(days[0]), to = ymd(days[6]);
+    S.month = new Date(mon.getFullYear(), mon.getMonth(), 1);
+    var f = { day: "numeric", month: "short" };
+    var title = days[0].toLocaleDateString("es-ES", f) + " – " + days[6].toLocaleDateString("es-ES", f) + " " + days[6].getFullYear();
+    var hours = []; for (var h = WK_FROM; h < WK_TO; h++) hours.push(h);
+    var dn = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+    $("#main").innerHTML =
+      '<div class="cal-head"><div class="cal-nav"><button class="btn icon" data-act="cal-prev" aria-label="Semana anterior">‹</button><h2>' + esc(title) +
+      '</h2><button class="btn icon" data-act="cal-next" aria-label="Semana siguiente">›</button><button class="btn ghost sm" data-act="cal-today">Hoy</button></div>' +
+      calTools(sel) + "</div>" + calNotices() +
+      '<div class="cal-wrap"><div class="wk-scroll"><div class="wk" style="--wk-h:' + WK_H + 'px">' +
+      '<div class="wk-corner"></div>' + days.map(function (d, i) {
+        var k = ymd(d);
+        return '<button class="wk-dh' + (k === today() ? " today" : "") + (k === sel ? " sel" : "") + '" data-day="' + k + '"><span>' + dn[i] + "</span><b>" + d.getDate() + "</b></button>";
+      }).join("") +
+      '<div class="wk-adl">Todo el día</div>' + days.map(function (d) { return '<div class="wk-ad" data-ad="' + ymd(d) + '"></div>'; }).join("") +
+      '<div class="wk-hours">' + hours.map(function (h) { return "<span>" + (h < 10 ? "0" : "") + h + ":00</span>"; }).join("") + "</div>" +
+      days.map(function (d) { var k = ymd(d); return '<div class="wk-col' + (k === today() ? " today" : "") + '" data-wk="' + k + '" data-day="' + k + '"></div>'; }).join("") +
+      '</div></div><section class="panel agenda" id="agenda"></section></div>';
+
+    var follow = followUps();
+    var paint = function (evs) {
+      var by = eventsByDay(evs);
+      days.forEach(function (d) {
+        var k = ymd(d);
+        var allDay = (by[k] || []).filter(function (e) { return e.todoElDia; });
+        $('[data-ad="' + k + '"]').innerHTML = allDay.map(function (e) { return '<i class="ev g"' + evStyle(e) + ">" + esc(e.titulo) + "</i>"; })
+          .concat((follow[k] || []).map(function (l) { return '<i class="ev c">' + esc(up(l.nombre) || l.email) + "</i>"; })).join("");
+        // Eventos con hora: posición por minutos y carriles cuando se solapan.
+        var dayStart = parseDay(k); dayStart.setHours(0, 0, 0, 0);
+        var items = (by[k] || []).filter(function (e) { return !e.todoElDia; }).map(function (e) {
+          var s = (new Date(e.inicio) - dayStart) / 60000, en = (new Date(e.fin) - dayStart) / 60000;
+          s = Math.max(s, WK_FROM * 60); en = Math.min(Math.max(en, s + 15), WK_TO * 60);
+          return { e: e, s: s, en: en };
+        }).filter(function (x) { return x.s < WK_TO * 60 && x.en > WK_FROM * 60; }).sort(function (a, b) { return a.s - b.s || b.en - a.en; });
+        var lanes = [], groupEnd = -1, group = [];
+        var flush = function () { group.forEach(function (x) { x.n = lanes.length; }); lanes = []; group = []; };
+        items.forEach(function (x) {
+          if (x.s >= groupEnd) { flush(); groupEnd = x.en; } else groupEnd = Math.max(groupEnd, x.en);
+          var lane = 0; while (lanes[lane] > x.s) lane++;
+          lanes[lane] = x.en; x.lane = lane; group.push(x);
+        });
+        flush();
+        var col = $('[data-wk="' + k + '"]');
+        col.innerHTML = items.map(function (x) {
+          var top = (x.s - WK_FROM * 60) / 60 * WK_H, hgt = Math.max(20, (x.en - x.s) / 60 * WK_H - 2);
+          var c = evColor(x.e);
+          return '<div class="wk-ev' + (c ? " own" : "") + '" style="top:' + top + "px;height:" + hgt + "px;left:calc(" + (x.lane * 100 / x.n) + "% + 2px);width:calc(" + (100 / x.n) + "% - 4px)" +
+            (c ? ";--evc:" + c[0] + ";--evt:" + c[1] : "") + '"' +
+            ' title="' + esc(fmtTime(x.e.inicio) + "–" + fmtTime(x.e.fin) + " " + x.e.titulo) + '"><b>' + esc(x.e.titulo) + "</b><small>" + fmtTime(x.e.inicio) + "–" + fmtTime(x.e.fin) + "</small></div>";
+        }).join("");
+      });
+      // Línea de la hora actual
+      var now = new Date(), nk = ymd(now), mins = now.getHours() * 60 + now.getMinutes(), nc = $('[data-wk="' + nk + '"]');
+      if (nc && mins >= WK_FROM * 60 && mins <= WK_TO * 60) nc.insertAdjacentHTML("beforeend", '<i class="wk-now" style="top:' + ((mins - WK_FROM * 60) / 60 * WK_H) + 'px"></i>');
+      renderAgenda(sel, by[sel] || [], follow[sel] || []);
+    };
+    paint([]);
+    loadCalInto(from, to, function () { return S.calView === "semana" && (S.day || today()) === sel; }, paint);
+  }
+
   function renderCalendar() {
+    if (S.calView === "semana") { renderWeek(); return; }
     var m = S.month || new Date(new Date().getFullYear(), new Date().getMonth(), 1);
     S.month = m;
     var first = new Date(m.getFullYear(), m.getMonth(), 1);
@@ -819,11 +929,7 @@
     $("#main").innerHTML =
       '<div class="cal-head"><div class="cal-nav"><button class="btn icon" data-act="cal-prev" aria-label="Mes anterior">‹</button><h2>' + esc(title.charAt(0).toUpperCase() + title.slice(1)) +
       '</h2><button class="btn icon" data-act="cal-next" aria-label="Mes siguiente">›</button><button class="btn ghost sm" data-act="cal-today">Hoy</button></div>' +
-      '<div class="cal-tools"><span class="legend"><i class="lg-g"></i>Google Calendar <i class="lg-c"></i>Seguimientos</span>' +
-      (S.ics ? '<button class="btn ghost sm" type="button" data-act="cal-refresh" title="Volver a leer tu Google Calendar">↻ Actualizar</button><small class="muted" id="cal-read"></small>' : "") +
-      '<a class="btn primary sm" href="' + gcalLink("", sel) + '" target="_blank" rel="noopener">+ Evento en Google Calendar</a></div></div>' +
-      (!S.ics ? '<div class="connect"><p><b>Conecta tu Google Calendar</b> para ver aquí tus citas y tareas.</p><button class="btn primary sm" data-act="settings">Conectar</button></div>' : "") +
-      (/\/public\//.test(S.ics) ? '<div class="connect"><p><b>Solo ves «Busy» porque has pegado la dirección pública.</b> En Google Calendar → Integrar el calendario, copia la <b>Dirección secreta en formato iCal</b> (contiene «private-») y pégala en Ajustes.</p><button class="btn primary sm" data-act="settings">Cambiar</button></div>' : "") +
+      calTools(sel) + "</div>" + calNotices() +
       '<div class="cal-wrap"><div class="cal" role="grid">' +
       ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map(function (d) { return '<div class="cal-dow">' + d + "</div>"; }).join("") +
       days.map(function (d) {
@@ -832,14 +938,9 @@
           '" data-day="' + k + '"><span class="n">' + d.getDate() + '</span><span class="ev-list" data-evs="' + k + '"></span></button>';
       }).join("") + '</div><section class="panel agenda" id="agenda"></section></div>';
 
-    var follow = {};
-    S.leads.forEach(function (l) { if (l.seguimiento && l.etapa !== "customer") (follow[l.seguimiento] = follow[l.seguimiento] || []).push(l); });
+    var follow = followUps();
     var paint = function (evs) {
-      var by = {};
-      evs.forEach(function (e) {
-        var d0 = eventDay(e), d1 = e.todoElDia ? e.fin : d0;
-        for (var d = parseDay(d0), n = 0; ymd(d) <= d1 && n < 40; d = addDays(d, 1), n++) (by[ymd(d)] = by[ymd(d)] || []).push(e);
-      });
+      var by = eventsByDay(evs);
       $$("[data-evs]").forEach(function (box) {
         var k = box.getAttribute("data-evs");
         var items = (by[k] || []).map(function (e) { return '<i class="ev g"' + evStyle(e) + ">" + (e.todoElDia ? "" : fmtTime(e.inicio) + " ") + esc(e.titulo) + "</i>"; })
@@ -849,15 +950,7 @@
       renderAgenda(sel, by[sel] || [], follow[sel] || []);
     };
     paint([]);
-    if (S.ics) loadCal(from, to, S.calForce).then(function (c) {
-      S.calForce = false;
-      if (S.page === "calendario" && S.month === m) {
-        paint(c.eventos);
-        var rd = $("#cal-read");
-        if (rd && S.calRead) rd.textContent = "Leído a las " + new Date(S.calRead).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
-        if (S.calErr) toast(S.calErr, true);
-      }
-    });
+    loadCalInto(from, to, function () { return S.calView === "mes" && S.month === m; }, paint);
   }
 
   function renderAgenda(day, evs, follow) {
@@ -1339,7 +1432,14 @@
         api("tpl_save", { id: $("#tpl-form [name=id]").value, borrar: true }).then(function (j) { S.tpls = j.plantillas; closeDrawer(true); renderMail(); toast("Plantilla eliminada"); })
           .catch(function (err) { toast(err.message, true); });
       }
-      if (a === "cal-prev" || a === "cal-next") { S.month = new Date(S.month.getFullYear(), S.month.getMonth() + (a === "cal-next" ? 1 : -1), 1); renderCalendar(); }
+      if ((a === "cal-prev" || a === "cal-next") && S.calView === "semana") { S.day = ymd(addDays(parseDay(S.day || today()), a === "cal-next" ? 7 : -7)); renderCalendar(); }
+      else if (a === "cal-prev" || a === "cal-next") { S.month = new Date(S.month.getFullYear(), S.month.getMonth() + (a === "cal-next" ? 1 : -1), 1); renderCalendar(); }
+      if (a === "cal-view") {
+        S.calView = act.getAttribute("data-v");
+        try { localStorage.setItem("crm-calvista", S.calView); } catch (err) {}
+        if (S.calView === "mes" && S.day) S.month = new Date(parseDay(S.day).getFullYear(), parseDay(S.day).getMonth(), 1);
+        renderCalendar();
+      }
       if (a === "cal-today") { S.month = null; S.day = today(); renderCalendar(); }
       if (a === "cal-refresh") { S.cal = {}; S.calForce = true; renderCalendar(); toast("Leyendo tu Google Calendar…"); }
       if (a === "doc-del") {
