@@ -355,6 +355,7 @@ function ics_events($raw, $fromTs, $toTs, DateTimeZone $local) {
       $endTs = $ts + $dur;
       $out[] = [
         'id' => substr(md5($uid . $ts), 0, 12),
+        'serie' => substr(md5($uid ?: ($e['SUMMARY'][0] ?? '') . $ts), 0, 12), // mismo valor en todas las repeticiones
         'titulo' => cut(ics_text($e['SUMMARY'][0] ?? '(Sin título)'), 200),
         'inicio' => $allDay ? $o->format('Y-m-d') : $o->format('c'),
         'fin' => $allDay ? (new DateTime('@' . ($endTs - 1)))->setTimezone($local)->format('Y-m-d') : date('c', $endTs),

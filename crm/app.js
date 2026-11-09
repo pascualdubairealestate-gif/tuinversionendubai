@@ -28,6 +28,8 @@
   var DEFAULT_COLORES = [{ p: "reunión, meeting", c: "rojo" }, { p: "llamada", c: "azul" }, { p: "dubai", c: "verde" }];
   function plain(t) { return String(t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
   function evColor(e) {
+    var own = S.evcol && e.serie && S.evcol[e.serie];
+    if (own && PALETA[own]) return PALETA[own];
     var txt = plain(e.titulo + " " + (e.lugar || ""));
     var rules = S.colores || DEFAULT_COLORES;
     for (var i = 0; i < rules.length; i++) {
@@ -153,6 +155,7 @@
       S.ics = j.ics || "";
       S.feed = j.feed || "";
       S.colores = j.colores || DEFAULT_COLORES;
+      S.evcol = j.evcolores || {};
       S.smtp = j.smtp || ""; S.smtpName = j.smtp_name || ""; S.smtpHost = j.smtp_host || "smtp.gmail.com"; S.smtpPort = j.smtp_port || 465;
       if (silent && S.leads.length > before) toast("Nuevo contacto recibido desde la web");
       if (S.ready && !S.open && (!silent || ["inicio", "contactos", "ventas"].indexOf(S.page) > -1)) render();
@@ -264,10 +267,18 @@
     });
   }
 
-  function eventLi(e) {
+  // Muestrario para cambiar el color de un evento a mano («Auto» = según las palabras de Ajustes).
+  function colorPicker(e) {
+    var own = (S.evcol || {})[e.serie] || "";
+    return '<span class="ev-pick" data-serie="' + esc(e.serie || "") + '" role="group" aria-label="Color del evento">' +
+      Object.keys(PALETA).map(function (k) {
+        return '<button type="button" class="sw' + (own === k ? " on" : "") + '" data-act="ev-color" data-c="' + k + '" style="background:' + PALETA[k][0] + '" title="' + k.charAt(0).toUpperCase() + k.slice(1) + '" aria-label="' + k + '"></button>';
+      }).join("") + '<button type="button" class="sw auto' + (own ? "" : " on") + '" data-act="ev-color" data-c="" title="Automático (según palabras)">A</button></span>';
+  }
+  function eventLi(e, pick) {
     var past = !e.todoElDia && new Date(e.fin).getTime() < Date.now();
     return '<li class="task' + (past ? " done" : "") + '"' + evStyle(e) + '><span class="t-when">' + (e.todoElDia ? "Todo el día" : fmtTime(e.inicio) + "–" + fmtTime(e.fin)) +
-      '</span><span class="t-what">' + esc(e.titulo) + (e.lugar ? '<small>' + esc(e.lugar) + "</small>" : "") + "</span></li>";
+      '</span><span class="t-what">' + esc(e.titulo) + (e.lugar ? '<small>' + esc(e.lugar) + "</small>" : "") + (pick && e.serie ? colorPicker(e) : "") + "</span></li>";
   }
 
   /* ---------- Contactos ---------- */
@@ -853,7 +864,7 @@
     var box = $("#agenda");
     if (!box) return;
     box.innerHTML = '<header class="panel-h"><h3>' + esc(dayLabel(day)) + '</h3><a class="btn ghost sm" href="' + gcalLink("", day) + '" target="_blank" rel="noopener">+ Añadir</a></header>' +
-      (evs.length || follow.length ? '<ul class="task-list">' + evs.map(eventLi).join("") + follow.map(function (l) {
+      (evs.length || follow.length ? '<ul class="task-list">' + evs.map(function (e) { return eventLi(e, true); }).join("") + follow.map(function (l) {
         return '<li class="task crm" data-id="' + esc(l.id) + '" tabindex="0"><span class="t-when">Seguimiento</span><span class="t-what">' + ICON.user + " " + esc(up(l.nombre) || l.email) + (l.proxima_accion ? " — " + esc(l.proxima_accion) : "") + "</span></li>";
       }).join("") + "</ul>" : '<p class="muted">Nada programado este día.</p>');
   }
@@ -1216,6 +1227,14 @@
         if (S.page === "correo") renderMail();
       }
       if (a === "mail-design") { copyDesign(); return; }
+      if (a === "ev-color") {
+        var serie = act.closest("[data-serie]").getAttribute("data-serie"), col = act.getAttribute("data-c");
+        S.evcol = S.evcol || {};
+        if (col) S.evcol[serie] = col; else delete S.evcol[serie];
+        renderCalendar();
+        api("ev_color", { serie: serie, color: col }).then(function (j) { S.evcol = j.evcolores || {}; toast(col ? "Color cambiado (también en sus repeticiones)" : "Color automático"); }, function (err) { toast(err.message, true); });
+        return;
+      }
       if (a === "color-add") { $("#color-rules").insertAdjacentHTML("beforeend", colorRuleRow({ p: "", c: "morado" })); $("#color-rules li:last-child .cr-p").focus(); return; }
       if (a === "color-del") { var rli = act.closest("li"); rli.parentNode.removeChild(rli); S.dirty = true; return; }
       if (a === "feed-copy") {

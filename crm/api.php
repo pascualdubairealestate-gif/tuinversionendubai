@@ -135,7 +135,7 @@ if ($action === 'state') {
   if (empty($cfg['feed_key'])) {
     $cfg = with_lock('config', function () { $c = config(); if (empty($c['feed_key'])) { $c['feed_key'] = bin2hex(random_bytes(16)); store_write('config', $c); } return $c; });
   }
-  json_out(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'feed' => $cfg['feed_key'] ?? '', 'colores' => $cfg['colores'] ?? null, 'smtp' => $cfg['smtp_user'] ?? '', 'smtp_name' => $cfg['smtp_name'] ?? '', 'smtp_host' => $cfg['smtp_host'] ?? 'smtp.gmail.com', 'smtp_port' => (int) ($cfg['smtp_port'] ?? 465), 'csrf' => csrf()]);
+  json_out(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'feed' => $cfg['feed_key'] ?? '', 'colores' => $cfg['colores'] ?? null, 'evcolores' => (object) store_read('evcolores', []), 'smtp' => $cfg['smtp_user'] ?? '', 'smtp_name' => $cfg['smtp_name'] ?? '', 'smtp_host' => $cfg['smtp_host'] ?? 'smtp.gmail.com', 'smtp_port' => (int) ($cfg['smtp_port'] ?? 465), 'csrf' => csrf()]);
 }
 
 if ($action === 'save' && $method === 'POST') {
@@ -356,6 +356,23 @@ if ($action === 'mail_send' && $method === 'POST') {
     });
   }
   json_out(['ok' => true, 'lead' => $lead]);
+}
+
+/* ---------- Color elegido a mano para un evento de Google (todas sus repeticiones) ---------- */
+if ($action === 'ev_color' && $method === 'POST') {
+  require_auth();
+  $b = body();
+  $k = (string) ($b['serie'] ?? '');
+  $c = (string) ($b['color'] ?? '');
+  if (!preg_match('/^[0-9a-f]{12}$/', $k)) json_out(['error' => 'Evento no válido'], 422);
+  $map = with_lock('evcolores', function () use ($k, $c) {
+    $m = store_read('evcolores', []);
+    if (in_array($c, ['rojo', 'naranja', 'amarillo', 'verde', 'azul', 'morado', 'rosa', 'gris'], true)) $m[$k] = $c; else unset($m[$k]);
+    if (count($m) > 2000) $m = array_slice($m, -2000, null, true);
+    store_write('evcolores', $m);
+    return $m;
+  });
+  json_out(['evcolores' => (object) $map]);
 }
 
 /* ---------- Ventas ---------- */
