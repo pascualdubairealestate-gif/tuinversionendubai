@@ -578,7 +578,7 @@ window.__PV__ = {
             try { localStorage.setItem("pv_guide_done", "1"); } catch (err) {}
             if (CFG.guideUrl) {
               // Enlace visible además de abrirla: algunos navegadores bloquean la ventana nueva tras el envío.
-              if (msg) msg.innerHTML = '¡Hecho! <a href="' + CFG.guideUrl + '" target="_blank" rel="noopener" download>Abrir la guía (PDF) →</a>';
+              if (msg) msg.innerHTML = '¡Hecho! Te la he enviado a tu correo. <a href="' + CFG.guideUrl + '" target="_blank" rel="noopener" download>Abrirla ahora (PDF) →</a>';
               window.open(CFG.guideUrl, "_blank", "noopener");
             } else {
               setTimeout(function () { var m = form.closest(".modal"); if (m && !m.hidden) closeModal(m); toast(texts.guia); }, 1800);

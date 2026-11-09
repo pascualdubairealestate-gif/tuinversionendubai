@@ -372,8 +372,25 @@ function ics_events($raw, $fromTs, $toTs, DateTimeZone $local) {
 /* ---------- Envío de correo por SMTP (Gmail con contraseña de aplicación) ---------- */
 function smtp_header($s) { return '=?UTF-8?B?' . base64_encode($s) . '?='; }
 
-// Envía un correo HTML + texto. Devuelve '' si salió bien o el motivo del fallo.
-function smtp_send(array $cfg, $to, $subject, $html, $text) {
+// Cuerpo MIME: texto + HTML y, si hay, adjuntos [[ruta, nombre, tipo]]. Devuelve [cabecera Content-Type, cuerpo].
+function mime_body($html, $text, array $attachments = []) {
+  $alt = 'a' . bin2hex(random_bytes(8));
+  $body = "--$alt\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($text)) .
+    "--$alt\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($html)) .
+    "--$alt--\r\n";
+  if (!$attachments) return ["multipart/alternative; boundary=\"$alt\"", $body];
+  $mix = 'm' . bin2hex(random_bytes(8));
+  $out = "--$mix\r\nContent-Type: multipart/alternative; boundary=\"$alt\"\r\n\r\n" . $body;
+  foreach ($attachments as $a) {
+    [$path, $name, $type] = $a;
+    $out .= "--$mix\r\nContent-Type: $type; name=\"$name\"\r\nContent-Transfer-Encoding: base64\r\n" .
+      "Content-Disposition: attachment; filename=\"$name\"\r\n\r\n" . chunk_split(base64_encode((string) file_get_contents($path)));
+  }
+  return ["multipart/mixed; boundary=\"$mix\"", $out . "--$mix--\r\n"];
+}
+
+// Envía un correo HTML + texto (y adjuntos). Devuelve '' si salió bien o el motivo del fallo.
+function smtp_send(array $cfg, $to, $subject, $html, $text, array $attachments = []) {
   $user = $cfg['smtp_user'] ?? ''; $pass = $cfg['smtp_pass'] ?? '';
   if (!$user || !$pass) return 'Configura tu correo en Ajustes';
   $host = $cfg['smtp_host'] ?? 'smtp.gmail.com'; $port = (int) ($cfg['smtp_port'] ?? 465);
@@ -414,15 +431,12 @@ function smtp_send(array $cfg, $to, $subject, $html, $text) {
     $cmd("MAIL FROM:<$user>", 250);
     $cmd("RCPT TO:<$to>", 250);
     $cmd('DATA', 354);
-    $b = 'b' . bin2hex(random_bytes(8));
+    [$ctype, $mbody] = mime_body($html, $text, $attachments);
     $name = $cfg['smtp_name'] ?? '';
     $msg = 'From: ' . ($name ? smtp_header($name) . " <$user>" : $user) . "\r\n" .
       "To: <$to>\r\nSubject: " . smtp_header($subject) . "\r\nDate: " . date('r') . "\r\n" .
       'Message-ID: <' . bin2hex(random_bytes(12)) . '@' . substr(strrchr($user, '@'), 1) . ">\r\n" .
-      "MIME-Version: 1.0\r\nContent-Type: multipart/alternative; boundary=\"$b\"\r\n\r\n" .
-      "--$b\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($text)) .
-      "--$b\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($html)) .
-      "--$b--\r\n";
+      "MIME-Version: 1.0\r\nContent-Type: $ctype\r\n\r\n" . $mbody;
     $cmd($msg . "\r\n.", 250);
     @fwrite($fp, "QUIT\r\n");
     fclose($fp);
@@ -431,4 +445,42 @@ function smtp_send(array $cfg, $to, $subject, $html, $text) {
     @fclose($fp);
     return $e->getMessage();
   }
+}
+
+/* ---------- Guía gratuita por correo ---------- */
+const GUIDE_PDF = 'guia-10-pasos-invertir-dubai.pdf';
+const GUIDE_TITLE = 'Los 10 pasos para realizar tu inversión con éxito en Dubái';
+
+// Envía la guía en PDF a quien la pide en la web. Usa el correo del CRM (Ajustes) y, si no hay, el correo del hosting.
+function send_guide($to, $nombre) {
+  $pdf = dirname(__DIR__) . '/assets/' . GUIDE_PDF;
+  if (!is_file($pdf)) return 'No se encuentra el PDF de la guía';
+  $cfg = config();
+  $host = preg_replace('/^www\./', '', preg_replace('/[^a-z0-9.-]/i', '', preg_replace('/:\d+$/', '', $_SERVER['HTTP_HOST'] ?? 'localhost')));
+  $site = "https://$host";
+  $hola = $nombre ? 'Hola ' . htmlspecialchars(strtok($nombre, ' '), ENT_QUOTES, 'UTF-8') . ',' : 'Hola,';
+  $wa = 'https://wa.me/message/QI3A7Q5BXFTCA1';
+  $f = 'font-family:Helvetica,Arial,sans-serif;';
+  $html = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f4f0;"><tr><td align="center" style="padding:12px;">' .
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:14px;"><tr><td style="padding:28px;' . $f . 'font-size:16px;line-height:1.6;color:#0b1424;">' .
+    "<p style=\"margin:0 0 14px;\">$hola</p>" .
+    '<p style="margin:0 0 14px;">Aquí tienes tu guía gratuita <b>«' . GUIDE_TITLE . '»</b>. Va adjunta a este correo en PDF.</p>' .
+    '<p style="margin:0 0 18px;">Te lleva por los diez pasos de una compra en Dubái: el agente, la estrategia, la reserva, los planes de pago, el contrato, la obra, la entrega de llaves y el alquiler.</p>' .
+    '<table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:999px;background:#f7931e;">' .
+    '<a href="' . $site . '/assets/' . GUIDE_PDF . '" style="display:inline-block;padding:12px 24px;' . $f . 'font-size:15px;font-weight:bold;color:#0b1424;text-decoration:none;">Descargar la guía</a></td></tr></table>' .
+    '<p style="margin:20px 0 14px;">Cuando la leas, si quieres que veamos tu caso concreto, te dedico una llamada de 20 minutos sin compromiso. Solo tienes que responder a este correo o <a href="' . $wa . '" style="color:#c76a00;">escribirme por WhatsApp</a>.</p>' .
+    '<p style="margin:0;">Un abrazo,<br><b>Pascual Vidal</b><br><span style="color:#5a6474;font-size:13px;">Consultor inmobiliario en Dubái · RERA #97799</span></p>' .
+    '</td></tr></table>' .
+    '<p style="margin:12px 0 0;' . $f . 'font-size:12px;color:#8a919c;">Recibes este correo porque pediste la guía en ' . $host . '. Si no quieres recibir más correos, responde «baja».</p>' .
+    '</td></tr></table>';
+  $text = ($nombre ? 'Hola ' . strtok($nombre, ' ') . ',' : 'Hola,') . "\n\nAquí tienes tu guía gratuita «" . GUIDE_TITLE . "». Va adjunta en PDF y también puedes descargarla aquí: $site/assets/" . GUIDE_PDF .
+    "\n\nSi quieres que veamos tu caso, te dedico una llamada de 20 minutos sin compromiso: responde a este correo o escríbeme por WhatsApp: $wa\n\nUn abrazo,\nPascual Vidal\nConsultor inmobiliario en Dubái · RERA #97799\n\nSi no quieres recibir más correos, responde «baja».";
+  $subject = 'Tu guía: ' . GUIDE_TITLE;
+  $att = [[$pdf, GUIDE_PDF, 'application/pdf']];
+  if (!empty($cfg['smtp_user']) && !empty($cfg['smtp_pass'])) return smtp_send($cfg, $to, $subject, $html, $text, $att);
+  if (!function_exists('mail')) return 'El servidor no permite enviar correos';
+  [$ctype, $body] = mime_body($html, $text, $att);
+  $from = "noreply@$host";
+  $headers = 'From: ' . smtp_header('Pascual Vidal') . " <$from>\r\nReply-To: " . (($cfg['notify'] ?? '') ?: $from) . "\r\nMIME-Version: 1.0\r\nContent-Type: $ctype";
+  return @mail($to, smtp_header($subject), $body, $headers, "-f$from") ? '' : 'El servidor no pudo enviar el correo';
 }

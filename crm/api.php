@@ -125,6 +125,27 @@ if ($action === 'lead') {
     $subj = '=?UTF-8?B?' . base64_encode('Nuevo lead: ' . ($lead['nombre'] ?: $lead['email'])) . '?=';
     @mail($notify, $subj, $msg, "From: CRM <noreply@$host>\r\nContent-Type: text/plain; charset=UTF-8");
   }
+  // Guía: se responde ya a la web y el correo con el PDF sale justo después, sin hacer esperar al visitante.
+  if ($form === 'guia' && filter_var($email, FILTER_VALIDATE_EMAIL) && rate('guiamail', 5, 3600)) {
+    http_response_code(200);
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store');
+    echo json_encode(['ok' => true, 'guia' => 'email']);
+    if (function_exists('fastcgi_finish_request')) fastcgi_finish_request();
+    elseif (function_exists('litespeed_finish_request')) litespeed_finish_request();
+    else { @ob_end_flush(); flush(); }
+    ignore_user_abort(true);
+    $err = send_guide($email, $res[0]['nombre'] ?? '');
+    $id = $res[0]['id'];
+    with_lock('leads', function () use ($id, $err) {
+      $leads = store_read('leads', []);
+      foreach ($leads as $i => $l) if ($l['id'] === $id) {
+        activity($leads[$i], $err === '' ? '📎 Guía enviada por email (PDF adjunto)' : '⚠ No se pudo enviar la guía por email: ' . $err, 'sistema');
+        store_write('leads', $leads);
+      }
+    });
+    exit;
+  }
   json_out(['ok' => true]);
 }
 
