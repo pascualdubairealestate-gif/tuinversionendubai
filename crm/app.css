@@ -429,3 +429,12 @@ tbody tr:last-child td { border-bottom: 0; }
 .gcal-offer small { display: block; color: var(--mute); font-size: 12px; }
 .stat .pot { margin: 8px 0 0; padding-top: 8px; border-top: 1px solid var(--line); font-size: 12px; color: var(--mute); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .stat .pot strong { color: var(--amber-ink); font-size: 14px; font-variant-numeric: tabular-nums; }
+
+/* ---------- Colores de eventos de Google ---------- */
+.ev.g[style] { background: var(--evc); color: var(--evt); }
+.task[style] { border-left-color: var(--evc); }
+.color-rules { list-style: none; margin: 10px 0; padding: 0; display: grid; gap: 6px; }
+.color-rules li { display: flex; align-items: center; gap: 8px; }
+.color-rules .cr-p { flex: 1 1 auto; min-width: 0; }
+.color-rules .cr-c { width: 120px; flex: none; }
+.cr-dot { width: 14px; height: 14px; border-radius: 50%; flex: none; }

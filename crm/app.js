@@ -23,6 +23,20 @@
   var ORIGENES = ["Web · Guía", "Web · Boletín", "Web · Consultoría", "Web · Dossier", "Instagram", "WhatsApp", "YouTube", "Meta", "Referido", "Evento", "Llamada", "Manual", "Otro"];
   var PRESUPUESTOS = ["Por definir", "Menos de 250.000 €", "250.000 – 500.000 €", "500.000 – 1.000.000 €", "Más de 1.000.000 €"];
   var OBJETIVOS = ["Rentabilidad por alquiler", "Revalorización / reventa", "Golden Visa / residencia", "Segunda vivienda", "Crear empresa en Dubái"];
+  // Colores de los eventos de Google según palabras del título (se cambian en Ajustes).
+  var PALETA = { rojo: ["#d50000", "#fff"], naranja: ["#f4511e", "#fff"], amarillo: ["#f6bf26", "#3b2f00"], verde: ["#0b8043", "#fff"], azul: ["#1a73e8", "#fff"], morado: ["#8e24aa", "#fff"], rosa: ["#d81b60", "#fff"], gris: ["#616161", "#fff"] };
+  var DEFAULT_COLORES = [{ p: "reunión, meeting", c: "rojo" }, { p: "llamada", c: "azul" }, { p: "dubai", c: "verde" }];
+  function plain(t) { return String(t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
+  function evColor(e) {
+    var txt = plain(e.titulo + " " + (e.lugar || ""));
+    var rules = S.colores || DEFAULT_COLORES;
+    for (var i = 0; i < rules.length; i++) {
+      var words = rules[i].p.split(",").map(function (w) { return plain(w).trim(); }).filter(Boolean);
+      if (words.some(function (w) { return txt.indexOf(w) > -1; })) return PALETA[rules[i].c];
+    }
+    return null;
+  }
+  function evStyle(e) { var c = evColor(e); return c ? ' style="--evc:' + c[0] + ";--evt:" + c[1] + '"' : ""; }
   var WA_LINK = "https://wa.me/message/QI3A7Q5BXFTCA1";
   var EMAIL_IMG = "/assets/img/email-dubai.jpg";
   var DOC_EXT = "pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png,webp,heic,txt,csv,zip,mp4,mov";
@@ -138,6 +152,7 @@
       S.notify = j.notify || "";
       S.ics = j.ics || "";
       S.feed = j.feed || "";
+      S.colores = j.colores || DEFAULT_COLORES;
       S.smtp = j.smtp || ""; S.smtpName = j.smtp_name || ""; S.smtpHost = j.smtp_host || "smtp.gmail.com"; S.smtpPort = j.smtp_port || 465;
       if (silent && S.leads.length > before) toast("Nuevo contacto recibido desde la web");
       if (S.ready && !S.open && (!silent || ["inicio", "contactos", "ventas"].indexOf(S.page) > -1)) render();
@@ -251,7 +266,7 @@
 
   function eventLi(e) {
     var past = !e.todoElDia && new Date(e.fin).getTime() < Date.now();
-    return '<li class="task' + (past ? " done" : "") + '"><span class="t-when">' + (e.todoElDia ? "Todo el día" : fmtTime(e.inicio) + "–" + fmtTime(e.fin)) +
+    return '<li class="task' + (past ? " done" : "") + '"' + evStyle(e) + '><span class="t-when">' + (e.todoElDia ? "Todo el día" : fmtTime(e.inicio) + "–" + fmtTime(e.fin)) +
       '</span><span class="t-what">' + esc(e.titulo) + (e.lugar ? '<small>' + esc(e.lugar) + "</small>" : "") + "</span></li>";
   }
 
@@ -816,7 +831,7 @@
       });
       $$("[data-evs]").forEach(function (box) {
         var k = box.getAttribute("data-evs");
-        var items = (by[k] || []).map(function (e) { return '<i class="ev g">' + (e.todoElDia ? "" : fmtTime(e.inicio) + " ") + esc(e.titulo) + "</i>"; })
+        var items = (by[k] || []).map(function (e) { return '<i class="ev g"' + evStyle(e) + ">" + (e.todoElDia ? "" : fmtTime(e.inicio) + " ") + esc(e.titulo) + "</i>"; })
           .concat((follow[k] || []).map(function (l) { return '<i class="ev c">' + esc(up(l.nombre) || l.email) + "</i>"; }));
         box.innerHTML = items.slice(0, 3).join("") + (items.length > 3 ? '<i class="ev more">+' + (items.length - 3) + "</i>" : "");
       });
@@ -1071,6 +1086,9 @@
       '<div class="m-to-row"><input id="feed-url" readonly value="' + esc(feedUrl()) + '" aria-label="Dirección del calendario" /><button class="btn primary sm" type="button" data-act="feed-copy">Copiar</button></div>' +
       '<ol class="steps-list small"><li>Pulsa <b>Copiar</b>.</li><li>En Google Calendar (ordenador): a la izquierda, junto a «Otros calendarios», pulsa <b>+</b> → <b>Desde URL</b>.</li><li>Pega la dirección y pulsa <b>Añadir calendario</b>. Aparecerá como «CRM · Seguimientos».</li></ol>' +
       '<p class="muted small">Google lo refresca cada pocas horas (no al instante). Para que salga ya, usa el botón «Añadir a Google Calendar» de cada contacto. No compartas esta dirección; si se filtra, <button class="link-btn" type="button" data-act="feed-reset">genera una nueva</button>.</p></div>' +
+      '<form class="box" id="colors-form"><h3>Colores del calendario</h3><p class="muted small">Si el título (o el lugar) de un evento de Google contiene una de estas palabras, sale de ese color. Separa varias palabras con comas. Da igual mayúsculas y tildes; manda la primera regla que coincida.</p>' +
+      '<ul class="color-rules" id="color-rules">' + (S.colores || DEFAULT_COLORES).map(colorRuleRow).join("") + "</ul>" +
+      '<div class="quick"><button class="btn ghost sm" type="button" data-act="color-add">+ Añadir regla</button><button class="btn primary" type="submit">Guardar colores</button></div></form>' +
       '<form class="box set-form" id="smtp-form"><h3>Enviar correos desde el CRM</h3><p class="muted small">El CRM envía desde tu propio buzón. Elige dónde tienes el correo: si lo lees en Gmail es <b>Google</b>; si lo lees en el webmail de Hostinger es <b>Hostinger</b>; si es Outlook, <b>Microsoft</b>.</p>' +
       '<label class="f"><span>Proveedor de tu correo</span><select name="smtp_prov" id="smtp-prov">' +
       [["google", "Google (Gmail o Google Workspace)"], ["hostinger", "Hostinger (correo de tu dominio)"], ["outlook", "Microsoft (Outlook / Microsoft 365)"], ["otro", "Otro servidor"]].map(function (o) {
@@ -1105,6 +1123,12 @@
     if (p === "hostinger") return "Usa la contraseña de ese buzón (la que pones en el webmail de Hostinger). Si no la recuerdas: hPanel → Correos electrónicos → tu buzón → Cambiar contraseña.";
     if (p === "outlook") return "Usa la contraseña de tu cuenta de Microsoft. Si tienes verificación en 2 pasos, crea una contraseña de aplicación en account.microsoft.com → Seguridad. En Microsoft 365 de empresa, el administrador debe tener activado «SMTP autenticado».";
     return "Pide a tu proveedor los datos SMTP (servidor y puerto 465 SSL o 587 STARTTLS) y usa la contraseña del buzón.";
+  }
+  function colorRuleRow(r) {
+    return '<li><input class="cr-p" value="' + esc(r.p) + '" placeholder="palabras, separadas, por comas" aria-label="Palabras" />' +
+      '<select class="cr-c" aria-label="Color">' + Object.keys(PALETA).map(function (k) {
+        return '<option value="' + k + '"' + (k === r.c ? " selected" : "") + ">" + k.charAt(0).toUpperCase() + k.slice(1) + "</option>";
+      }).join("") + '</select><i class="cr-dot" style="background:' + PALETA[r.c || "rojo"][0] + '"></i><button class="btn icon sm" type="button" data-act="color-del" aria-label="Quitar regla">✕</button></li>';
   }
   function feedUrl() { return S.feed ? location.origin + location.pathname.replace(/[^/]*$/, "") + "api.php?action=feed&k=" + S.feed : ""; }
   function submitSettings(form) {
@@ -1192,6 +1216,8 @@
         if (S.page === "correo") renderMail();
       }
       if (a === "mail-design") { copyDesign(); return; }
+      if (a === "color-add") { $("#color-rules").insertAdjacentHTML("beforeend", colorRuleRow({ p: "", c: "morado" })); $("#color-rules li:last-child .cr-p").focus(); return; }
+      if (a === "color-del") { var rli = act.closest("li"); rli.parentNode.removeChild(rli); S.dirty = true; return; }
       if (a === "feed-copy") {
         var fu = $("#feed-url");
         var fok = function () { toast("Dirección copiada. Pégala en Google Calendar → Otros calendarios → + → Desde URL."); };
@@ -1348,6 +1374,15 @@
     var f = e.target, fid = f.getAttribute("id"); // no f.id: un campo name="id" lo taparía
     if (fid === "lead-form") { e.preventDefault(); submitLead(f); }
     if (fid === "sale-form") { e.preventDefault(); submitSale(f); }
+    if (fid === "colors-form") {
+      e.preventDefault();
+      var rules = $$("#color-rules li", f).map(function (li) { return { p: $(".cr-p", li).value.trim(), c: $(".cr-c", li).value }; }).filter(function (r) { return r.p; });
+      api("settings", { colores: rules }).then(function (j) {
+        if (j.csrf) S.csrf = j.csrf;
+        S.colores = rules; S.dirty = false; toast("Colores guardados");
+        if (S.page === "calendario" || S.page === "inicio") render();
+      }, function (err) { toast(err.message, true); });
+    }
     if (fid === "pick-form") {
       e.preventDefault();
       var chosen = $$(".pick-list input:checked", f).map(function (x) { return x.value; });
@@ -1405,6 +1440,7 @@
     if (t.id === "m-img") { S.mail.imagen = t.checked ? (S.mail.imagen || EMAIL_IMG) : ""; refreshPreview(); }
     if (t.id === "m-wa") { S.mail.boton = t.checked; refreshPreview(); }
     if (t.id === "pick-etapa" || t.id === "pick-origen") filterPicker();
+    if (t.classList.contains("cr-c")) t.parentNode.querySelector(".cr-dot").style.background = PALETA[t.value][0];
     if (t.id === "smtp-prov") {
       $(".smtp-otro").hidden = t.value !== "otro";
       $("#smtp-pass-l").textContent = smtpPassLabel(t.value);

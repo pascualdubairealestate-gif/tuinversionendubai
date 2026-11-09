@@ -135,7 +135,7 @@ if ($action === 'state') {
   if (empty($cfg['feed_key'])) {
     $cfg = with_lock('config', function () { $c = config(); if (empty($c['feed_key'])) { $c['feed_key'] = bin2hex(random_bytes(16)); store_write('config', $c); } return $c; });
   }
-  json_out(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'feed' => $cfg['feed_key'] ?? '', 'smtp' => $cfg['smtp_user'] ?? '', 'smtp_name' => $cfg['smtp_name'] ?? '', 'smtp_host' => $cfg['smtp_host'] ?? 'smtp.gmail.com', 'smtp_port' => (int) ($cfg['smtp_port'] ?? 465), 'csrf' => csrf()]);
+  json_out(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'feed' => $cfg['feed_key'] ?? '', 'colores' => $cfg['colores'] ?? null, 'smtp' => $cfg['smtp_user'] ?? '', 'smtp_name' => $cfg['smtp_name'] ?? '', 'smtp_host' => $cfg['smtp_host'] ?? 'smtp.gmail.com', 'smtp_port' => (int) ($cfg['smtp_port'] ?? 465), 'csrf' => csrf()]);
 }
 
 if ($action === 'save' && $method === 'POST') {
@@ -227,6 +227,15 @@ if ($action === 'settings' && $method === 'POST') {
       if ($u === '') unset($cfg['smtp_pass']);
     }
     if (!empty($b['feed_reset'])) $cfg['feed_key'] = bin2hex(random_bytes(16));
+    if (isset($b['colores']) && is_array($b['colores'])) {
+      $pal = ['rojo', 'naranja', 'amarillo', 'verde', 'azul', 'morado', 'rosa', 'gris'];
+      $rules = [];
+      foreach (array_slice($b['colores'], 0, 30) as $r) {
+        $w = cut($r['p'] ?? '', 200); $c = (string) ($r['c'] ?? '');
+        if ($w !== '' && in_array($c, $pal, true)) $rules[] = ['p' => $w, 'c' => $c];
+      }
+      $cfg['colores'] = $rules;
+    }
     if (!empty($b['nueva'])) {
       if (!password_verify((string) ($b['actual'] ?? ''), $cfg['hash'])) return ['error' => 'La contraseña actual no es correcta'];
       if (strlen((string) $b['nueva']) < 10) return ['error' => 'La nueva contraseña necesita al menos 10 caracteres'];
