@@ -467,7 +467,7 @@ function send_guide($to, $nombre) {
     '<p style="margin:0 0 14px;">Aquí tienes tu guía gratuita <b>«' . GUIDE_TITLE . '»</b>. Va adjunta a este correo en PDF.</p>' .
     '<p style="margin:0 0 18px;">Te lleva por los diez pasos de una compra en Dubái: el agente, la estrategia, la reserva, los planes de pago, el contrato, la obra, la entrega de llaves y el alquiler.</p>' .
     '<table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:999px;background:#f7931e;">' .
-    '<a href="' . $site . '/assets/' . GUIDE_PDF . '" style="display:inline-block;padding:12px 24px;' . $f . 'font-size:15px;font-weight:bold;color:#0b1424;text-decoration:none;">Descargar la guía</a></td></tr></table>' .
+    '<a href="' . $site . '/assets/' . GUIDE_PDF . '?v=' . filemtime($pdf) . '" style="display:inline-block;padding:12px 24px;' . $f . 'font-size:15px;font-weight:bold;color:#0b1424;text-decoration:none;">Descargar la guía</a></td></tr></table>' .
     '<p style="margin:20px 0 14px;">Cuando la leas, si quieres que veamos tu caso concreto, te dedico una llamada de 20 minutos sin compromiso. Solo tienes que responder a este correo o <a href="' . $wa . '" style="color:#c76a00;">escribirme por WhatsApp</a>.</p>' .
     '<p style="margin:0;">Un abrazo,<br><b>Pascual Vidal</b><br><span style="color:#5a6474;font-size:13px;">Consultor inmobiliario en Dubái · RERA #97799</span></p>' .
     '</td></tr></table>' .
