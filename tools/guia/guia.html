@@ -22,6 +22,8 @@
   .foot { position: absolute; left: 18mm; right: 18mm; bottom: 10mm; display: flex; justify-content: space-between; font-size: 7.5pt; color: var(--mute); letter-spacing: .06em; text-transform: uppercase; border-top: 1px solid var(--line); padding-top: 3mm; }
   .dark .foot { color: #8f9bb0; border-color: rgba(244, 239, 230, .14); }
   h1, h2, h3 { font-family: var(--f-display); font-weight: 600; margin: 0; line-height: 1.05; text-wrap: balance; }
+  /* Números modernos en toda la guía: los de Cormorant por defecto hacen que el 10 parezca «io» */
+  body, h1, h2, h3, .quote, .arch, .cover .who b, .cover .brand span { font-variant-numeric: lining-nums; }
   h2 { font-size: 27pt; margin-bottom: 4mm; }
   h3 { font-size: 16.5pt; margin: 5mm 0 2mm; }
   p { margin: 0 0 3mm; }
@@ -61,11 +63,13 @@
   .cover .img { position: absolute; right: 0; top: 0; width: 98mm; height: 100%; background: url("img/pascual-retrato.jpg") center 22% / cover no-repeat; }
   .cover .img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--navy) 0%, rgba(11, 20, 36, .55) 30%, rgba(11, 20, 36, 0) 60%), linear-gradient(0deg, rgba(11, 20, 36, .85) 0%, rgba(11, 20, 36, 0) 35%); }
   .cover .in { position: absolute; left: 18mm; top: 26mm; width: 128mm; }
-  .cover .brand { display: flex; align-items: center; gap: 4mm; margin-bottom: 34mm; }
+  .cover .brand { display: flex; align-items: center; gap: 4mm; margin-bottom: 26mm; }
   .arch { width: 12mm; height: 15mm; border: 1px solid var(--ivory); border-radius: 6mm 6mm 1.2mm 1.2mm; display: grid; place-items: center; font: 600 13pt var(--f-display); color: var(--ivory); padding-top: .6mm; }
   .cover .brand span { font: 600 15pt var(--f-display); }
   .cover .brand small { display: block; font: 800 6.5pt var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: var(--amber); }
   .cover h1 { font-size: 44pt; line-height: 1; color: var(--ivory); }
+  /* El 10 en grande con números modernos (los de Cormorant parecen «io») */
+  .big-n { display: block; font: 800 120pt/.82 var(--f-body); letter-spacing: -.04em; color: var(--amber); margin: 0 0 5mm -1.5mm; font-variant-numeric: lining-nums; }
   .cover h1 em { color: var(--amber); }
   .cover .sub { font-size: 12.5pt; color: #c9d0db; margin-top: 7mm; max-width: 112mm; }
   .cover .who { position: absolute; left: 18mm; bottom: 20mm; font-size: 9pt; color: #c9d0db; }
@@ -75,7 +79,7 @@
   /* Índice */
   .toc { list-style: none; margin: 6mm 0 0; padding: 0; counter-reset: e; display: grid; gap: 0; }
   .toc li { counter-increment: e; display: grid; grid-template-columns: 14mm 1fr; align-items: baseline; padding: 2mm 0; border-bottom: 1px solid var(--line); }
-  .toc li::before { content: counter(e, decimal-leading-zero); font: 600 18pt var(--f-display); color: var(--amber); }
+  .toc li::before { content: counter(e, decimal-leading-zero); font: 800 14pt var(--f-body); color: var(--amber); font-variant-numeric: lining-nums tabular-nums; }
   .toc b { font-size: 11pt; }
   .toc span { display: block; color: var(--mute); font-size: 9pt; }
 
@@ -109,7 +113,7 @@
   <p class="year">Guía gratuita · Edición 2026</p>
   <div class="in">
     <div class="brand"><div class="arch">PV</div><div><span>Pascual Vidal</span><small>Tu inversión en Dubái</small></div></div>
-    <h1>Los 10 pasos para realizar tu inversión <em>con éxito</em> en Dubái</h1>
+    <h1><span class="big-n">10</span>pasos para realizar tu inversión <em>con éxito</em> en Dubái</h1>
     <p class="sub">Del agente con licencia RERA a la entrega de llaves: estrategia, reserva, planes de pago, contrato, Oqood, obra, entrega, inspección y alquiler.</p>
   </div>
   <div class="who"><b>Pascual Vidal</b>Consultor inmobiliario español en Dubái · RERA #97799</div>

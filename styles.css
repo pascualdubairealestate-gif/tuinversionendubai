@@ -841,3 +841,6 @@ body, .splash { background: var(--sand-bg); }
 .lp-block .article-faq { max-width: 820px; margin-top: 24px; }
 .blog .contact { background: transparent; padding-top: 50px; }
 @media (max-width: 860px) { .lp-steps { grid-template-columns: minmax(0, 1fr); } }
+
+/* Guía: números modernos en el título (Cormorant dibuja el 10 como «io») */
+.guide-card h3, .guide-card .book b { font-variant-numeric: lining-nums; }
