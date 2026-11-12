@@ -42,6 +42,7 @@ function crm_dir() {
   if ($dir) return $dir;
   // 1) Fuera de la web: /home/uXXX/domains/tudominio.com/crm-data
   $out = dirname(__DIR__, 2) . '/crm-data';
+  if (!@is_dir($out)) crm_migrate($out);
   if ((@is_dir($out) || @mkdir($out, 0700, true)) && @is_writable($out)) return $dir = $out;
   // 2) Respaldo: carpeta protegida dentro de /crm
   $in = __DIR__ . '/data';
@@ -51,6 +52,25 @@ function crm_dir() {
   }
   if (!is_file("$in/index.html")) @file_put_contents("$in/index.html", '');
   return $dir = $in;
+}
+
+// Si la web cambia de dominio en Hostinger, la carpeta del CRM se queda en la del dominio anterior
+// (/home/uXXX/domains/<dominio anterior>/crm-data). La primera vez se trae aquí, con todo dentro.
+function crm_migrate($out) {
+  $found = [];
+  foreach (@glob(dirname($out, 2) . '/*/crm-data', GLOB_ONLYDIR) ?: [] as $d) {
+    if (realpath($d) !== realpath(dirname($out)) . '/crm-data' && is_file("$d/leads.php")) $found[] = $d;
+  }
+  if (count($found) !== 1) return; // ninguna o varias candidatas: no se toca nada
+  if (@rename($found[0], $out)) return;
+  $copy = function ($from, $to) use (&$copy) {
+    @mkdir($to, 0700, true);
+    foreach (scandir($from) ?: [] as $f) {
+      if ($f === '.' || $f === '..') continue;
+      is_dir("$from/$f") ? $copy("$from/$f", "$to/$f") : @copy("$from/$f", "$to/$f");
+    }
+  };
+  $copy($found[0], $out);
 }
 
 function store_read($name, $default = []) {
