@@ -539,7 +539,7 @@ if ($action === 'doc') {
 }
 
 /* ---------- Búsquedas potenciales (personas encontradas con Claude en LinkedIn) ---------- */
-const PROS_FIELDS = ['nombre' => 120, 'cargo' => 160, 'empresa' => 160, 'pais' => 80, 'ciudad' => 80, 'linkedin' => 300, 'telefono' => 40, 'email' => 160, 'resumen' => 3000, 'mensaje' => 3000, 'asunto' => 160, 'notas' => 2000];
+const PROS_FIELDS = ['nombre' => 120, 'cargo' => 160, 'empresa' => 160, 'pais' => 80, 'ciudad' => 80, 'linkedin' => 300, 'instagram' => 300, 'usuario' => 80, 'red' => 20, 'telefono' => 40, 'email' => 160, 'resumen' => 3000, 'mensaje' => 3000, 'asunto' => 160, 'notas' => 2000];
 const PROS_ESTADOS = ['pendiente', 'contactado', 'respondio', 'descartado'];
 
 function pros_clean(array $in, array $base = []) {
@@ -548,10 +548,22 @@ function pros_clean(array $in, array $base = []) {
   if (isset($in['estado']) && in_array($in['estado'], PROS_ESTADOS, true)) $p['estado'] = $in['estado'];
   if (!empty($p['email'])) $p['email'] = strtolower($p['email']);
   if (!empty($p['linkedin']) && !preg_match('~^https?://~i', $p['linkedin'])) $p['linkedin'] = 'https://' . ltrim($p['linkedin'], '/');
+  // Instagram: acepta @usuario, usuario o la URL del perfil.
+  if (!empty($p['usuario'])) $p['usuario'] = '@' . ltrim(trim($p['usuario']), '@');
+  if (!empty($p['instagram']) && !preg_match('~^https?://~i', $p['instagram'])) {
+    $u = ltrim(trim($p['instagram']), '@/');
+    $p['instagram'] = stripos($u, 'instagram.com') !== false ? 'https://' . $u : 'https://www.instagram.com/' . $u . '/';
+  }
+  if (empty($p['instagram']) && !empty($p['usuario'])) $p['instagram'] = 'https://www.instagram.com/' . ltrim($p['usuario'], '@') . '/';
+  if (empty($p['usuario']) && !empty($p['instagram']) && preg_match('~instagram\.com/([A-Za-z0-9._]+)~i', $p['instagram'], $m)) $p['usuario'] = '@' . $m[1];
+  $red = strtolower($p['red'] ?? '');
+  if (!in_array($red, ['linkedin', 'instagram'], true)) $red = !empty($p['instagram']) && empty($p['linkedin']) ? 'instagram' : 'linkedin';
+  $p['red'] = $red;
   return $p;
 }
 function pros_key(array $p) {
   if (!empty($p['linkedin'])) return 'in:' . strtolower(rtrim(preg_replace('~^https?://(www\.)?~i', '', $p['linkedin']), '/'));
+  if (!empty($p['usuario'])) return 'ig:' . strtolower(ltrim($p['usuario'], '@'));
   if (!empty($p['email'])) return 'em:' . $p['email'];
   return 'nm:' . strtolower(($p['nombre'] ?? '') . '|' . ($p['empresa'] ?? ''));
 }
@@ -633,7 +645,7 @@ if ($action === 'prospect_delete' && $method === 'POST') {
   json_out(['prospectos' => $list]);
 }
 
-// Pasa una búsqueda a Contactos (origen LinkedIn) con el resumen como nota.
+// Pasa una búsqueda a Contactos (origen LinkedIn o Instagram) con el resumen como nota.
 if ($action === 'prospect_lead' && $method === 'POST') {
   require_auth();
   $id = (string) (body()['id'] ?? '');
@@ -648,10 +660,12 @@ if ($action === 'prospect_lead' && $method === 'POST') {
       if (strlen(phone_digits($pros['telefono'] ?? '')) >= 7 && phone_digits($l['telefono']) === phone_digits($pros['telefono'])) return $l;
     }
     $l = blank_lead();
-    $l['origen'] = 'LinkedIn';
-    $l = apply_patch($l, ['nombre' => $pros['nombre'] ?? '', 'email' => $pros['email'] ?? '', 'telefono' => $pros['telefono'] ?? '', 'pais' => $pros['pais'] ?? '', 'etiquetas' => 'linkedin']);
+    $ig = ($pros['red'] ?? '') === 'instagram';
+    $l['origen'] = $ig ? 'Instagram' : 'LinkedIn';
+    $l = apply_patch($l, ['nombre' => $pros['nombre'] ?? '', 'email' => $pros['email'] ?? '', 'telefono' => $pros['telefono'] ?? '', 'pais' => $pros['pais'] ?? '', 'etiquetas' => $ig ? 'instagram' : 'linkedin']);
     $txt = 'Desde Búsquedas potenciales' . (!empty($pros['cargo']) || !empty($pros['empresa']) ? ': ' . trim(($pros['cargo'] ?? '') . ' · ' . ($pros['empresa'] ?? ''), ' ·') : '');
     if (!empty($pros['linkedin'])) $txt .= "\n" . $pros['linkedin'];
+    if (!empty($pros['instagram'])) $txt .= "\n" . $pros['instagram'];
     if (!empty($pros['resumen'])) $txt .= "\n\n" . $pros['resumen'];
     activity($l, $txt, 'nota');
     $leads[] = $l;

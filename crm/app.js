@@ -1279,6 +1279,27 @@
     "Después abre mi CRM en " + location.origin + "/crm/#busquedas, pulsa «Importar de Claude», pega el JSON y pulsa «Importar»."
   ].join("\n");
 
+  var CLAUDE_PROMPT_IG = [
+    "Estoy en Instagram. Busca hasta 10 perfiles de posibles clientes para mi asesoría de inversión inmobiliaria en Dubái: empresarios o inversores que vivan o trabajen en países del Golfo (Emiratos Árabes Unidos, Arabia Saudí, Qatar, Kuwait, Baréin u Omán) y que hablen español.",
+    "",
+    "Para encontrarlos, mira hashtags y ubicaciones como #españolesendubai, #españolesenqatar, #latinosendubai, #emprendedoresdubai, #dubaibusiness o #dubaiinvestment; cuentas de comunidades de españoles y latinos en el Golfo; y quién comenta o sigue a cuentas del sector. Descarta cuentas de agencias inmobiliarias, influencers de viajes y perfiles sin actividad.",
+    "",
+    "Para cada perfil:",
+    "1. Lee su biografía, su enlace y sus publicaciones recientes: a qué se dedica, dónde vive y qué le interesa.",
+    "2. Escribe un resumen breve (3 a 5 líneas) de a qué se dedica y qué le puede interesar.",
+    "3. Apunta su teléfono, su WhatsApp y su email solo si aparecen públicamente en su biografía, en su enlace o en los botones de contacto. Si no aparecen, déjalos vacíos: no los inventes ni los deduzcas.",
+    "   Da prioridad a los perfiles que tengan teléfono o email públicos, pero no descartes al resto: también se les puede escribir por mensaje directo.",
+    "4. Escribe un mensaje personalizado en español, corto (2 a 4 frases), cercano y natural, a partir de algo concreto de una publicación suya o de su perfil. No vendas nada ni hables de inversiones o propiedades de primeras. Termina con una pregunta abierta y firma como Pascual.",
+    "",
+    "No envíes mensajes, no sigas a nadie y no des «me gusta»: solo investiga. Ve con calma entre perfil y perfil.",
+    "",
+    "Al terminar, dame el resultado solo como JSON (una lista) con estas claves: red (pon \"instagram\"), nombre, usuario (con @), instagram (URL del perfil), cargo, empresa, pais, ciudad, telefono, email, resumen, mensaje, asunto (un asunto corto por si le escribo por email).",
+    "",
+    "Después abre mi CRM en " + location.origin + "/crm/#busquedas, pulsa «Importar de Claude», pega el JSON y pulsa «Importar»."
+  ].join("\n");
+  function redOf(p) { return p.red === "instagram" ? "instagram" : "linkedin"; }
+  var RED_NOMBRE = { linkedin: "LinkedIn", instagram: "Instagram" };
+
   function loadPros() {
     return api("prospects").then(function (j) { S.pros = j.prospectos || []; return S.pros; });
   }
@@ -1302,8 +1323,8 @@
     var sub = [p.cargo, p.empresa].filter(Boolean).join(" · ");
     var where = [p.ciudad, p.pais].filter(Boolean).join(", ");
     return '<article class="pros" data-pros="' + esc(p.id) + '">' +
-      '<header class="pros-h"><span class="avatar">' + esc(initials(p)) + '</span><div class="pros-who"><b>' + esc(up(p.nombre)) + (prosReach(p) ? "" : ' <span class="pill li-only" title="Sin teléfono ni email: escríbele por LinkedIn">Solo LinkedIn</span>') + "</b>" +
-      (sub ? "<small>" + esc(sub) + "</small>" : "") +
+      '<header class="pros-h"><span class="avatar">' + esc(initials(p)) + '</span><div class="pros-who"><b><span class="red-dot red-' + redOf(p) + '" title="Encontrado en ' + RED_NOMBRE[redOf(p)] + '">' + (redOf(p) === "instagram" ? "IG" : "in") + "</span> " + esc(up(p.nombre)) + (prosReach(p) ? "" : ' <span class="pill li-only red-' + redOf(p) + '" title="Sin teléfono ni email: escríbele por ' + RED_NOMBRE[redOf(p)] + '">Solo ' + RED_NOMBRE[redOf(p)] + "</span>") + "</b>" +
+      (sub || p.usuario ? "<small>" + esc([p.usuario, sub].filter(Boolean).join(" · ")) + "</small>" : "") +
       '<small class="muted">' + esc([where, "añadido " + fmtDate(p.creado)].filter(Boolean).join(" · ")) + (p.contactado ? " · contactado " + fmtDate(p.contactado) : "") + "</small></div>" +
       '<select class="pros-estado st-' + esc(est) + '" aria-label="Estado">' + Object.keys(PROS_ESTADOS).map(function (k) {
         return '<option value="' + k + '"' + (k === est ? " selected" : "") + ">" + PROS_ESTADOS[k] + "</option>";
@@ -1312,7 +1333,8 @@
       '<p class="pros-data">' +
       (p.telefono ? "<span>📞 " + esc(p.telefono) + "</span>" : '<span class="muted">Sin teléfono</span>') +
       (p.email ? "<span>✉ " + esc(p.email) + "</span>" : '<span class="muted">Sin email</span>') +
-      (p.linkedin ? '<a href="' + esc(p.linkedin) + '" target="_blank" rel="noopener">Ver en LinkedIn ↗</a>' : "") + "</p></div>" +
+      (p.linkedin ? '<a href="' + esc(p.linkedin) + '" target="_blank" rel="noopener">Ver en LinkedIn ↗</a>' : "") +
+      (p.instagram ? '<a href="' + esc(p.instagram) + '" target="_blank" rel="noopener">Ver en Instagram ↗</a>' : "") + "</p></div>" +
       '<div class="pros-sec"><label class="pros-l" for="pm-' + esc(p.id) + '">Mensaje para abrir conversación</label>' +
       '<textarea class="pros-msg" id="pm-' + esc(p.id) + '" rows="5">' + esc(p.mensaje || "") + "</textarea></div>" +
       '<footer class="pros-acts">' +
@@ -1339,14 +1361,16 @@
       if (!f && p.estado === "descartado") return false;
       if (S.prosCanal === "si" && !prosReach(p)) return false;
       if (S.prosCanal === "no" && prosReach(p)) return false;
-      return !q || [p.nombre, p.cargo, p.empresa, p.pais, p.ciudad, p.resumen].join(" ").toLowerCase().indexOf(q) > -1;
+      if (S.prosRed && redOf(p) !== S.prosRed) return false;
+      return !q || [p.nombre, p.cargo, p.empresa, p.pais, p.ciudad, p.resumen, p.usuario].join(" ").toLowerCase().indexOf(q) > -1;
     }).sort(function (a, b) { return (prosReach(b) ? 1 : 0) - (prosReach(a) ? 1 : 0); });
     var activos = S.pros.filter(function (p) { return p.estado !== "descartado"; });
     var nReach = activos.filter(prosReach).length;
     $("#main").innerHTML =
       '<section class="pros-intro panel"><div><h3>Clientes potenciales encontrados con Claude</h3>' +
-      '<p class="muted small">1. Copia las instrucciones. 2. En LinkedIn, abre Claude en Chrome y pégaselas. 3. Claude investiga, te prepara un resumen y un mensaje por persona y lo importa aquí.</p></div>' +
-      '<div class="pros-btns"><button type="button" class="btn primary" data-act="pros-prompt">Copiar instrucciones para Claude</button>' +
+      '<p class="muted small">1. Copia las instrucciones de LinkedIn o de Instagram. 2. Entra en esa red, abre Claude en Chrome y pégaselas. 3. Claude investiga, te prepara un resumen y un mensaje por persona y lo importa aquí.</p></div>' +
+      '<div class="pros-btns"><button type="button" class="btn primary" data-act="pros-prompt">Instrucciones para LinkedIn</button>' +
+      '<button type="button" class="btn primary" data-act="pros-prompt-ig">Instrucciones para Instagram</button>' +
       '<button type="button" class="btn ghost" data-act="pros-import">Importar de Claude</button>' +
       '<button type="button" class="btn ghost" data-act="pros-new">+ Añadir a mano</button></div></section>' +
       (S.prosImport ? '<form id="pros-import-form" class="panel pros-import"><label class="f"><span>Pega aquí lo que te ha dado Claude</span>' +
@@ -1358,7 +1382,10 @@
       "</select></label>" +
       '<label class="sort-by"><span>Contacto:</span><select id="pros-c"><option value="">Todos</option>' +
       '<option value="si"' + (S.prosCanal === "si" ? " selected" : "") + ">Con teléfono o email (" + nReach + ")</option>" +
-      '<option value="no"' + (S.prosCanal === "no" ? " selected" : "") + ">Solo LinkedIn (" + (activos.length - nReach) + ")</option></select></label></nav>" +
+      '<option value="no"' + (S.prosCanal === "no" ? " selected" : "") + ">Solo red social (" + (activos.length - nReach) + ")</option></select></label>" +
+      '<label class="sort-by"><span>Red:</span><select id="pros-r"><option value="">Todas</option>' + ["linkedin", "instagram"].map(function (k) {
+        return '<option value="' + k + '"' + (S.prosRed === k ? " selected" : "") + ">" + RED_NOMBRE[k] + " (" + activos.filter(function (p) { return redOf(p) === k; }).length + ")</option>";
+      }).join("") + "</select></label></nav>" +
       '<div id="pros-list" class="pros-list">' + (list.length ? list.map(prosCard).join("") :
         '<p class="empty big">' + (S.pros.length ? "No hay búsquedas con este filtro." : "Aún no hay búsquedas. Copia las instrucciones y pídele a Claude que busque en LinkedIn.") + "</p>") + "</div>";
   }
@@ -1391,6 +1418,8 @@
       '<button type="button" class="btn icon" data-close aria-label="Cerrar">✕</button></header>' +
       '<div class="grid">' + field("nombre", "Nombre y apellidos", p.nombre) + field("cargo", "Cargo", p.cargo) +
       field("empresa", "Empresa", p.empresa) + field("pais", "País", p.pais) + field("ciudad", "Ciudad", p.ciudad) +
+      '<label class="f"><span>Encontrado en</span><select name="red">' + ["linkedin", "instagram"].map(function (k) { return '<option value="' + k + '"' + (redOf(p) === k ? " selected" : "") + ">" + RED_NOMBRE[k] + "</option>"; }).join("") + "</select></label>" +
+      field("usuario", "Usuario de Instagram (@)", p.usuario) + field("instagram", "Perfil de Instagram (URL)", p.instagram) +
       field("linkedin", "Perfil de LinkedIn (URL)", p.linkedin) + field("telefono", "Teléfono (con prefijo)", p.telefono, "tel") + field("email", "Email", p.email, "email") + "</div>" +
       ta("resumen", "Resumen", 5, "A qué se dedica, qué le puede interesar…") +
       field("asunto", "Asunto (si le escribes por email)", p.asunto) +
@@ -1412,6 +1441,7 @@
       var a = act.getAttribute("data-act");
       if (a === "new") openLead(null);
       if (a === "pros-prompt") { copyText(CLAUDE_PROMPT, "Instrucciones copiadas. Pégaselas a Claude en Chrome estando en LinkedIn."); return; }
+      if (a === "pros-prompt-ig") { copyText(CLAUDE_PROMPT_IG, "Instrucciones copiadas. Pégaselas a Claude en Chrome estando en Instagram."); return; }
       if (a === "pros-import") { S.prosImport = !S.prosImport; renderPros(); if (S.prosImport) $("#pros-import-form textarea").focus(); return; }
       if (a === "pros-new") { openPros(null); return; }
       if (a.indexOf("pros-") === 0 && act.closest("[data-pros]")) {
@@ -1430,7 +1460,7 @@
           api("prospect_delete", { id: pid }).then(function (j) { S.pros = j.prospectos; renderPros(); toast("Borrado"); }, function (err) { toast(err.message, true); });
         }
         if (a === "pros-lead") {
-          api("prospect_lead", { id: pid }).then(function (j) { S.pros = j.prospectos; S.leads = j.leads; renderPros(); toast("Añadido a Contactos con origen LinkedIn"); }, function (err) { toast(err.message, true); });
+          api("prospect_lead", { id: pid }).then(function (j) { S.pros = j.prospectos; S.leads = j.leads; renderPros(); toast("Añadido a Contactos con origen " + RED_NOMBRE[redOf(pr)]); }, function (err) { toast(err.message, true); });
         }
         if (a === "pros-open-lead") { location.hash = "contactos"; setTimeout(function () { openLead(pr.lead); }, 50); }
         e.preventDefault();
@@ -1672,7 +1702,7 @@
     if (fid === "pros-form") {
       e.preventDefault();
       var pdata = {};
-      $$("input[name], textarea[name]", f).forEach(function (x) { if (x.name !== "pid") pdata[x.name] = x.value.trim(); });
+      $$("input[name], textarea[name], select[name]", f).forEach(function (x) { if (x.name !== "pid") pdata[x.name] = x.value.trim(); });
       if (!pdata.nombre) { toast("Pon al menos el nombre", true); return; }
       saveProsField(f.elements.pid.value, pdata).then(function () { S.dirty = false; closeDrawer(true); renderPros(); toast("Guardado"); }, function (err) { toast(err.message, true); });
     }
@@ -1744,6 +1774,7 @@
     var t = e.target;
     if (t.id === "pros-f") { S.prosEstado = t.value; renderPros(); return; }
     if (t.id === "pros-c") { S.prosCanal = t.value; renderPros(); return; }
+    if (t.id === "pros-r") { S.prosRed = t.value; renderPros(); return; }
     if (t.classList.contains("pros-estado")) {
       saveProsField(t.closest("[data-pros]").getAttribute("data-pros"), { estado: t.value }).then(function () { renderPros(); toast("Estado: " + PROS_ESTADOS[t.value]); }, function (err) { toast(err.message, true); });
       return;

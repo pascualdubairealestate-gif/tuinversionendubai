@@ -502,3 +502,7 @@ tbody tr:last-child td { border-bottom: 0; }
 .pros-acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding-top: 12px; border-top: 1px solid var(--line); }
 .pros-more { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
 .pill.li-only { background: rgba(10, 102, 194, .1); color: #0a5cad; vertical-align: 2px; margin-left: 4px; }
+.pill.li-only.red-instagram { background: rgba(214, 41, 118, .1); color: #b0215f; }
+.red-dot { display: inline-grid; place-items: center; min-width: 20px; height: 18px; padding: 0 4px; border-radius: 5px; font-size: 10px; font-weight: 800; color: #fff; vertical-align: 2px; margin-right: 2px; }
+.red-dot.red-linkedin { background: #0a66c2; }
+.red-dot.red-instagram { background: linear-gradient(45deg, #f09433, #dc2743 50%, #bc1888); }
