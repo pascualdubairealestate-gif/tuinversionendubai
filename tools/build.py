@@ -300,7 +300,7 @@ pages["mexico"] = article(
     "Invertir en Dubái <em>desde México</em>",
     "Cómo comprar un piso en Dubái siendo mexicano: precios en pesos, cómo enviar el dinero, qué declarar ante el SAT y cómo hacerlo todo sin viajar.",
     "Cada vez más mexicanos compran en Dubái para cobrar rentas en una moneda ligada al dólar. Te explico cuánto cuesta en pesos, cómo se envía el dinero, qué declaras en México y cómo se compra a distancia.",
-    "/assets/img/proyecto-expo-city.webp", "Proyecto de obra nueva en Expo City, Dubái",
+    "/assets/img/blog-mexico-emiratos.webp", "Bandera de México junto a la bandera de Emiratos Árabes Unidos",
     [
         ("por-que", "Por qué Dubái atrae a inversores mexicanos",
          ul("<strong>Rentas en una moneda estable:</strong> el dírham va ligado al dólar, así que tus ingresos no dependen del peso.",
