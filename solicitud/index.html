@@ -46,6 +46,9 @@
     .slide.on { opacity: 1; visibility: visible; transform: none; transition: opacity .55s var(--ease), transform .55s var(--ease), visibility 0s; }
     .slide.up { transform: translateY(-60px); }
     .q { width: 100%; max-width: 680px; }
+    .intro { margin: 0 0 22px; font: 500 clamp(19px, 2.6vw, 22px)/1.35 var(--f-display); color: var(--sand); }
+    .intro em { color: var(--amber); }
+    h1, h2, .intro { font-variant-numeric: lining-nums; }
     .num { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; color: var(--amber); margin-bottom: 10px; }
     h1, h2 { font-family: var(--f-display); font-weight: 500; letter-spacing: -.01em; margin: 0 0 10px; }
     h1 { font-size: clamp(40px, 7vw, 64px); line-height: 1.02; }
@@ -126,14 +129,7 @@
 
     <section class="slide" data-step="0">
       <div class="q">
-        <h1>Invierte en Dubái <em>con criterio</em></h1>
-        <p class="help">Cuéntame tu caso en 30 segundos y te escribo para asesorarte, sin compromiso.</p>
-        <div class="actions"><button type="button" class="btn" data-next>Empezar →</button><span class="hint">pulsa <b>Enter ↵</b></span></div>
-      </div>
-    </section>
-
-    <section class="slide" data-step="1">
-      <div class="q">
+        <p class="intro">Invierte en Dubái <em>con criterio</em>. Cuéntame tu caso en 30 segundos.</p>
         <div class="num">1 →</div>
         <h2><label for="nombre">Nombre y apellidos <span class="req">*</span></label></h2>
         <p class="help">Para saber cómo dirigirme a ti.</p>
@@ -143,7 +139,7 @@
       </div>
     </section>
 
-    <section class="slide" data-step="2">
+    <section class="slide" data-step="1">
       <div class="q">
         <div class="num">2 →</div>
         <h2><label for="tel">Número de teléfono <span class="req">*</span></label></h2>
@@ -161,7 +157,7 @@
       </div>
     </section>
 
-    <section class="slide" data-step="3">
+    <section class="slide" data-step="2">
       <div class="q">
         <div class="num">3 →</div>
         <h2>Mayor preocupación antes de invertir</h2>
@@ -171,7 +167,7 @@
       </div>
     </section>
 
-    <section class="slide" data-step="4">
+    <section class="slide" data-step="3">
       <div class="q">
         <div class="num">4 →</div>
         <h2>Capital a invertir <span class="req">*</span></h2>
@@ -183,7 +179,7 @@
       </div>
     </section>
 
-    <section class="slide" data-step="5">
+    <section class="slide" data-step="4">
       <div class="q">
         <div class="done-ic" aria-hidden="true">✓</div>
         <h2 id="gracias">¡Gracias!</h2>
@@ -219,7 +215,7 @@
 
     var $ = function (s) { return document.querySelector(s); };
     var slides = [].slice.call(document.querySelectorAll(".slide"));
-    var LAST_Q = 4, step = 0, sending = false;
+    var LAST_Q = 3, step = 0, sending = false;
     var data = { pais: PAISES[0], pre: [], cap: "" };
 
     function emoji(iso) { return iso.replace(/./g, function (c) { return String.fromCodePoint(127397 + c.charCodeAt(0)); }); }
@@ -288,18 +284,18 @@
 
     // Validación de cada paso
     function valid(s) {
-      if (s === 1) {
+      if (s === 0) {
         var n = $("#nombre").value.trim();
         $("#e1").textContent = n.length < 2 ? "Escribe tu nombre y apellidos." : "";
         return n.length >= 2;
       }
-      if (s === 2) {
+      if (s === 1) {
         var d = $("#tel").value.replace(/\D/g, "");
         var ok = d.length >= 6 && d.length <= 14;
         $("#e2").textContent = ok ? "" : "Escribe un número de teléfono válido.";
         return ok;
       }
-      if (s === 4) {
+      if (s === 3) {
         var m = !data.cap ? "Elige el capital que quieres invertir." : !$("#ok").checked ? "Acepta la política de privacidad para continuar." : "";
         $("#e4").textContent = m;
         return !m;
@@ -309,7 +305,7 @@
 
     function go(n) {
       if (n < 0 || n > slides.length - 1) return;
-      if (n > step && step >= 1 && step < LAST_Q && !valid(step)) { focusStep(step); return; }
+      if (n > step && step < LAST_Q && !valid(step)) { focusStep(step); return; }
       slides.forEach(function (s, i) {
         s.classList.toggle("on", i === n);
         s.classList.toggle("up", i < n);
@@ -336,8 +332,8 @@
       if (e.key === "Enter" && step < LAST_Q && !(e.target.closest && e.target.closest(".cc, a"))) { e.preventDefault(); go(step + 1); return; }
       if (e.target.tagName === "INPUT") return;
       var k = e.key.length === 1 ? e.key.toUpperCase().charCodeAt(0) - 65 : -1;
-      if (step === 3 && k >= 0 && k < PREOCUPACIONES.length) togglePre(document.querySelectorAll("#pre .opt")[k]);
-      if (step === 4 && k >= 0 && k < CAPITAL.length) pickCap(document.querySelectorAll("#cap .opt")[k]);
+      if (step === 2 && k >= 0 && k < PREOCUPACIONES.length) togglePre(document.querySelectorAll("#pre .opt")[k]);
+      if (step === 3 && k >= 0 && k < CAPITAL.length) pickCap(document.querySelectorAll("#cap .opt")[k]);
     });
     // Deslizar con el dedo arriba/abajo entre preguntas
     var y0 = null;
@@ -356,9 +352,9 @@
     $("#f").addEventListener("submit", function (e) {
       e.preventDefault();
       if (sending) return;
+      if (!valid(0)) return go(0);
       if (!valid(1)) return go(1);
-      if (!valid(2)) return go(2);
-      if (!valid(4)) return;
+      if (!valid(3)) return;
       sending = true; $("#send").disabled = true; $("#send").textContent = "Enviando…";
       var nombre = $("#nombre").value.trim();
       var payload = {
