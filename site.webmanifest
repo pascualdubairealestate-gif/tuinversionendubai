@@ -1,0 +1,13 @@
+{
+  "name": "Tu inversión en Dubái · Pascual Vidal",
+  "short_name": "Pascual Vidal",
+  "lang": "es",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#070d18",
+  "icons": [
+    { "src": "/assets/img/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/img/logo-pv-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

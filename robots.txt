@@ -1,5 +1,26 @@
+# Buscadores y asistentes de IA: bienvenidos a todo el contenido público.
 User-agent: *
 Allow: /
 Disallow: /crm/
+Disallow: /tools/
+
+# Rastreadores de IA (búsqueda y respuestas). Se permiten de forma explícita
+# para que ChatGPT, Perplexity, Claude, Gemini, Copilot, etc. puedan citar la web.
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: GPTBot
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Bingbot
+User-agent: meta-externalagent
+User-agent: CCBot
+Allow: /
+Disallow: /crm/
+Disallow: /tools/
 
 Sitemap: https://tuinversionendubai.com/sitemap.xml

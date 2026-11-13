@@ -4,7 +4,7 @@ import json, re, sys, html as H
 
 ROOT = sys.argv[1] if len(sys.argv) > 1 else "."
 SITE = "https://tuinversionendubai.com"
-V = "20261031c"
+V = "20261113a"
 DATE = "2026-10-28"
 DATE_TXT = "28 de octubre de 2026"
 
@@ -25,10 +25,36 @@ sprite = grab('  <!-- Iconos -->', '</svg>\n')
 toast = '  <div class="toast" data-toast role="status" aria-live="polite"></div>\n'
 favicon = re.search(r'<link rel="icon"[^>]*>', src).group(0)
 
-AUTHOR = {"@type": "Person", "name": "Pascual Vidal", "url": SITE + "/#sobre-mi"}
+PERSON_ID = SITE + "/sobre-pascual-vidal/#pascual"
+ORG_ID = SITE + "/#organizacion"
+WEB_ID = SITE + "/#web"
+AUTHOR = {"@type": "Person", "@id": PERSON_ID, "name": "Pascual Vidal", "url": SITE + "/sobre-pascual-vidal/",
+          "jobTitle": "Consultor de inversión inmobiliaria en Dubái", "image": SITE + "/assets/img/pascual-retrato.webp",
+          "sameAs": ["https://www.instagram.com/pascual.dubairealestate/", "https://www.youtube.com/@pascual.dubairealestate"]}
+PUBLISHER = {"@type": "Organization", "@id": ORG_ID, "name": "Tu inversión en Dubái", "url": SITE + "/",
+             "logo": {"@type": "ImageObject", "url": SITE + "/assets/img/logo-pv-512.png", "width": 512, "height": 512}}
+WA_LINK = "https://wa.me/message/QI3A7Q5BXFTCA1"
+TODAY = "2026-11-13"
+
+from PIL import Image as _Img
+import os as _os
 
 
-def page(path, title, desc, body, ld, og_image="/assets/img/pascual-dubai.webp", og_type="article", body_attrs=""):
+def dims(src):
+    """Ancho y alto reales de una imagen local (para evitar saltos de maquetación)."""
+    w, h = _Img.open(ROOT + src).size
+    return f'width="{w}" height="{h}"'
+
+
+def og_jpg(image):
+    """Versión JPG 1200x630 de la imagen para redes (generada por tools/seo_assets.py)."""
+    name = _os.path.basename(image).rsplit(".", 1)[0]
+    j = f"/assets/img/og/{name}.jpg"
+    return j if _os.path.exists(ROOT + j) else "/assets/img/og/pascual-vidal.jpg"
+
+
+
+def page(path, title, desc, body, ld, og_image="/assets/img/og/pascual-vidal.jpg", og_type="article", body_attrs="", og_alt="Pascual Vidal, consultor inmobiliario español en Dubái"):
     url = SITE + path
     return f"""<!doctype html>
 <html lang="es" class="no-js">
@@ -38,6 +64,8 @@ def page(path, title, desc, body, ld, og_image="/assets/img/pascual-dubai.webp",
   <title>{H.escape(title)}</title>
   <meta name="description" content="{H.escape(desc)}" />
   <link rel="canonical" href="{url}" />
+  <link rel="alternate" hreflang="es" href="{url}" />
+  <link rel="alternate" hreflang="x-default" href="{url}" />
   <meta property="og:type" content="{og_type}" />
   <meta property="og:locale" content="es_ES" />
   <meta property="og:site_name" content="Tu inversión en Dubái" />
@@ -45,9 +73,17 @@ def page(path, title, desc, body, ld, og_image="/assets/img/pascual-dubai.webp",
   <meta property="og:title" content="{H.escape(title)}" />
   <meta property="og:description" content="{H.escape(desc)}" />
   <meta property="og:image" content="{SITE}{og_image}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="{H.escape(og_alt)}" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="author" content="Pascual Vidal" />
   <meta name="theme-color" content="#ffffff" />
   {favicon}
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -77,8 +113,11 @@ def page(path, title, desc, body, ld, og_image="/assets/img/pascual-dubai.webp",
 ARTICLES = []
 
 
-def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related):
-    ARTICLES.append(dict(slug=slug, title=title, h1=h1, desc=desc, lead=lead, image=image, alt=alt))
+def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related, date=DATE, date_txt=DATE_TXT, wa_msg=None):
+    summary = SUMMARIES.get(slug, [])
+    ARTICLES.append(dict(slug=slug, title=title, h1=h1, desc=desc, lead=lead, image=image, alt=alt, date=date, date_txt=date_txt, summary=summary,
+                         faqs=faqs, sections=[t for _, t, _ in sections]))
+    tldr = ('\n      <div class="tldr" id="resumen"><b>En resumen</b><ul>' + "".join(f"<li>{x}</li>" for x in summary) + "</ul></div>") if summary else ""
     toc = "".join(f'<li><a href="#{sid}">{H.escape(t)}</a></li>' for sid, t, _ in sections)
     secs = "".join(f'\n      <h2 id="{sid}">{H.escape(t)}</h2>\n{c}' for sid, t, c in sections)
     faq_html = "".join(
@@ -86,18 +125,19 @@ def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related):
         for q, a in faqs)
     rel = "".join(f'<a class="related-card" href="/blog/{s}/"><small>Artículo</small><b>{H.escape(t)}</b><span>Leer →</span></a>' for s, t in related)
     path = f"/blog/{slug}/"
+    wa_text = H.escape(wa_msg or ("Hola Pascual, he leído tu artículo «" + re.sub("<[^>]+>", "", h1) + "» y quiero consultarte mi caso."))
     body = f"""    <article class="article">
       <header class="article-head container">
         <nav class="crumbs" aria-label="Migas de pan"><a href="/">Inicio</a><span>/</span><a href="/blog/">Blog</a></nav>
-        <p class="eyebrow"><span class="dot"></span>Guía para inversores · Actualizado el {DATE_TXT}</p>
+        <p class="eyebrow"><span class="dot"></span>Guía para inversores · Actualizado el {date_txt}</p>
         <h1>{h1}</h1>
         <p class="article-lead">{lead}</p>
-        <div class="article-author"><img src="/assets/img/pascual-retrato.webp" alt="Pascual Vidal" width="48" height="48" loading="lazy" /><span><b>Pascual Vidal</b><small>Consultor inmobiliario en Dubái · RERA #97799</small></span></div>
+        <div class="article-author"><img src="/assets/img/pascual-retrato.webp" alt="Pascual Vidal" width="48" height="48" loading="lazy" /><span><a href="/sobre-pascual-vidal/" rel="author"><b>Pascual Vidal</b></a><small>Consultor inmobiliario en Dubái · RERA #97799 · <time datetime="{date}">{date_txt}</time></small></span></div>
       </header>
-      <figure class="article-cover container"><img src="{image}" alt="{H.escape(alt)}" loading="eager" /></figure>
+      <figure class="article-cover container"><img src="{image}" alt="{H.escape(alt)}" {dims(image)} loading="eager" fetchpriority="high" /></figure>
       <div class="article-layout container">
         <aside class="toc"><b>En este artículo</b><ol>{toc}</ol></aside>
-        <div class="prose">{secs}
+        <div class="prose">{tldr}{secs}
       <h2 id="preguntas">Preguntas frecuentes</h2>
       <div class="article-faq">{faq_html}</div>
       <div class="article-cta">
@@ -107,7 +147,7 @@ def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related):
           <p>En 20 minutos vemos tu presupuesto, tu objetivo y qué zonas encajan contigo. Sin compromiso.</p>
         </div>
         <div class="article-cta-actions">
-          <a class="btn btn-wa" data-wa data-wa-msg="Hola Pascual, he leído tu artículo «{H.escape(h1)}» y quiero consultarte mi caso." href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg><span>Escríbeme por WhatsApp</span></a>
+          <a class="btn btn-wa" data-wa data-wa-msg="{wa_text}" href="{WA_LINK}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg><span>Escríbeme por WhatsApp</span></a>
           <button class="btn btn-dark" type="button" data-open-guide>Descargar la guía gratis</button>
         </div>
       </div>
@@ -117,9 +157,12 @@ def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related):
       <section class="related container"><h2>Sigue leyendo</h2><div class="related-grid">{rel}</div></section>
     </article>"""
     ld = [
-        {"@context": "https://schema.org", "@type": "Article", "headline": h1.replace("<em>", "").replace("</em>", ""), "description": desc,
-         "image": SITE + image, "datePublished": DATE, "dateModified": DATE, "inLanguage": "es", "author": AUTHOR,
-         "publisher": {"@type": "Organization", "name": "Tu inversión en Dubái", "url": SITE + "/"}, "mainEntityOfPage": SITE + path},
+        {"@context": "https://schema.org", "@type": "BlogPosting", "@id": SITE + path + "#articulo", "headline": re.sub("<[^>]+>", "", h1), "description": desc,
+         "abstract": " ".join(re.sub("<[^>]+>", "", x) for x in summary) or desc,
+         "image": [SITE + og_jpg(image), SITE + image], "datePublished": date, "dateModified": date, "inLanguage": "es", "author": AUTHOR,
+         "publisher": PUBLISHER, "mainEntityOfPage": {"@type": "WebPage", "@id": SITE + path}, "isPartOf": {"@id": WEB_ID},
+         "articleSection": "Guías para inversores", "about": [{"@type": "Place", "name": "Dubái"}, {"@type": "Thing", "name": "Inversión inmobiliaria"}],
+         "speakable": {"@type": "SpeakableSpecification", "cssSelector": [".article-lead", ".tldr"]}},
         {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"},
             {"@type": "ListItem", "position": 2, "name": "Blog", "item": SITE + "/blog/"},
@@ -127,7 +170,7 @@ def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related):
         {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
             {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": re.sub("<[^>]+>", "", a)}} for q, a in faqs]},
     ]
-    return path, page(path, title + " · Pascual Vidal", desc, body, ld, og_image=image)
+    return path, page(path, title + " · Pascual Vidal", desc, body, ld, og_image=og_jpg(image), og_alt=alt)
 
 
 def p(*paras):
@@ -149,6 +192,52 @@ def note(x):
 
 
 pages = {}
+
+# Resumen al inicio de cada artículo: respuestas directas y citables (lectores con prisa, Google y buscadores con IA).
+SUMMARIES = {
+    "cuanto-cuesta-comprar-piso-dubai": [
+        "En Dubái hay estudios y apartamentos de 1 dormitorio por debajo de <strong>200.000 €</strong> en zonas en crecimiento; en obra nueva reservas con un <strong>10–20 %</strong> y pagas el resto por fases.",
+        "El gasto principal es el <strong>4 % del Dubai Land Department</strong>, que se paga una sola vez.",
+        "Calcula unos gastos totales del <strong>6–8 %</strong> en segunda mano y del <strong>4–5 %</strong> en obra nueva, donde normalmente no hay comisión de agencia.",
+        "Cada año pagarás sobre todo la <strong>cuota de comunidad</strong> (<em>service charge</em>); en Emiratos no hay IBI.",
+    ],
+    "impuestos-invertir-dubai-espanol": [
+        "En Emiratos, un particular no paga impuesto sobre la renta, ni sobre plusvalías, ni IBI: solo el <strong>4 % del DLD</strong> al comprar.",
+        "Si eres residente fiscal en España, declaras el piso en el <strong>IRPF</strong> (alquiler, imputación de rentas o ganancia al vender).",
+        "Con más de <strong>50.000 €</strong> en inmuebles en el extranjero debes presentar el <strong>modelo 720</strong>; según tu caso, también cuenta para Patrimonio.",
+        "Existe un convenio de doble imposición España–Emiratos; la Golden Visa por sí sola no cambia tu residencia fiscal.",
+    ],
+    "golden-visa-dubai-inversion-inmobiliaria": [
+        "La Golden Visa es una residencia de <strong>10 años</strong>, renovable, que no te obliga a vivir en Emiratos.",
+        "Por inversión inmobiliaria necesitas un mínimo de <strong>2 millones de AED</strong> (unos 500.000 €) en una o varias propiedades; vale la obra nueva y, con condiciones, la compra con hipoteca.",
+        "Puedes incluir a tu cónyuge, a tus hijos y, en muchos casos, a tus padres.",
+        "Si no llegas al mínimo, existe un visado de inversor de 2 años con un umbral más bajo.",
+    ],
+    "invertir-en-dubai-desde-mexico": [
+        "Un dírham ronda los <strong>5 pesos</strong>: un apartamento de 1 dormitorio de 1.000.000 AED son unos <strong>5 millones MXN</strong>.",
+        "El dinero se envía por transferencia internacional (mejor en dólares) a la cuenta <em>escrow</em> del proyecto, justificando su origen.",
+        "Como residente fiscal en México, declaras las rentas y la ganancia al vender; en Emiratos no pagas impuesto sobre la renta.",
+        "Todo el proceso se puede hacer a distancia, sin viajar a Dubái.",
+    ],
+    "invertir-en-dubai-desde-colombia": [
+        "Un dírham ronda los <strong>1.100 pesos colombianos</strong>: un apartamento de 1 habitación de 1.000.000 AED son unos <strong>1.100 millones COP</strong>.",
+        "La inversión se canaliza por el mercado cambiario a través de tu banco, con la declaración de cambio que corresponda.",
+        "Como residente fiscal en Colombia declaras rentas, ganancia ocasional y, si superas el límite de la DIAN, activos en el exterior.",
+        "Comprar en Dubái te da patrimonio ligado al dólar y se puede hacer sin viajar.",
+    ],
+    "invertir-en-dubai-desde-miami": [
+        "El dírham está fijado al dólar (<strong>1 USD = 3,6725 AED</strong>): compras, cobras y vendes sin riesgo de cambio.",
+        "Un apartamento de 1 dormitorio de 1.000.000 AED cuesta unos <strong>272.000 USD</strong>; la Golden Visa empieza en unos 545.000 USD.",
+        "Emiratos no grava al particular, pero el IRS sí: rentas y ganancias se declaran en EE. UU. (y FBAR si tienes cuentas allí por encima de 10.000 USD).",
+        "Se paga por <em>wire transfer</em> en dólares y la compra se hace en remoto.",
+    ],
+    "invertir-en-dubai-desde-espana": [
+        "Un dírham ronda los <strong>0,24 €</strong>: un estudio en zona en crecimiento cuesta unos <strong>155.000 €</strong> y un apartamento de 1 dormitorio, unos 240.000 €.",
+        "En obra nueva reservas con un <strong>10–20 %</strong>; los bancos españoles no suelen financiar, pero algunos bancos de Emiratos dan hipoteca a no residentes (50–60 %).",
+        "En Emiratos no hay IBI ni impuesto sobre la renta para particulares; en España declaras IRPF, modelo 720 si superas 50.000 € y, según tu caso, Patrimonio.",
+        "Se puede comprar todo desde España, sin viajar.",
+    ],
+}
 
 # ---------------------------------------------------------------- 1
 pages["cuanto-cuesta-comprar-piso-dubai"] = article(
@@ -287,10 +376,212 @@ pages["golden-visa-dubai-inversion-inmobiliaria"] = article(
     [("cuanto-cuesta-comprar-piso-dubai", "Cuánto cuesta comprar un piso en Dubái"), ("impuestos-invertir-dubai-espanol", "Impuestos al invertir en Dubái siendo español")],
 )
 
+# ---------------------------------------------------------------- países (noviembre 2026)
+D2, D2_TXT = "2026-11-13", "13 de noviembre de 2026"
+FX_NOTE = "Cifras aproximadas: el dírham (AED) va ligado al dólar (1 USD = 3,6725 AED), así que lo que cambia es tu moneda frente al dólar. Revisa el tipo de cambio del día."
+
+pages["mexico"] = article(
+    "invertir-en-dubai-desde-mexico",
+    "Invertir en Dubái desde México: guía práctica",
+    "Invertir en Dubái <em>desde México</em>",
+    "Cómo comprar un piso en Dubái siendo mexicano: precios en pesos, cómo enviar el dinero, qué declarar ante el SAT y cómo hacerlo todo sin viajar.",
+    "Cada vez más mexicanos compran en Dubái para cobrar rentas en una moneda ligada al dólar. Te explico cuánto cuesta en pesos, cómo se envía el dinero, qué declaras en México y cómo se compra a distancia.",
+    "/assets/img/blog-mexico-emiratos.webp", "Bandera de México junto a la bandera de Emiratos Árabes Unidos",
+    [
+        ("por-que", "Por qué Dubái atrae a inversores mexicanos",
+         ul("<strong>Rentas en una moneda estable:</strong> el dírham va ligado al dólar, así que tus ingresos no dependen del peso.",
+            "<strong>Compra 100 % a tu nombre:</strong> los extranjeros pueden comprar en plena propiedad (<em>freehold</em>) en las zonas habilitadas, con registro oficial en el Dubai Land Department.",
+            "<strong>Obra nueva con planes de pago:</strong> reservas con un 10–20 % y pagas el resto por fases.",
+            "<strong>Seguridad jurídica:</strong> en obra nueva tus pagos van a una cuenta <em>escrow</em> supervisada por el gobierno.")),
+        ("precios", "Cuánto cuesta en pesos",
+         p(FX_NOTE + " Con un dólar entre 18 y 20 pesos, un dírham ronda los <strong>5 pesos</strong>.") +
+         table(["Propiedad (ejemplo)", "En dírhams", "En pesos (aprox.)"], [
+             ["Estudio en zona en crecimiento", "650.000 AED", "≈ 3,3 millones MXN"],
+             ["Apartamento de 1 dormitorio", "1.000.000 AED", "≈ 5 millones MXN"],
+             ["Apartamento de 2 dormitorios", "1.800.000 AED", "≈ 9 millones MXN"],
+             ["Mínimo para la Golden Visa", "2.000.000 AED", "≈ 10 millones MXN"],
+         ]) +
+         p("Súmale alrededor de un 4–5 % de gastos de compra en obra nueva. Te lo detallo en <a href=\"/blog/cuanto-cuesta-comprar-piso-dubai/\">cuánto cuesta comprar un piso en Dubái</a>.")),
+        ("dinero", "Cómo enviar el dinero desde México",
+         "      <ol>" + "".join(f"<li>{x}</li>" for x in [
+             "<strong>Transferencia internacional (SWIFT)</strong> desde tu banco en México a la cuenta <em>escrow</em> del proyecto o a la del promotor. Pregunta la comisión fija y, sobre todo, el tipo de cambio que te aplican: ahí está el coste real.",
+             "<strong>Plataformas como Wise o Revolut:</strong> suelen dar mejor tipo de cambio. Comprueba el límite por envío y que el destinatario acepta pagos desde ellas.",
+             "<strong>Envía en dólares si puedes:</strong> como el dírham está ligado al dólar, convertir pesos a dólares y enviar dólares suele ser lo más sencillo.",
+             "<strong>Justifica el origen de los fondos:</strong> el promotor y el banco te pedirán documentos que demuestren de dónde sale el dinero, por las normas contra el blanqueo. Tenlos listos.",
+         ]) + "</ol>\n"),
+        ("impuestos", "Impuestos en México",
+         p("Si eres <strong>residente fiscal en México</strong>, tributas por tus ingresos de cualquier país, también por tu piso en Dubái:") +
+         ul("<strong>Rentas del alquiler:</strong> se declaran en México en tu declaración anual.",
+            "<strong>Al vender:</strong> la ganancia se declara en México como enajenación de inmuebles.",
+            "<strong>En Emiratos:</strong> como particular no pagas impuesto sobre la renta ni sobre plusvalías, solo el 4 % del registro al comprar.",
+            "<strong>Si compras con una empresa en Emiratos:</strong> ojo con el régimen de REFIPRE (regímenes fiscales preferentes) y sus declaraciones informativas.") +
+         p("México y Emiratos firmaron un convenio para evitar la doble imposición. Cómo se aplica depende de tu caso: consúltalo con tu contador <strong>antes</strong> de comprar.")),
+        ("distancia", "Comprar sin viajar",
+         p("Todo el proceso se puede hacer en remoto: elección de la propiedad, reserva, firma electrónica del contrato y pagos. Yo vivo en Dubái todo el año y me ocupo de lo que requiere estar presente, incluida la entrega de llaves. Si quieres venir a verlo, consulta los requisitos de entrada vigentes para tu pasaporte.")),
+        ("golden-visa", "Golden Visa para mexicanos",
+         p("Con una inversión de 2 millones de AED (unos 10 millones de pesos) puedes pedir la residencia de 10 años para ti y tu familia, sin obligación de vivir en Emiratos. Todos los requisitos, en la <a href=\"/blog/golden-visa-dubai-inversion-inmobiliaria/\">guía de la Golden Visa</a>.")),
+    ],
+    [
+        ("¿Un mexicano puede comprar una propiedad en Dubái?", "Sí. Los extranjeros pueden comprar en plena propiedad en las zonas habilitadas, sin necesidad de residir en Emiratos ni de tener visado."),
+        ("¿Tengo que declarar al SAT un piso en Dubái?", "Si eres residente fiscal en México, sí debes declarar las rentas y, al vender, la ganancia. Consulta con tu contador cómo hacerlo en tu caso."),
+        ("¿Cuál es la forma más barata de mandar dinero de México a Dubái?", "Depende del importe. Compara la comisión y, sobre todo, el tipo de cambio de tu banco con plataformas como Wise o Revolut; enviar en dólares suele simplificarlo."),
+    ],
+    [("invertir-en-dubai-desde-colombia", "Invertir en Dubái desde Colombia"), ("invertir-en-dubai-desde-espana", "Invertir en Dubái desde España")],
+    date=D2, date_txt=D2_TXT, wa_msg="Hola Pascual, te escribo desde México. Quiero información para invertir en Dubái.",
+)
+
+pages["colombia"] = article(
+    "invertir-en-dubai-desde-colombia",
+    "Invertir en Dubái desde Colombia: guía práctica",
+    "Invertir en Dubái <em>desde Colombia</em>",
+    "Cómo comprar un piso en Dubái siendo colombiano: precios en pesos colombianos, cómo enviar el dinero por el mercado cambiario, qué declarar ante la DIAN y cómo comprar a distancia.",
+    "Para un inversor colombiano, Dubái es una forma de tener patrimonio en una moneda ligada al dólar, con rentas de alquiler y sin impuesto sobre la renta en Emiratos. Te explico precios, envío del dinero e impuestos en Colombia.",
+    "/assets/img/blog-colombia-emiratos.webp", "Bandera de Colombia junto a la bandera de Emiratos Árabes Unidos",
+    [
+        ("por-que", "Por qué Dubái atrae a inversores colombianos",
+         ul("<strong>Patrimonio en dólares:</strong> el dírham va ligado al dólar y protege tu inversión de la devaluación del peso.",
+            "<strong>Rentas de alquiler:</strong> demanda alta de alquiler anual y vacacional.",
+            "<strong>Planes de pago en obra nueva:</strong> reservas con un 10–20 % y pagas el resto durante la construcción.",
+            "<strong>Compra segura y registrada:</strong> cada compra queda inscrita en el Dubai Land Department.")),
+        ("precios", "Cuánto cuesta en pesos colombianos",
+         p(FX_NOTE + " Con un dólar entre 3.900 y 4.300 pesos, un dírham ronda los <strong>1.100 pesos</strong>.") +
+         table(["Propiedad (ejemplo)", "En dírhams", "En pesos colombianos (aprox.)"], [
+             ["Estudio en zona en crecimiento", "650.000 AED", "≈ 715 millones COP"],
+             ["Apartamento de 1 habitación", "1.000.000 AED", "≈ 1.100 millones COP"],
+             ["Apartamento de 2 habitaciones", "1.800.000 AED", "≈ 2.000 millones COP"],
+             ["Mínimo para la Golden Visa", "2.000.000 AED", "≈ 2.200 millones COP"],
+         ]) +
+         p("En obra nueva no pagas todo de golpe: con la entrada del 10–20 % empiezas, y el resto va por plazos. Gastos de compra: <a href=\"/blog/cuanto-cuesta-comprar-piso-dubai/\">aquí, uno por uno</a>.")),
+        ("dinero", "Cómo enviar el dinero desde Colombia",
+         "      <ol>" + "".join(f"<li>{x}</li>" for x in [
+             "<strong>Por el mercado cambiario:</strong> una inversión en el exterior se canaliza a través de tu banco (intermediario del mercado cambiario) con la declaración de cambio que corresponda. Tu banco te indica el formulario.",
+             "<strong>Transferencia en dólares</strong> a la cuenta <em>escrow</em> del proyecto o del promotor. Pregunta la comisión y el tipo de cambio que te aplican.",
+             "<strong>Documenta el origen de los fondos:</strong> en Dubái te lo pedirán por las normas contra el blanqueo, y en Colombia te conviene tenerlo todo en orden.",
+             "<strong>Guarda cada comprobante:</strong> los necesitarás para la declaración de renta y la de activos en el exterior.",
+         ]) + "</ol>\n"),
+        ("impuestos", "Impuestos en Colombia",
+         p("Si eres <strong>residente fiscal en Colombia</strong>, declaras tus rentas y tu patrimonio de cualquier país:") +
+         ul("<strong>Declaración de renta:</strong> incluye las rentas del alquiler en Dubái y, al vender, la ganancia ocasional.",
+            "<strong>Declaración de activos en el exterior:</strong> si tus activos fuera superan el límite que fija la DIAN cada año, tienes que presentarla.",
+            "<strong>Impuesto al patrimonio:</strong> si tu patrimonio total supera el umbral, el piso cuenta.",
+            "<strong>En Emiratos:</strong> como particular no pagas impuesto sobre la renta ni sobre plusvalías; solo el 4 % del registro al comprar.") +
+         p("Colombia y Emiratos firmaron un convenio para evitar la doble imposición. Habla con tu contador <strong>antes</strong> de comprar para hacerlo bien desde el principio.")),
+        ("distancia", "Comprar sin viajar",
+         p("La reserva, el contrato y los pagos se hacen a distancia. Yo estoy en Dubái todo el año y me encargo de lo presencial: revisión de la vivienda, entrega de llaves, amueblado y alquiler. Si quieres venir, consulta antes los requisitos de entrada vigentes para tu pasaporte.")),
+        ("golden-visa", "Golden Visa para colombianos",
+         p("Invirtiendo 2 millones de AED en propiedad puedes solicitar la residencia de 10 años para ti y tu familia. Requisitos y pasos en la <a href=\"/blog/golden-visa-dubai-inversion-inmobiliaria/\">guía de la Golden Visa</a>.")),
+    ],
+    [
+        ("¿Un colombiano puede comprar vivienda en Dubái?", "Sí. Los extranjeros pueden comprar en plena propiedad en las zonas habilitadas, sin residir en Emiratos."),
+        ("¿Tengo que declarar en Colombia un piso en Dubái?", "Si eres residente fiscal en Colombia, sí: en la declaración de renta y, si superas el límite, en la de activos en el exterior. Confírmalo con tu contador."),
+        ("¿Cómo envío el dinero desde Colombia?", "A través de tu banco, como operación del mercado cambiario con su declaración de cambio, normalmente en dólares a la cuenta escrow del proyecto."),
+    ],
+    [("invertir-en-dubai-desde-mexico", "Invertir en Dubái desde México"), ("invertir-en-dubai-desde-miami", "Invertir en Dubái desde Miami")],
+    date=D2, date_txt=D2_TXT, wa_msg="Hola Pascual, te escribo desde Colombia. Quiero información para invertir en Dubái.",
+)
+
+pages["miami"] = article(
+    "invertir-en-dubai-desde-miami",
+    "Invertir en Dubái desde Miami y EE. UU.: guía para hispanos",
+    "Invertir en Dubái <em>desde Miami</em>",
+    "Guía para hispanos en Miami y Estados Unidos que quieren comprar en Dubái: sin riesgo de cambio con el dólar, cómo pagar, qué declarar al IRS y cómo comprar a distancia.",
+    "Si vives en Miami o en cualquier parte de EE. UU., Dubái tiene una ventaja que pocos destinos ofrecen: el dírham va ligado al dólar. Te explico cómo se paga, qué declaras al IRS y por qué tantos inversores latinos de Florida lo están mirando.",
+    "/assets/img/blog-eeuu-emiratos.webp", "Bandera de Estados Unidos junto a la bandera de Emiratos Árabes Unidos",
+    [
+        ("por-que", "Por qué Dubái encaja con un inversor de Miami",
+         ul("<strong>Sin riesgo de cambio:</strong> 1 USD = 3,6725 AED, fijo desde hace décadas. Compras, cobras y vendes prácticamente en dólares.",
+            "<strong>Sin impuesto sobre la renta en Emiratos</strong> para particulares, ni impuesto anual sobre la propiedad.",
+            "<strong>Diversificación:</strong> un mercado con dinámica distinta a la de Florida, con fuerte demanda de alquiler.",
+            "<strong>Compra a distancia</strong> y gestión completa desde Dubái, en español.")),
+        ("precios", "Cuánto cuesta en dólares",
+         table(["Propiedad (ejemplo)", "En dírhams", "En dólares"], [
+             ["Estudio en zona en crecimiento", "650.000 AED", "≈ 177.000 USD"],
+             ["Apartamento de 1 dormitorio", "1.000.000 AED", "≈ 272.000 USD"],
+             ["Apartamento de 2 dormitorios", "1.800.000 AED", "≈ 490.000 USD"],
+             ["Mínimo para la Golden Visa", "2.000.000 AED", "≈ 545.000 USD"],
+         ]) +
+         p("Como el cambio es fijo, estos importes apenas varían. Suma alrededor de un 4–5 % de gastos de compra en obra nueva: <a href=\"/blog/cuanto-cuesta-comprar-piso-dubai/\">el desglose completo</a>.")),
+        ("pagos", "Cómo se paga desde EE. UU.",
+         "      <ol>" + "".join(f"<li>{x}</li>" for x in [
+             "<strong>Wire transfer en dólares</strong> desde tu banco en EE. UU. a la cuenta <em>escrow</em> del proyecto o a la del promotor. Sin conversión de moneda que te haga perder.",
+             "<strong>Planes de pago del promotor:</strong> los bancos de EE. UU. no suelen financiar propiedades en el extranjero, así que la obra nueva con pagos por fases es lo más habitual.",
+             "<strong>Origen de los fondos:</strong> ten a mano extractos y documentos que lo justifiquen; te los pedirán.",
+         ]) + "</ol>\n"),
+        ("impuestos", "Impuestos en EE. UU.",
+         p("Si eres ciudadano, residente permanente (green card) o residente fiscal en EE. UU., el IRS grava tus ingresos de cualquier país:") +
+         ul("<strong>Rentas del alquiler:</strong> se declaran en tu declaración federal, con sus gastos y la amortización que corresponda a una propiedad en el extranjero.",
+            "<strong>Al vender:</strong> la ganancia tributa en EE. UU.",
+            "<strong>Cuentas en Emiratos:</strong> si abres una cuenta bancaria allí y el saldo total de tus cuentas en el extranjero supera 10.000 USD, tienes que presentar el FBAR. Según tus activos, también puede aplicar el formulario 8938.",
+            "<strong>Florida</strong> no tiene impuesto estatal sobre la renta.",
+            "<strong>Sin convenio de doble imposición</strong> entre EE. UU. y Emiratos; como Emiratos no grava al particular, en la práctica tributas en EE. UU.") +
+         p("Revísalo con tu CPA o asesor fiscal <strong>antes</strong> de comprar, sobre todo si vas a comprar a través de una LLC.")),
+        ("distancia", "Comprar sin viajar",
+         p("Reserva, contrato, pagos y registro se hacen en remoto. Yo estoy en Dubái todo el año y me ocupo de la entrega, la revisión de desperfectos, el amueblado y el alquiler. Hay vuelos directos desde Miami a Dubái si quieres venir a verlo.")),
+        ("golden-visa", "Golden Visa",
+         p("Con 2 millones de AED (unos 545.000 USD) en propiedad puedes pedir la residencia de 10 años para ti y tu familia, compatible con seguir viviendo en Miami. Requisitos en la <a href=\"/blog/golden-visa-dubai-inversion-inmobiliaria/\">guía de la Golden Visa</a>.")),
+    ],
+    [
+        ("¿Hay riesgo de cambio al invertir en Dubái desde EE. UU.?", "Muy poco: el dírham está ligado al dólar a 3,6725 AED por dólar desde hace décadas."),
+        ("¿Tengo que declarar al IRS un piso en Dubái?", "Sí, si eres ciudadano o residente fiscal en EE. UU.: las rentas y la ganancia al vender. Si tienes cuentas en Emiratos, revisa también el FBAR."),
+        ("¿Puedo financiar la compra con un banco de EE. UU.?", "Normalmente no para una propiedad en el extranjero. Lo habitual es usar el plan de pagos del promotor en obra nueva."),
+    ],
+    [("invertir-en-dubai-desde-mexico", "Invertir en Dubái desde México"), ("impuestos-invertir-dubai-espanol", "Impuestos al invertir en Dubái siendo español")],
+    date=D2, date_txt=D2_TXT, wa_msg="Hola Pascual, te escribo desde Miami / EE. UU. Quiero información para invertir en Dubái.",
+)
+
+pages["espana"] = article(
+    "invertir-en-dubai-desde-espana",
+    "Invertir en Dubái desde España: guía práctica",
+    "Invertir en Dubái <em>desde España</em>",
+    "Cómo comprar un piso en Dubái siendo español: precios en euros, cómo enviar el dinero desde tu banco, financiación, qué declarar a Hacienda y cómo comprar sin viajar.",
+    "España es de donde más me escriben para invertir en Dubái. Te explico cuánto cuesta en euros, cómo mandar el dinero, si puedes financiarlo, qué declaras a Hacienda y cómo se compra a 6.000 kilómetros sin perder el control.",
+    "/assets/img/blog-espana-emiratos.webp", "Bandera de España junto a la bandera de Emiratos Árabes Unidos",
+    [
+        ("por-que", "Por qué Dubái atrae a inversores españoles",
+         ul("<strong>Rentas de alquiler</strong> con una demanda que sigue creciendo, tanto anual como vacacional.",
+            "<strong>Sin IBI ni impuesto sobre la renta</strong> en Emiratos para particulares.",
+            "<strong>Planes de pago en obra nueva:</strong> reservas con un 10–20 % y pagas el resto durante la construcción.",
+            "<strong>Diversificar fuera del euro:</strong> el dírham va ligado al dólar.",
+            "<strong>Compra segura:</strong> registro oficial en el Dubai Land Department y cuentas <em>escrow</em> en obra nueva.")),
+        ("precios", "Cuánto cuesta en euros",
+         p(FX_NOTE + " Con un euro entre 1,05 y 1,15 dólares, un dírham ronda los <strong>0,24 €</strong>.") +
+         table(["Propiedad (ejemplo)", "En dírhams", "En euros (aprox.)"], [
+             ["Estudio en zona en crecimiento", "650.000 AED", "≈ 155.000 €"],
+             ["Apartamento de 1 dormitorio", "1.000.000 AED", "≈ 240.000 €"],
+             ["Apartamento de 2 dormitorios", "1.800.000 AED", "≈ 430.000 €"],
+             ["Mínimo para la Golden Visa", "2.000.000 AED", "≈ 480.000 €"],
+         ]) +
+         p("A eso súmale los gastos de compra, que te detallo uno por uno en <a href=\"/blog/cuanto-cuesta-comprar-piso-dubai/\">cuánto cuesta comprar un piso en Dubái</a>.")),
+        ("dinero", "Cómo enviar el dinero desde España",
+         "      <ol>" + "".join(f"<li>{x}</li>" for x in [
+             "<strong>Transferencia internacional (SWIFT)</strong> desde tu banco a la cuenta <em>escrow</em> del proyecto o a la del promotor. Fíjate en la comisión y, sobre todo, en el tipo de cambio euro–dírham que te aplican.",
+             "<strong>Wise o Revolut</strong> suelen dar mejor cambio en importes medianos. Comprueba los límites por envío y que el destinatario acepta el pago.",
+             "<strong>Justifica el origen de los fondos:</strong> nómina, venta de un inmueble, ahorros… Te lo pedirán en Dubái y tu banco español también puede preguntarlo.",
+             "<strong>Guarda todos los justificantes:</strong> los necesitarás para la renta, el modelo 720 y para calcular la ganancia cuando vendas.",
+         ]) + "</ol>\n"),
+        ("financiacion", "¿Puedo financiarlo?",
+         p("Los bancos españoles no suelen financiar una vivienda en el extranjero. Las opciones reales son el <strong>plan de pagos del promotor</strong> en obra nueva o una <strong>hipoteca de un banco de Emiratos</strong>: algunos financian a no residentes, normalmente hasta el 50–60 % del valor y con más requisitos que a un residente.")),
+        ("impuestos", "Qué declaras a Hacienda",
+         p("Si sigues siendo residente fiscal en España, el piso de Dubái cuenta en tu IRPF, en el modelo 720 si superas los 50.000 € en el extranjero y, según tu caso, en Patrimonio. Lo tienes explicado paso a paso en <a href=\"/blog/impuestos-invertir-dubai-espanol/\">impuestos al invertir en Dubái siendo español</a>.")),
+        ("distancia", "Comprar sin viajar",
+         p("Todo se puede hacer desde España: elección, reserva, firma electrónica y pagos. Yo vivo en Dubái todo el año y me encargo de lo presencial: revisión de la vivienda, entrega de llaves, amueblado y alquiler. Hay vuelos directos desde Madrid y Barcelona, y la diferencia horaria es de solo 2–3 horas. Los españoles no necesitan visado previo para entrar en Emiratos como turistas.")),
+        ("golden-visa", "Golden Visa para españoles",
+         p("Con 2 millones de AED (unos 480.000 €) en propiedad puedes pedir la residencia de 10 años para ti y tu familia, sin obligación de vivir allí. Requisitos y pasos en la <a href=\"/blog/golden-visa-dubai-inversion-inmobiliaria/\">guía de la Golden Visa</a>.")),
+    ],
+    [
+        ("¿Un español puede comprar un piso en Dubái?", "Sí. Los extranjeros pueden comprar en plena propiedad (freehold) en las zonas habilitadas, sin residir en Emiratos ni tener visado."),
+        ("¿Cuánto dinero necesito para empezar?", "En obra nueva puedes empezar con la entrada del 10–20 % del precio. Un estudio en zona en crecimiento ronda los 155.000 €, así que la entrada parte de unos 15.000–30.000 € más gastos."),
+        ("¿Un banco español me da hipoteca para Dubái?", "Normalmente no. Lo habitual es el plan de pagos del promotor o una hipoteca de un banco de Emiratos, que financia a no residentes hasta el 50–60 %."),
+    ],
+    [("impuestos-invertir-dubai-espanol", "Impuestos al invertir en Dubái siendo español"), ("invertir-en-dubai-desde-mexico", "Invertir en Dubái desde México")],
+    date=D2, date_txt=D2_TXT, wa_msg="Hola Pascual, te escribo desde España. Quiero información para invertir en Dubái.",
+)
+
 # ---------------------------------------------------------------- índice
+ARTICLES.sort(key=lambda a: a["date"], reverse=True)
 cards = "".join(
-    f'<a class="post-card" href="/blog/{a["slug"]}/"><span class="post-img"><img src="{a["image"]}" alt="{H.escape(a["alt"])}" loading="lazy" /></span>'
-    f'<span class="post-body"><small>Guía · {DATE_TXT}</small><b>{H.escape(a["title"])}</b><span>{H.escape(a["desc"])}</span><i>Leer artículo →</i></span></a>'
+    f'<a class="post-card" href="/blog/{a["slug"]}/"><span class="post-img"><img src="{a["image"]}" alt="{H.escape(a["alt"])}" {dims(a["image"])} loading="lazy" /></span>'
+    f'<span class="post-body"><small>Guía · {a["date_txt"]}</small><b>{H.escape(a["title"])}</b><span>{H.escape(a["desc"])}</span><i>Leer artículo →</i></span></a>'
     for a in ARTICLES)
 idx_body = f"""    <section class="blog-index container">
       <nav class="crumbs" aria-label="Migas de pan"><a href="/">Inicio</a><span>/</span><span>Blog</span></nav>
@@ -299,8 +590,10 @@ idx_body = f"""    <section class="blog-index container">
       <p class="article-lead">Costes reales, impuestos, Golden Visa, zonas y alquiler. Lo que te contaría en una consultoría, por escrito y en español.</p>
       <div class="post-grid">{cards}</div>
     </section>"""
-idx_ld = {"@context": "https://schema.org", "@type": "Blog", "name": "Blog · Tu inversión en Dubái", "url": SITE + "/blog/", "inLanguage": "es",
-          "blogPost": [{"@type": "BlogPosting", "headline": a["title"], "url": f'{SITE}/blog/{a["slug"]}/'} for a in ARTICLES]}
+idx_ld = {"@context": "https://schema.org", "@type": "Blog", "@id": SITE + "/blog/#blog", "name": "Blog · Tu inversión en Dubái", "url": SITE + "/blog/", "inLanguage": "es",
+          "author": {"@id": PERSON_ID}, "publisher": PUBLISHER, "isPartOf": {"@id": WEB_ID},
+          "blogPost": [{"@type": "BlogPosting", "@id": f'{SITE}/blog/{a["slug"]}/#articulo', "headline": a["title"], "url": f'{SITE}/blog/{a["slug"]}/',
+                        "datePublished": a["date"], "image": SITE + og_jpg(a["image"]), "author": {"@id": PERSON_ID}} for a in ARTICLES]}
 pages["_index"] = ("/blog/", page("/blog/", "Blog sobre invertir en Dubái · Pascual Vidal",
                                   "Guías en español sobre invertir en Dubái: cuánto cuesta comprar, impuestos para españoles, Golden Visa, zonas y alquiler.",
                                   idx_body, idx_ld, og_type="website"))
@@ -331,7 +624,7 @@ def legal_page(slug, title, intro, sections):
     path = f"/{slug}/"
     ld = {"@context": "https://schema.org", "@type": "WebPage", "name": title, "url": SITE + path, "inLanguage": "es"}
     doc = page(path, title + " · Tu inversión en Dubái", re.sub("<[^>]+>", "", intro), body, ld, og_type="website")
-    return path, doc.replace('<meta name="theme-color"', '<meta name="robots" content="noindex, follow" />\n  <meta name="theme-color"', 1)
+    return path, doc.replace('<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />', '<meta name="robots" content="noindex, follow" />', 1)
 
 
 pages["_aviso"] = legal_page("aviso-legal", "Aviso legal",
@@ -425,7 +718,113 @@ lp_ld = {"@context": "https://schema.org", "@type": "WebPage", "name": "Consulto
 lp_doc = page("/consultoria/", "Consultoría gratuita para invertir en Dubái · Pascual Vidal",
               "Reserva una llamada gratuita de 20 minutos con un consultor inmobiliario español en Dubái. Te acompaño antes, durante y después de la compra.",
               lp_body, lp_ld, og_type="website", body_attrs=" data-no-guide-popup")
-pages["_consultoria"] = ("/consultoria/", lp_doc.replace('<meta name="theme-color"', '<meta name="robots" content="noindex, follow" />\n  <meta name="theme-color"', 1))
+pages["_consultoria"] = ("/consultoria/", lp_doc.replace('<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />', '<meta name="robots" content="noindex, follow" />', 1))
+
+
+# ---------------------------------------------------------------- página de autor (E-E-A-T: quién está detrás de los contenidos)
+ABOUT_FACTS = [
+    ("Quién soy", p(
+        "Soy <strong>Pascual Vidal</strong>, consultor inmobiliario español afincado en Dubái. Llevo tres años en el mercado inmobiliario de Emiratos y vivo aquí los 12 meses del año.",
+        "Estoy registrado como agente en <strong>RERA</strong> (Real Estate Regulatory Agency, el regulador del Dubai Land Department) con el número <strong>97799</strong>. He gestionado más de <strong>90 operaciones</strong> en Dubái.")),
+    ("A quién ayudo", p(
+        "A inversores hispanohablantes —de España, México, Colombia, Argentina, Chile, Perú y Estados Unidos— que quieren comprar una propiedad en Dubái, Abu Dabi o Ras Al Khaimah, sobre todo de obra nueva, y que no quieren quedarse solos una vez firmada la compra.")),
+    ("Cómo trabajo", ul(
+        "<strong>Consultor, no comercial:</strong> antes de recomendarte una propiedad analizamos tu objetivo y tu presupuesto y hacemos los números reales.",
+        "<strong>Compra en remoto:</strong> reserva, contratos, pagos y registro en el Dubai Land Department sin que tengas que viajar.",
+        "<strong>Después de comprar:</strong> entrega de llaves, amueblado a medida, alquiler vacacional o anual, mantenimiento, reventa y Golden Visa.")),
+    ("Dónde puedes verme", p(
+        'Explico el mercado de Dubái en mi canal de <a href="https://www.youtube.com/@pascual.dubairealestate" rel="me noopener" target="_blank">YouTube</a> y en <a href="https://www.instagram.com/pascual.dubairealestate/" rel="me noopener" target="_blank">Instagram</a>, y por escrito en el <a href="/blog/">blog</a>.')),
+]
+about_secs = "".join(f'\n      <h2 id="a{i}">{H.escape(t)}</h2>\n{c}' for i, (t, c) in enumerate(ABOUT_FACTS, 1))
+about_posts = "".join(f'<li><a href="/blog/{a["slug"]}/">{H.escape(a["title"])}</a></li>' for a in ARTICLES)
+about_body = f"""    <article class="article">
+      <header class="article-head container">
+        <nav class="crumbs" aria-label="Migas de pan"><a href="/">Inicio</a><span>/</span><span>Pascual Vidal</span></nav>
+        <p class="eyebrow"><span class="dot"></span>Consultor inmobiliario en Dubái · RERA #97799</p>
+        <h1>Pascual Vidal, <em>consultor inmobiliario</em> español en Dubái</h1>
+        <p class="article-lead">Ayudo a hispanohablantes a invertir en propiedades en Dubái y Emiratos, y sigo a su lado después de la compra.</p>
+      </header>
+      <figure class="article-cover container"><img src="/assets/img/pascual-dubai.webp" alt="Pascual Vidal en Dubái" {dims("/assets/img/pascual-dubai.webp")} loading="eager" fetchpriority="high" style="aspect-ratio:16/9;object-position:center 30%" /></figure>
+      <div class="article-layout container">
+        <aside class="toc"><b>En esta página</b><ol>{"".join(f'<li><a href="#a{i}">{H.escape(t)}</a></li>' for i, (t, _) in enumerate(ABOUT_FACTS, 1))}</ol></aside>
+        <div class="prose">{about_secs}
+      <h2 id="articulos">Mis guías</h2>
+      <ul>{about_posts}</ul>
+      <div class="article-cta">
+        <div>
+          <p class="eyebrow"><span class="dot"></span>Consultoría gratuita</p>
+          <h3>¿Hablamos de tu inversión?</h3>
+          <p>En 20 minutos vemos tu presupuesto, tu objetivo y qué zonas encajan contigo. Sin compromiso.</p>
+        </div>
+        <div class="article-cta-actions">
+          <a class="btn btn-wa" data-wa data-wa-msg="Hola Pascual, he leído quién eres en tu web y quiero hablar de mi inversión en Dubái." href="{WA_LINK}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg><span>Escríbeme por WhatsApp</span></a>
+          <a class="btn btn-dark" href="/#contacto">Reservar llamada</a>
+        </div>
+      </div>
+        </div>
+      </div>
+    </article>"""
+about_ld = {"@context": "https://schema.org", "@type": "ProfilePage", "@id": SITE + "/sobre-pascual-vidal/", "url": SITE + "/sobre-pascual-vidal/",
+            "name": "Pascual Vidal, consultor inmobiliario español en Dubái", "inLanguage": "es", "isPartOf": {"@id": WEB_ID}, "dateModified": TODAY,
+            "mainEntity": dict(AUTHOR, **{
+                "description": "Consultor inmobiliario español en Dubái, registrado en RERA con el n.º 97799. Asesora a inversores hispanohablantes en la compra, alquiler y reventa de propiedades en Emiratos.",
+                "nationality": {"@type": "Country", "name": "España"}, "knowsLanguage": ["es", "en"], "homeLocation": {"@type": "City", "name": "Dubái"},
+                "worksFor": {"@id": ORG_ID},
+                "hasCredential": {"@type": "EducationalOccupationalCredential", "credentialCategory": "Licencia profesional",
+                                  "name": "Agente inmobiliario registrado en RERA n.º 97799",
+                                  "recognizedBy": {"@type": "GovernmentOrganization", "name": "Dubai Land Department (RERA)", "url": "https://dubailand.gov.ae/"}},
+                "knowsAbout": ["Inversión inmobiliaria en Dubái", "Obra nueva sobre plano", "Golden Visa de Emiratos", "Alquiler vacacional en Dubái",
+                               "Fiscalidad de inversores españoles y latinoamericanos en Dubái"]})}
+pages["_autor"] = ("/sobre-pascual-vidal/", page("/sobre-pascual-vidal/", "Pascual Vidal, consultor inmobiliario español en Dubái (RERA #97799)",
+    "Quién es Pascual Vidal: consultor inmobiliario español en Dubái registrado en RERA (n.º 97799), con más de 90 operaciones. Inversión, postventa, alquiler y Golden Visa.",
+    about_body, about_ld, og_type="profile"))
+
+# ---------------------------------------------------------------- 404
+nf_body = """    <section class="notfound container">
+      <p class="eyebrow"><span class="dot"></span>Error 404</p>
+      <h1>Esta página <em>no existe</em></h1>
+      <p class="article-lead">Puede que el enlace esté mal o que la hayamos movido. Esto es lo más leído:</p>
+      <div class="post-links">""" + "".join(f'<a class="btn btn-dark btn-sm" href="/blog/{a["slug"]}/">{H.escape(a["title"])}</a>' for a in ARTICLES[:4]) + """</div>
+      <p><a class="btn btn-primary" href="/">Volver al inicio</a></p>
+    </section>"""
+nf = page("/404/", "Página no encontrada · Tu inversión en Dubái", "La página que buscas no existe.", nf_body,
+          {"@context": "https://schema.org", "@type": "WebPage", "name": "Página no encontrada"}, og_type="website")
+nf = nf.replace('<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />', '<meta name="robots" content="noindex, follow" />')
+nf = re.sub(r'\s*<link rel="(canonical|alternate)"[^>]*>', "", nf)
+open(ROOT + "/404.html", "w").write(nf)
+
+# ---------------------------------------------------------------- llms.txt (resumen para buscadores con IA: ChatGPT, Perplexity, Gemini, Claude…)
+def _txt(x):
+    return H.unescape(re.sub("<[^>]+>", "", x))
+
+llms = ["# Tu inversión en Dubái · Pascual Vidal", "",
+        "> Consultoría de inversión inmobiliaria en Dubái para hispanohablantes, dirigida por Pascual Vidal, consultor español registrado en RERA "
+        "(Dubai Land Department) con el n.º 97799, que vive en Dubái y ha gestionado más de 90 operaciones. Ayuda a comprar propiedades —sobre todo de "
+        "obra nueva— en Dubái, Abu Dabi y Ras Al Khaimah, y se ocupa de la postventa: entrega, amueblado, alquiler vacacional y anual, reventa y Golden Visa.", "",
+        "Datos clave:",
+        "- Idiomas: español e inglés. Clientes de España, México, Colombia, Argentina, Chile, Perú y Estados Unidos.",
+        "- La compra se puede hacer entera en remoto; primera consultoría gratuita de 20 minutos.",
+        "- Contacto: WhatsApp " + WA_LINK + " · formulario en " + SITE + "/#contacto",
+        "- YouTube: https://www.youtube.com/@pascual.dubairealestate · Instagram: https://www.instagram.com/pascual.dubairealestate/", "",
+        "## Páginas principales", "",
+        f"- [Inicio]({SITE}/): servicios, proyectos destacados y preguntas frecuentes sobre invertir en Dubái.",
+        f"- [Quién es Pascual Vidal]({SITE}/sobre-pascual-vidal/): trayectoria, licencia RERA y forma de trabajar.",
+        f"- [Consultoría gratuita]({SITE}/consultoria/): reserva de llamada.", "",
+        "## Guías (blog)", ""]
+for a in ARTICLES:
+    llms.append(f"- [{a['title']}]({SITE}/blog/{a['slug']}/): {a['desc']}")
+llms += ["", "## Preguntas frecuentes", ""]
+for q, a in home_faq.items():
+    llms.append(f"- **{_txt(q)}** {_txt(a)}")
+llms += ["", "## Resúmenes de las guías", ""]
+for a in ARTICLES:
+    if a["summary"]:
+        llms.append(f"### {a['title']}")
+        llms.append(f"Fuente: {SITE}/blog/{a['slug']}/ (actualizado {a['date']})")
+        llms += [f"- {_txt(x)}" for x in a["summary"]]
+        llms.append("")
+llms.append("Información orientativa, no asesoramiento fiscal ni legal. Cifras y normas sujetas a cambios.")
+open(ROOT + "/llms.txt", "w").write("\n".join(llms) + "\n")
 
 import os
 for key, (path, doc) in pages.items():
@@ -434,7 +833,9 @@ for key, (path, doc) in pages.items():
     open(d + "index.html", "w").write(doc)
     print("ok", path)
 
-urls = ["/"] + [p for k, (p, _) in pages.items() if k in ("_index",) or not k.startswith("_")]
+LASTMOD = {"/": TODAY, "/blog/": max(a["date"] for a in ARTICLES), "/sobre-pascual-vidal/": TODAY}
+LASTMOD.update({f'/blog/{a["slug"]}/': a["date"] for a in ARTICLES})
+urls = ["/", "/sobre-pascual-vidal/", "/blog/"] + [f'/blog/{a["slug"]}/' for a in ARTICLES]
 sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
-    f"  <url><loc>{SITE}{u}</loc><lastmod>{DATE}</lastmod></url>\n" for u in urls) + "</urlset>\n"
+    f"  <url><loc>{SITE}{u}</loc><lastmod>{LASTMOD[u]}</lastmod></url>\n" for u in urls) + "</urlset>\n"
 open(ROOT + "/sitemap.xml", "w").write(sm)

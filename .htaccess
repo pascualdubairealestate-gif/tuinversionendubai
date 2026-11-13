@@ -80,12 +80,38 @@
   AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json image/svg+xml font/woff font/woff2
 </IfModule>
 
-# ----- HTTPS redirect (uncomment if your domain has SSL) -----
-# <IfModule mod_rewrite.c>
-#   RewriteEngine On
-#   RewriteCond %{HTTPS} !=on
-#   RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
-# </IfModule>
+# ----- Dominio único: todo (con tilde, www, http) va a https://tuinversionendubai.com -----
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_HOST} !^tuinversionendubai\.com$ [NC]
+  RewriteCond %{HTTP_HOST} (^|\.)(tuinversionendubai\.com|xn--tuinversinendubai-oyb\.com)$ [NC]
+  RewriteRule ^(.*)$ https://tuinversionendubai.com/$1 [R=301,L]
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteCond %{HTTP_HOST} ^tuinversionendubai\.com$ [NC]
+  RewriteRule ^(.*)$ https://tuinversionendubai.com/$1 [R=301,L]
+</IfModule>
+
+# ----- SEO: una sola URL por página -----
+ErrorDocument 404 /404.html
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # /index.html y /carpeta/index.html -> URL limpia (evita contenido duplicado)
+  RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]
+  RewriteRule ^(.*/)?index\.html$ /$1 [R=301,L]
+  # /blog -> /blog/ (barra final, como en el sitemap y las canónicas)
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^(.+[^/])$ /$1/ [R=301,L]
+</IfModule>
+
+# llms.txt y robots.txt en texto plano UTF-8 (tildes correctas)
+<FilesMatch "^(llms\.txt|robots\.txt)$">
+  ForceType "text/plain; charset=utf-8"
+</FilesMatch>
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+  AddCharset utf-8 .html .txt .xml .webmanifest
+</IfModule>
 
 # ----- Pretty URLs: serve "/about" as "/about.html" (uncomment if multi-page) -----
 # <IfModule mod_rewrite.c>
