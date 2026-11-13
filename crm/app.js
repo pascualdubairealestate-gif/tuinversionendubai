@@ -287,7 +287,7 @@
   function filtered() {
     var q = S.q.toLowerCase().trim();
     return S.leads.filter(function (l) {
-      if (S.origen && l.origen !== S.origen) return false;
+      if (S.origen === "-" ? String(l.origen || "").trim() : S.origen && l.origen !== S.origen) return false;
       if (S.etapa && l.etapa !== S.etapa) return false;
       if (S.hoy && !overdue(l)) return false;
       if (!q) return true;
@@ -318,7 +318,7 @@
       (withStage ? '<select id="f-etapa" aria-label="Etapa"><option value="">Todas las etapas</option>' + Object.keys(S.stages).map(function (k) {
         return '<option value="' + k + '"' + (k === S.etapa ? " selected" : "") + ">" + esc(S.stages[k]) + "</option>";
       }).join("") + "</select>" : "") +
-      '<label class="sort-by tag-by"><span>Origen:</span><select id="f-origen"><option value="">Todos</option>' + origins.map(function (o) {
+      '<label class="sort-by tag-by"><span>Origen:</span><select id="f-origen"><option value="">Todos</option><option value="-"' + (S.origen === "-" ? " selected" : "") + '>Sin origen (' + S.leads.filter(function (l) { return !String(l.origen || "").trim(); }).length + ')</option>' + origins.map(function (o) {
         return "<option" + (o === S.origen ? " selected" : "") + ">" + esc(o) + "</option>";
       }).join("") + "</select></label>" +
       '<button type="button" class="btn ghost sm" data-act="copy-emails">Copiar emails</button>' +
@@ -659,7 +659,7 @@
     $(".drawer-panel").innerHTML = '<form id="pick-form"><header class="d-head"><h2 id="d-title">Elegir destinatarios</h2><button type="button" class="btn icon" data-close aria-label="Cerrar">✕</button></header>' +
       '<div class="toolbar"><input class="search" id="pick-q" type="search" placeholder="Buscar…" /><select id="pick-etapa" aria-label="Etapa"><option value="">Todas las etapas</option>' +
       Object.keys(S.stages).map(function (k) { return '<option value="' + k + '">' + esc(S.stages[k]) + "</option>"; }).join("") + "</select>" +
-      '<select id="pick-origen" aria-label="Origen"><option value="">Todos los orígenes</option>' + origins.map(function (o) { return "<option>" + esc(o) + "</option>"; }).join("") + "</select></div>" +
+      '<select id="pick-origen" aria-label="Origen"><option value="">Todos los orígenes</option><option value="-">Sin origen</option>' + origins.map(function (o) { return "<option>" + esc(o) + "</option>"; }).join("") + "</select></div>" +
       '<label class="chk"><input type="checkbox" id="pick-all" /> Marcar todos los visibles</label>' +
       '<ul class="pick-list">' + people.map(function (l) {
         return '<li data-etapa="' + esc(l.etapa) + '" data-origen="' + esc(l.origen || "") + '" data-q="' + esc((l.nombre + " " + l.email + " " + l.etiquetas + " " + l.origen).toLowerCase()) + '"><label class="chk"><input type="checkbox" value="' + esc(l.email) + '"' + (S.mail.lista.indexOf(l.email) > -1 ? " checked" : "") + " /> <span><b>" + esc(up(l.nombre) || l.email) + "</b><small>" + esc(l.email) + " · " + esc(S.stages[l.etapa] || "") + (l.origen ? " · " + esc(l.origen) : "") + "</small></span></label></li>";
@@ -670,7 +670,7 @@
   function filterPicker() {
     var q = ($("#pick-q").value || "").toLowerCase().trim(), et = $("#pick-etapa").value, og = $("#pick-origen").value;
     $$(".pick-list li").forEach(function (li) {
-      li.hidden = (q && li.getAttribute("data-q").indexOf(q) < 0) || (et && li.getAttribute("data-etapa") !== et) || (og && li.getAttribute("data-origen") !== og);
+      li.hidden = (q && li.getAttribute("data-q").indexOf(q) < 0) || (et && li.getAttribute("data-etapa") !== et) || (og === "-" ? !!li.getAttribute("data-origen").trim() : og && li.getAttribute("data-origen") !== og);
     });
   }
 
@@ -1108,7 +1108,7 @@
       '<div class="grid">' +
       field("nombre", "Nombre", l.nombre) + field("email", "Email", l.email, "email") +
       field("telefono", "Teléfono / WhatsApp", l.telefono, "tel") + field("pais", "País", l.pais) +
-      select("origen", "Origen", l.origen || "Manual", ORIGENES) + select("presupuesto", "Presupuesto", l.presupuesto || "Por definir", PRESUPUESTOS) +
+      (l.id && !String(l.origen || "").trim() ? '<label class="f"><span>Origen</span><select name="origen"><option value="" selected>Sin origen: elige uno</option>' + ORIGENES.map(function (o) { return "<option>" + esc(o) + "</option>"; }).join("") + "</select></label>" : select("origen", "Origen", l.origen || "Manual", ORIGENES)) + select("presupuesto", "Presupuesto", l.presupuesto || "Por definir", PRESUPUESTOS) +
       field("objetivo", "Objetivo", l.objetivo, "text", true) + field("proyecto", "Proyecto de interés", l.proyecto) +
       field("valor", "Valor operación (€)", l.valor, "text") + field("etiquetas", "Etiquetas (separadas por comas)", l.etiquetas, "text", true) +
       field("proxima_accion", "Próxima acción", l.proxima_accion) + field("seguimiento", "Fecha de seguimiento", l.seguimiento, "date") +
