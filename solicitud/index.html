@@ -6,7 +6,7 @@
   <title>Solicitar información · Pascual Vidal · Tu inversión en Dubái</title>
   <meta name="description" content="Cuéntame tu caso en 30 segundos y te asesoro sobre tu inversión inmobiliaria en Dubái." />
   <meta name="robots" content="noindex" />
-  <meta name="theme-color" content="#070d18" />
+  <meta name="theme-color" content="#ffffff" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23070d18'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='28' fill='%23d9c7a7' text-anchor='middle'%3EPV%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -46,6 +46,18 @@
     .ticks li::before { content: "✓"; color: var(--amber); font-weight: 800; margin-right: 10px; }
     .cue { position: absolute; left: 50%; bottom: max(28px, env(safe-area-inset-bottom)); transform: translateX(-50%); display: grid; justify-items: center; gap: 8px; color: var(--mute); font-size: 13px; font-weight: 600; text-decoration: none; }
     .cue i { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid rgba(247, 147, 30, .6); color: var(--amber); font-style: normal; font-size: 18px; animation: bob 1.8s var(--ease) infinite; }
+    /* Introducción con el fondo claro de la portada de la web */
+    .hero-bg { position: relative; overflow: hidden; color: #0b1424; background: #ffffff; }
+    .hero-bg::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(560px circle at 75% 35%, rgba(217, 182, 120, .55), transparent 62%), radial-gradient(420px circle at 88% 8%, rgba(217, 199, 167, .35), transparent 70%), radial-gradient(520px circle at 10% 95%, rgba(217, 199, 167, .3), transparent 70%); }
+    .hero-bg .hero { z-index: 1; }
+    .hero-bg .lead { color: #4a5262; }
+    .hero-bg .ticks { color: #1b2c4b; }
+    .hero-bg .cue { color: #4a5262; }
+    .top .brand { color: #0b1424; }
+    .top .brand-mark { border-color: #1b2c4b; }
+    .sent .top .brand { color: var(--ivory); }
+    .sent .top .brand-mark { border-color: var(--sand); }
     @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
 
     /* Formulario */
@@ -121,6 +133,7 @@
   </header>
 
   <main id="main">
+    <div class="hero-bg">
     <section class="hero wrap">
       <p class="eyebrow rv">Asesoría gratuita</p>
       <h1 class="rv">Invierte en Dubái <em>con criterio</em></h1>
@@ -132,6 +145,7 @@
       </ul>
       <a class="cue" href="#form" aria-label="Ir al formulario"><span>Desliza</span><i aria-hidden="true">↓</i></a>
     </section>
+    </div>
 
     <section class="form wrap" id="form">
       <h2 class="rv">Solicita <em>información</em></h2>
@@ -369,7 +383,7 @@
         .then(function (r) { if (!r.ok) throw new Error(r.status); })
         .then(function () {
           $("#gracias").textContent = "¡Gracias, " + nombre.split(" ")[0] + "!";
-          $("#main").hidden = true; $("#thanks").hidden = false;
+          document.body.classList.add("sent"); $("#main").hidden = true; $("#thanks").hidden = false;
           window.scrollTo(0, 0); $("#gracias").focus();
           setTimeout(function () { location.href = REDIRECT; }, 4500);
         })
