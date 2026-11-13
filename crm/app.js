@@ -20,7 +20,7 @@
     nurturing: "Aún no: seguir en contacto",
     discarded: "Descartado: no sigue adelante"
   };
-  var ORIGENES = ["Web · Guía", "Web · Boletín", "Web · Consultoría", "Web · Dossier", "Instagram", "WhatsApp", "YouTube", "Meta", "Referido", "Evento", "Llamada", "Manual", "Otro"];
+  var ORIGENES = ["Web · Guía", "Web · Boletín", "Web · Consultoría", "Web · Dossier", "Instagram", "YouTube", "Meta", "Referido", "Directo", "Otro"];
   var PRESUPUESTOS = ["Por definir", "Menos de 250.000 €", "250.000 – 500.000 €", "500.000 – 1.000.000 €", "Más de 1.000.000 €"];
   var OBJETIVOS = ["Rentabilidad por alquiler", "Revalorización / reventa", "Golden Visa / residencia", "Segunda vivienda", "Crear empresa en Dubái"];
   // Colores de los eventos de Google según palabras del título (se cambian en Ajustes).
@@ -1076,7 +1076,7 @@
   function openLead(id) {
     var l = id ? leadById(id) : null;
     if (id && !l) return;
-    l = l || { id: "", etapa: "lead", actividad: [], origen: "Manual" };
+    l = l || { id: "", etapa: "lead", actividad: [], origen: "Directo" };
     if (S.gcalOffer && S.gcalOffer !== l.id) S.gcalOffer = "";
     S.open = l.id || "__new";
     S.dirty = false;
@@ -1109,7 +1109,7 @@
       '<div class="grid">' +
       field("nombre", "Nombre", l.nombre) + field("email", "Email", l.email, "email") +
       field("telefono", "Teléfono / WhatsApp", l.telefono, "tel") + field("pais", "País", l.pais) +
-      (l.id && !String(l.origen || "").trim() ? '<label class="f"><span>Origen</span><select name="origen"><option value="" selected>Sin origen: elige uno</option>' + ORIGENES.map(function (o) { return "<option>" + esc(o) + "</option>"; }).join("") + "</select></label>" : select("origen", "Origen", l.origen || "Manual", ORIGENES)) + select("presupuesto", "Presupuesto", l.presupuesto || "Por definir", PRESUPUESTOS) +
+      (l.id && !String(l.origen || "").trim() ? '<label class="f"><span>Origen</span><select name="origen"><option value="" selected>Sin origen: elige uno</option>' + ORIGENES.map(function (o) { return "<option>" + esc(o) + "</option>"; }).join("") + "</select></label>" : select("origen", "Origen", l.origen || "Directo", ORIGENES)) + select("presupuesto", "Presupuesto", l.presupuesto || "Por definir", PRESUPUESTOS) +
       field("objetivo", "Objetivo", l.objetivo, "text", true) + field("proyecto", "Proyecto de interés", l.proyecto) +
       field("valor", "Valor operación (€)", l.valor, "text") + field("etiquetas", "Etiquetas (separadas por comas)", l.etiquetas, "text", true) +
       field("proxima_accion", "Próxima acción", l.proxima_accion) + field("seguimiento", "Fecha de seguimiento", l.seguimiento, "date") +
