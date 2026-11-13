@@ -340,7 +340,7 @@ pages["mexico"] = article(
         ("¿Tengo que declarar al SAT un piso en Dubái?", "Si eres residente fiscal en México, sí debes declarar las rentas y, al vender, la ganancia. Consulta con tu contador cómo hacerlo en tu caso."),
         ("¿Cuál es la forma más barata de mandar dinero de México a Dubái?", "Depende del importe. Compara la comisión y, sobre todo, el tipo de cambio de tu banco con plataformas como Wise o Revolut; enviar en dólares suele simplificarlo."),
     ],
-    [("invertir-en-dubai-desde-colombia", "Invertir en Dubái desde Colombia"), ("cuanto-cuesta-comprar-piso-dubai", "Cuánto cuesta comprar un piso en Dubái")],
+    [("invertir-en-dubai-desde-colombia", "Invertir en Dubái desde Colombia"), ("invertir-en-dubai-desde-espana", "Invertir en Dubái desde España")],
     date=D2, date_txt=D2_TXT, wa_msg="Hola Pascual, te escribo desde México. Quiero información para invertir en Dubái.",
 )
 
@@ -441,6 +441,54 @@ pages["miami"] = article(
     ],
     [("invertir-en-dubai-desde-mexico", "Invertir en Dubái desde México"), ("impuestos-invertir-dubai-espanol", "Impuestos al invertir en Dubái siendo español")],
     date=D2, date_txt=D2_TXT, wa_msg="Hola Pascual, te escribo desde Miami / EE. UU. Quiero información para invertir en Dubái.",
+)
+
+pages["espana"] = article(
+    "invertir-en-dubai-desde-espana",
+    "Invertir en Dubái desde España: guía práctica",
+    "Invertir en Dubái <em>desde España</em>",
+    "Cómo comprar un piso en Dubái siendo español: precios en euros, cómo enviar el dinero desde tu banco, financiación, qué declarar a Hacienda y cómo comprar sin viajar.",
+    "España es de donde más me escriben para invertir en Dubái. Te explico cuánto cuesta en euros, cómo mandar el dinero, si puedes financiarlo, qué declaras a Hacienda y cómo se compra a 6.000 kilómetros sin perder el control.",
+    "/assets/img/blog-espana-emiratos.webp", "Bandera de España junto a la bandera de Emiratos Árabes Unidos",
+    [
+        ("por-que", "Por qué Dubái atrae a inversores españoles",
+         ul("<strong>Rentas de alquiler</strong> con una demanda que sigue creciendo, tanto anual como vacacional.",
+            "<strong>Sin IBI ni impuesto sobre la renta</strong> en Emiratos para particulares.",
+            "<strong>Planes de pago en obra nueva:</strong> reservas con un 10–20 % y pagas el resto durante la construcción.",
+            "<strong>Diversificar fuera del euro:</strong> el dírham va ligado al dólar.",
+            "<strong>Compra segura:</strong> registro oficial en el Dubai Land Department y cuentas <em>escrow</em> en obra nueva.")),
+        ("precios", "Cuánto cuesta en euros",
+         p(FX_NOTE + " Con un euro entre 1,05 y 1,15 dólares, un dírham ronda los <strong>0,24 €</strong>.") +
+         table(["Propiedad (ejemplo)", "En dírhams", "En euros (aprox.)"], [
+             ["Estudio en zona en crecimiento", "650.000 AED", "≈ 155.000 €"],
+             ["Apartamento de 1 dormitorio", "1.000.000 AED", "≈ 240.000 €"],
+             ["Apartamento de 2 dormitorios", "1.800.000 AED", "≈ 430.000 €"],
+             ["Mínimo para la Golden Visa", "2.000.000 AED", "≈ 480.000 €"],
+         ]) +
+         p("A eso súmale los gastos de compra, que te detallo uno por uno en <a href=\"/blog/cuanto-cuesta-comprar-piso-dubai/\">cuánto cuesta comprar un piso en Dubái</a>.")),
+        ("dinero", "Cómo enviar el dinero desde España",
+         "      <ol>" + "".join(f"<li>{x}</li>" for x in [
+             "<strong>Transferencia internacional (SWIFT)</strong> desde tu banco a la cuenta <em>escrow</em> del proyecto o a la del promotor. Fíjate en la comisión y, sobre todo, en el tipo de cambio euro–dírham que te aplican.",
+             "<strong>Wise o Revolut</strong> suelen dar mejor cambio en importes medianos. Comprueba los límites por envío y que el destinatario acepta el pago.",
+             "<strong>Justifica el origen de los fondos:</strong> nómina, venta de un inmueble, ahorros… Te lo pedirán en Dubái y tu banco español también puede preguntarlo.",
+             "<strong>Guarda todos los justificantes:</strong> los necesitarás para la renta, el modelo 720 y para calcular la ganancia cuando vendas.",
+         ]) + "</ol>\n"),
+        ("financiacion", "¿Puedo financiarlo?",
+         p("Los bancos españoles no suelen financiar una vivienda en el extranjero. Las opciones reales son el <strong>plan de pagos del promotor</strong> en obra nueva o una <strong>hipoteca de un banco de Emiratos</strong>: algunos financian a no residentes, normalmente hasta el 50–60 % del valor y con más requisitos que a un residente.")),
+        ("impuestos", "Qué declaras a Hacienda",
+         p("Si sigues siendo residente fiscal en España, el piso de Dubái cuenta en tu IRPF, en el modelo 720 si superas los 50.000 € en el extranjero y, según tu caso, en Patrimonio. Lo tienes explicado paso a paso en <a href=\"/blog/impuestos-invertir-dubai-espanol/\">impuestos al invertir en Dubái siendo español</a>.")),
+        ("distancia", "Comprar sin viajar",
+         p("Todo se puede hacer desde España: elección, reserva, firma electrónica y pagos. Yo vivo en Dubái todo el año y me encargo de lo presencial: revisión de la vivienda, entrega de llaves, amueblado y alquiler. Hay vuelos directos desde Madrid y Barcelona, y la diferencia horaria es de solo 2–3 horas. Los españoles no necesitan visado previo para entrar en Emiratos como turistas.")),
+        ("golden-visa", "Golden Visa para españoles",
+         p("Con 2 millones de AED (unos 480.000 €) en propiedad puedes pedir la residencia de 10 años para ti y tu familia, sin obligación de vivir allí. Requisitos y pasos en la <a href=\"/blog/golden-visa-dubai-inversion-inmobiliaria/\">guía de la Golden Visa</a>.")),
+    ],
+    [
+        ("¿Un español puede comprar un piso en Dubái?", "Sí. Los extranjeros pueden comprar en plena propiedad (freehold) en las zonas habilitadas, sin residir en Emiratos ni tener visado."),
+        ("¿Cuánto dinero necesito para empezar?", "En obra nueva puedes empezar con la entrada del 10–20 % del precio. Un estudio en zona en crecimiento ronda los 155.000 €, así que la entrada parte de unos 15.000–30.000 € más gastos."),
+        ("¿Un banco español me da hipoteca para Dubái?", "Normalmente no. Lo habitual es el plan de pagos del promotor o una hipoteca de un banco de Emiratos, que financia a no residentes hasta el 50–60 %."),
+    ],
+    [("impuestos-invertir-dubai-espanol", "Impuestos al invertir en Dubái siendo español"), ("invertir-en-dubai-desde-mexico", "Invertir en Dubái desde México")],
+    date=D2, date_txt=D2_TXT, wa_msg="Hola Pascual, te escribo desde España. Quiero información para invertir en Dubái.",
 )
 
 # ---------------------------------------------------------------- índice
