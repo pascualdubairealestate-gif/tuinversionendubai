@@ -1269,6 +1269,7 @@
     "1. Lee su perfil público: cargo, empresa, trayectoria, publicaciones recientes e intereses.",
     "2. Escribe un resumen breve (3 a 5 líneas) de a qué se dedica y qué le puede interesar.",
     "3. Apunta su teléfono y su email solo si aparecen públicamente en su perfil o en su información de contacto. Si no aparecen, déjalos vacíos: no los inventes ni los deduzcas.",
+    "   Da prioridad a los perfiles que tengan teléfono o email públicos, pero no descartes al resto: también se les puede escribir por LinkedIn.",
     "4. Escribe un mensaje personalizado en español, de 3 a 5 frases, cercano y natural, para abrir una conversación genuina a partir de algo concreto de su perfil. No vendas nada ni hables de inversiones o propiedades de primeras. Termina con una pregunta abierta y firma como Pascual.",
     "",
     "No envíes mensajes ni solicitudes de conexión: solo investiga.",
@@ -1281,6 +1282,7 @@
   function loadPros() {
     return api("prospects").then(function (j) { S.pros = j.prospectos || []; return S.pros; });
   }
+  function prosReach(p) { return !!(waLink(p.telefono) || p.email); }
   function prosById(id) { return (S.pros || []).filter(function (p) { return p.id === id; })[0]; }
   function gmailLink(p, msg) {
     return "https://mail.google.com/mail/?view=cm&fs=1&to=" + encodeURIComponent(p.email) + "&su=" + encodeURIComponent(p.asunto || ("Hola " + String(p.nombre || "").split(" ")[0])) + "&body=" + encodeURIComponent(msg);
@@ -1300,7 +1302,7 @@
     var sub = [p.cargo, p.empresa].filter(Boolean).join(" · ");
     var where = [p.ciudad, p.pais].filter(Boolean).join(", ");
     return '<article class="pros" data-pros="' + esc(p.id) + '">' +
-      '<header class="pros-h"><span class="avatar">' + esc(initials(p)) + '</span><div class="pros-who"><b>' + esc(up(p.nombre)) + "</b>" +
+      '<header class="pros-h"><span class="avatar">' + esc(initials(p)) + '</span><div class="pros-who"><b>' + esc(up(p.nombre)) + (prosReach(p) ? "" : ' <span class="pill li-only" title="Sin teléfono ni email: escríbele por LinkedIn">Solo LinkedIn</span>') + "</b>" +
       (sub ? "<small>" + esc(sub) + "</small>" : "") +
       '<small class="muted">' + esc([where, "añadido " + fmtDate(p.creado)].filter(Boolean).join(" · ")) + (p.contactado ? " · contactado " + fmtDate(p.contactado) : "") + "</small></div>" +
       '<select class="pros-estado st-' + esc(est) + '" aria-label="Estado">' + Object.keys(PROS_ESTADOS).map(function (k) {
@@ -1335,8 +1337,12 @@
     var list = S.pros.filter(function (p) {
       if (f && (p.estado || "pendiente") !== f) return false;
       if (!f && p.estado === "descartado") return false;
+      if (S.prosCanal === "si" && !prosReach(p)) return false;
+      if (S.prosCanal === "no" && prosReach(p)) return false;
       return !q || [p.nombre, p.cargo, p.empresa, p.pais, p.ciudad, p.resumen].join(" ").toLowerCase().indexOf(q) > -1;
-    });
+    }).sort(function (a, b) { return (prosReach(b) ? 1 : 0) - (prosReach(a) ? 1 : 0); });
+    var activos = S.pros.filter(function (p) { return p.estado !== "descartado"; });
+    var nReach = activos.filter(prosReach).length;
     $("#main").innerHTML =
       '<section class="pros-intro panel"><div><h3>Clientes potenciales encontrados con Claude</h3>' +
       '<p class="muted small">1. Copia las instrucciones. 2. En LinkedIn, abre Claude en Chrome y pégaselas. 3. Claude investiga, te prepara un resumen y un mensaje por persona y lo importa aquí.</p></div>' +
@@ -1349,7 +1355,10 @@
       '<nav class="toolbar"><input class="search" id="pros-q" type="search" placeholder="Buscar nombre, empresa, país…" value="' + esc(S.prosQ || "") + '" />' +
       '<label class="sort-by"><span>Estado:</span><select id="pros-f"><option value="">Activos (' + (S.pros.length - count("descartado")) + ")</option>" +
       Object.keys(PROS_ESTADOS).map(function (k) { return '<option value="' + k + '"' + (k === f ? " selected" : "") + ">" + PROS_ESTADOS[k] + " (" + count(k) + ")</option>"; }).join("") +
-      "</select></label></nav>" +
+      "</select></label>" +
+      '<label class="sort-by"><span>Contacto:</span><select id="pros-c"><option value="">Todos</option>' +
+      '<option value="si"' + (S.prosCanal === "si" ? " selected" : "") + ">Con teléfono o email (" + nReach + ")</option>" +
+      '<option value="no"' + (S.prosCanal === "no" ? " selected" : "") + ">Solo LinkedIn (" + (activos.length - nReach) + ")</option></select></label></nav>" +
       '<div id="pros-list" class="pros-list">' + (list.length ? list.map(prosCard).join("") :
         '<p class="empty big">' + (S.pros.length ? "No hay búsquedas con este filtro." : "Aún no hay búsquedas. Copia las instrucciones y pídele a Claude que busque en LinkedIn.") + "</p>") + "</div>";
   }
@@ -1734,6 +1743,7 @@
   document.addEventListener("change", function (e) {
     var t = e.target;
     if (t.id === "pros-f") { S.prosEstado = t.value; renderPros(); return; }
+    if (t.id === "pros-c") { S.prosCanal = t.value; renderPros(); return; }
     if (t.classList.contains("pros-estado")) {
       saveProsField(t.closest("[data-pros]").getAttribute("data-pros"), { estado: t.value }).then(function () { renderPros(); toast("Estado: " + PROS_ESTADOS[t.value]); }, function (err) { toast(err.message, true); });
       return;
