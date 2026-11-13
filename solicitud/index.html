@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Solicitar información · Pascual Vidal · Tu inversión en Dubái</title>
+  <meta name="description" content="Cuéntame tu caso en 30 segundos y te asesoro sobre tu inversión inmobiliaria en Dubái." />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#070d18" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23070d18'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='28' fill='%23d9c7a7' text-anchor='middle'%3EPV%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy-950: #070d18; --navy-900: #0b1424; --navy-800: #12203a; --navy-700: #1b2c4b;
+      --ivory: #f4efe6; --sand: #d9c7a7; --mute: #9aa6b8; --line: rgba(244, 239, 230, .14);
+      --amber: #f7931e; --amber-2: #ffa326; --err: #ff8a7a;
+      --f-display: "Cormorant Garamond", "Times New Roman", serif;
+      --f-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --ease: cubic-bezier(.22, 1, .36, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; overflow: hidden; color: var(--ivory); font-family: var(--f-body); -webkit-font-smoothing: antialiased;
+      background: radial-gradient(120% 80% at 85% 0%, #1b2c4b 0%, rgba(27, 44, 75, 0) 60%), radial-gradient(90% 70% at 0% 100%, rgba(247, 147, 30, .10) 0%, rgba(247, 147, 30, 0) 60%), var(--navy-950);
+    }
+    button, input { font: inherit; color: inherit; }
+    .top { position: fixed; inset: 0 0 auto; z-index: 5; display: flex; align-items: center; justify-content: space-between; padding: 18px max(20px, env(safe-area-inset-left)) 0; }
+    .brand { display: flex; align-items: center; gap: 12px; color: var(--ivory); text-decoration: none; }
+    .brand-mark { display: grid; place-items: center; width: 40px; height: 46px; border: 1.5px solid var(--sand); border-radius: 20px 20px 6px 6px; font: 600 17px/1 var(--f-display); color: var(--ivory); }
+    .brand-text { display: grid; line-height: 1.15; }
+    .brand-text strong { font-weight: 700; font-size: 14px; }
+    .brand-text small { font: italic 500 14px var(--f-display); color: var(--amber); }
+    .progress { position: fixed; inset: 0 0 auto; height: 4px; background: rgba(244, 239, 230, .08); z-index: 6; }
+    .progress i { display: block; height: 100%; width: 0; background: var(--amber); transition: width .5s var(--ease); }
+
+    .deck { position: relative; height: 100%; }
+    .slide {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      padding: 96px max(20px, env(safe-area-inset-left)) 110px; overflow-y: auto;
+      opacity: 0; visibility: hidden; transform: translateY(60px);
+      transition: opacity .55s var(--ease), transform .55s var(--ease), visibility 0s .55s;
+    }
+    .slide.on { opacity: 1; visibility: visible; transform: none; transition: opacity .55s var(--ease), transform .55s var(--ease), visibility 0s; }
+    .slide.up { transform: translateY(-60px); }
+    .q { width: 100%; max-width: 680px; }
+    .num { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; color: var(--amber); margin-bottom: 10px; }
+    h1, h2 { font-family: var(--f-display); font-weight: 500; letter-spacing: -.01em; margin: 0 0 10px; }
+    h1 { font-size: clamp(40px, 7vw, 64px); line-height: 1.02; }
+    h2 { font-size: clamp(28px, 4.6vw, 40px); line-height: 1.1; }
+    h1 em, h2 em { color: var(--amber); }
+    .req { color: var(--amber); }
+    .help { color: var(--mute); font-size: 15px; margin: 0 0 26px; line-height: 1.5; }
+
+    .line { width: 100%; border: 0; border-bottom: 2px solid var(--line); background: transparent; padding: 10px 2px; font-size: clamp(22px, 3.4vw, 28px); outline: none; transition: border-color .2s; }
+    .line::placeholder { color: rgba(244, 239, 230, .3); }
+    .line:focus { border-bottom-color: var(--amber); }
+
+    .phone { display: flex; align-items: stretch; gap: 12px; position: relative; }
+    .cc { display: inline-flex; align-items: center; gap: 8px; flex: none; padding: 0 12px; border: 0; border-bottom: 2px solid var(--line); background: transparent; cursor: pointer; font-size: clamp(18px, 3vw, 24px); }
+    .cc:focus-visible, .cc[aria-expanded="true"] { border-bottom-color: var(--amber); outline: none; }
+    .cc img, .opt-cc img { width: 28px; height: 20px; border-radius: 3px; object-fit: cover; box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); }
+    .cc .car { font-size: 12px; color: var(--mute); }
+    .cc-menu { position: absolute; z-index: 10; top: calc(100% + 8px); left: 0; width: min(360px, 100%); max-height: 320px; display: flex; flex-direction: column; background: var(--navy-800); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 20px 50px rgba(0, 0, 0, .45); overflow: hidden; }
+    .cc-menu[hidden] { display: none; }
+    .cc-menu input { margin: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--navy-950); outline: none; font-size: 15px; }
+    .cc-menu input:focus { border-color: var(--amber); }
+    .cc-list { overflow-y: auto; margin: 0; padding: 0 6px 6px; list-style: none; }
+    .opt-cc { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border: 0; background: none; border-radius: 9px; cursor: pointer; text-align: left; font-size: 15px; }
+    .opt-cc span { flex: 1; }
+    .opt-cc small { color: var(--mute); font-size: 14px; }
+    .opt-cc:hover, .opt-cc.act { background: rgba(247, 147, 30, .14); }
+
+    .opts { display: grid; gap: 10px; margin: 0; padding: 0; border: 0; }
+    .opt { display: flex; align-items: center; gap: 14px; width: 100%; max-width: 460px; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(247, 147, 30, .35); background: rgba(247, 147, 30, .06); cursor: pointer; text-align: left; font-size: 17px; transition: background .2s, border-color .2s, transform .15s; }
+    .opt:hover { background: rgba(247, 147, 30, .14); }
+    .opt:active { transform: scale(.99); }
+    .opt kbd { display: grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 6px; border: 1px solid rgba(247, 147, 30, .6); font: 700 12px var(--f-body); color: var(--amber); }
+    .opt .tick { margin-left: auto; opacity: 0; color: var(--amber); font-weight: 800; }
+    .opt[aria-pressed="true"], .opt[aria-checked="true"] { background: rgba(247, 147, 30, .2); border-color: var(--amber); }
+    .opt[aria-pressed="true"] kbd, .opt[aria-checked="true"] kbd { background: var(--amber); color: var(--navy-950); }
+    .opt[aria-pressed="true"] .tick, .opt[aria-checked="true"] .tick { opacity: 1; }
+    .opt:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+    .actions { display: flex; align-items: center; gap: 14px; margin-top: 28px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 24px; border: 0; border-radius: 999px; background: var(--amber); color: var(--navy-950); font-weight: 800; font-size: 16px; cursor: pointer; text-decoration: none; transition: background .2s, transform .15s; }
+    .btn:hover { background: var(--amber-2); }
+    .btn:active { transform: scale(.98); }
+    .btn[disabled] { opacity: .6; cursor: wait; }
+    .hint { color: var(--mute); font-size: 13px; }
+    .hint b { color: var(--ivory); font-weight: 700; }
+    .err { min-height: 22px; margin: 10px 0 0; color: var(--err); font-size: 14px; font-weight: 600; }
+    .consent { display: flex; gap: 10px; align-items: flex-start; margin-top: 22px; color: var(--mute); font-size: 13px; line-height: 1.5; max-width: 460px; }
+    .consent input { width: 18px; height: 18px; accent-color: var(--amber); margin-top: 1px; flex: none; }
+    .consent a { color: var(--ivory); }
+    .hp { position: absolute; left: -9999px; }
+
+    .nav { position: fixed; right: max(20px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); z-index: 5; display: flex; gap: 2px; }
+    .nav button { width: 42px; height: 38px; border: 0; background: var(--amber); color: var(--navy-950); font-size: 18px; font-weight: 800; cursor: pointer; }
+    .nav button:first-child { border-radius: 8px 0 0 8px; }
+    .nav button:last-child { border-radius: 0 8px 8px 0; }
+    .nav button[disabled] { opacity: .35; cursor: default; }
+    .done-ic { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--amber); color: var(--navy-950); font-size: 30px; font-weight: 800; margin-bottom: 22px; }
+    @media (max-width: 560px) {
+      .top { padding-top: 14px; }
+      .brand-text { display: none; }
+      .slide { align-items: flex-start; padding-top: 90px; }
+      .opt { font-size: 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .slide, .slide.on { transition: none; transform: none; } }
+  </style>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+  <header class="top">
+    <a class="brand" href="/" aria-label="Tu inversión en Dubái · Pascual Vidal">
+      <span class="brand-mark">PV</span>
+      <span class="brand-text"><strong>Pascual Vidal</strong><small>Tu inversión en Dubái</small></span>
+    </a>
+  </header>
+
+  <form class="deck" id="f" novalidate>
+    <input class="hp" type="text" name="web" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+    <section class="slide" data-step="0">
+      <div class="q">
+        <h1>Invierte en Dubái <em>con criterio</em></h1>
+        <p class="help">Cuéntame tu caso en 30 segundos y te escribo para asesorarte, sin compromiso.</p>
+        <div class="actions"><button type="button" class="btn" data-next>Empezar →</button><span class="hint">pulsa <b>Enter ↵</b></span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-step="1">
+      <div class="q">
+        <div class="num">1 →</div>
+        <h2><label for="nombre">Nombre y apellidos <span class="req">*</span></label></h2>
+        <p class="help">Para saber cómo dirigirme a ti.</p>
+        <input class="line" id="nombre" name="nombre" autocomplete="name" placeholder="Escribe aquí tu nombre…" maxlength="120" />
+        <p class="err" id="e1" role="alert"></p>
+        <div class="actions"><button type="button" class="btn" data-next>Continuar ✓</button><span class="hint">pulsa <b>Enter ↵</b></span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-step="2">
+      <div class="q">
+        <div class="num">2 →</div>
+        <h2><label for="tel">Número de teléfono <span class="req">*</span></label></h2>
+        <p class="help">Te escribiré por WhatsApp.</p>
+        <div class="phone">
+          <button type="button" class="cc" id="cc" aria-haspopup="listbox" aria-expanded="false" aria-label="Prefijo del país"></button>
+          <input class="line" id="tel" name="tel" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="600 000 000" maxlength="20" />
+          <div class="cc-menu" id="ccMenu" hidden>
+            <input type="search" id="ccQ" placeholder="Buscar país o prefijo…" aria-label="Buscar país" autocomplete="off" />
+            <ul class="cc-list" id="ccList" role="listbox" aria-label="Países"></ul>
+          </div>
+        </div>
+        <p class="err" id="e2" role="alert"></p>
+        <div class="actions"><button type="button" class="btn" data-next>Continuar ✓</button><span class="hint">pulsa <b>Enter ↵</b></span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-step="3">
+      <div class="q">
+        <div class="num">3 →</div>
+        <h2>Mayor preocupación antes de invertir</h2>
+        <p class="help">Elige todas las que quieras.</p>
+        <div class="opts" id="pre" role="group" aria-label="Mayor preocupación antes de invertir"></div>
+        <div class="actions"><button type="button" class="btn" data-next>Continuar ✓</button><span class="hint">pulsa <b>Enter ↵</b></span></div>
+      </div>
+    </section>
+
+    <section class="slide" data-step="4">
+      <div class="q">
+        <div class="num">4 →</div>
+        <h2>Capital a invertir <span class="req">*</span></h2>
+        <p class="help">Una aproximación es suficiente.</p>
+        <div class="opts" id="cap" role="radiogroup" aria-label="Capital a invertir"></div>
+        <label class="consent"><input type="checkbox" id="ok" /> <span>Acepto la <a href="/privacidad/" target="_blank" rel="noopener">política de privacidad</a> y que Pascual Vidal me contacte.</span></label>
+        <p class="err" id="e4" role="alert"></p>
+        <div class="actions"><button type="submit" class="btn" id="send">Solicitar información</button></div>
+      </div>
+    </section>
+
+    <section class="slide" data-step="5">
+      <div class="q">
+        <div class="done-ic" aria-hidden="true">✓</div>
+        <h2 id="gracias">¡Gracias!</h2>
+        <p class="help">He recibido tus datos. Te escribiré por WhatsApp muy pronto.<br />Ahora te llevo a la web…</p>
+        <div class="actions"><a class="btn" href="/">Ir a la web →</a></div>
+      </div>
+    </section>
+  </form>
+
+  <div class="nav" aria-label="Navegación">
+    <button type="button" id="prev" aria-label="Anterior">↑</button>
+    <button type="button" id="next" aria-label="Siguiente">↓</button>
+  </div>
+
+  <script>
+  (function () {
+    var ENDPOINT = "/crm/api.php?action=lead";
+    var REDIRECT = "/";
+    var PREOCUPACIONES = ["No conocer el mercado", "Elegir mal la zona", "Elegir mal el constructor", "No saber si es seguro", "Fiscalidad / impuestos", "Rentabilidad real", "Poder revender en el futuro", "Nada en especial"];
+    var CAPITAL = ["100.000 € - 250.000 €", "250.000 € - 500.000 €", "500.000 € - 1M €", "Más de 1M €"];
+    // Mismos tramos que usa el CRM en el campo Presupuesto.
+    var PRESUPUESTO_CRM = ["Menos de 250.000 €", "250.000 – 500.000 €", "500.000 – 1.000.000 €", "Más de 1.000.000 €"];
+    // País (código ISO) y prefijo. España va primero y es el de por defecto.
+    var PAISES = "ES34 AE971 MX52 AR54 CO57 CL56 PE51 VE58 EC593 UY598 PY595 BO591 CR506 PA507 DO1809 PR1787 GT502 HN504 SV503 NI505 CU53 US1 CA1 GB44 IE353 FR33 PT351 IT39 DE49 AT43 CH41 BE32 NL31 LU352 AD376 MC377 SE46 NO47 DK45 FI358 IS354 PL48 CZ420 SK421 HU36 RO40 BG359 GR30 CY357 MT356 HR385 SI386 RS381 BA387 ME382 MK389 AL355 EE372 LV371 LT370 UA380 MD373 BY375 RU7 TR90 GE995 AM374 AZ994 KZ7 UZ998 SA966 QA974 KW965 BH973 OM968 JO962 LB961 IL972 EG20 MA212 DZ213 TN216 LY218 NG234 GH233 KE254 ZA27 ET251 TZ255 UG256 SN221 CI225 CM237 AO244 MZ258 MU230 SC248 IN91 PK92 BD880 LK94 NP977 MV960 IR98 IQ964 AF93 CN86 HK852 MO853 TW886 JP81 KR82 SG65 MY60 TH66 VN84 PH63 ID62 KH855 AU61 NZ64 BR55 JM1876 TT1868 BS1242 BB1246".split(" ").map(function (s) {
+      return { iso: s.slice(0, 2), code: s.slice(2) };
+    });
+    var dn = null;
+    try { dn = new Intl.DisplayNames(["es"], { type: "region" }); } catch (e) {}
+    PAISES.forEach(function (p) { p.name = dn ? dn.of(p.iso) : p.iso; });
+    var first = PAISES.shift();
+    PAISES.sort(function (a, b) { return a.name.localeCompare(b.name, "es"); });
+    PAISES.unshift(first);
+
+    var $ = function (s) { return document.querySelector(s); };
+    var slides = [].slice.call(document.querySelectorAll(".slide"));
+    var LAST_Q = 4, step = 0, sending = false;
+    var data = { pais: PAISES[0], pre: [], cap: "" };
+
+    function emoji(iso) { return iso.replace(/./g, function (c) { return String.fromCodePoint(127397 + c.charCodeAt(0)); }); }
+    // Bandera en imagen (se ve igual en todos los móviles); si no carga, se usa el emoji.
+    function flag(p) { return '<img src="https://flagcdn.com/w40/' + p.iso.toLowerCase() + '.png" alt="" width="28" height="20" loading="lazy" onerror="this.outerHTML=\'<span aria-hidden=true>' + emoji(p.iso) + '</span>\'" />'; }
+    function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+    function letter(i) { return String.fromCharCode(65 + i); }
+
+    // Opciones
+    $("#pre").innerHTML = PREOCUPACIONES.map(function (t, i) {
+      return '<button type="button" class="opt" aria-pressed="false" data-v="' + esc(t) + '"><kbd>' + letter(i) + "</kbd>" + esc(t) + '<span class="tick">✓</span></button>';
+    }).join("");
+    $("#cap").innerHTML = CAPITAL.map(function (t, i) {
+      return '<button type="button" class="opt" role="radio" aria-checked="false" data-v="' + esc(t) + '"><kbd>' + letter(i) + "</kbd>" + esc(t) + '<span class="tick">✓</span></button>';
+    }).join("");
+
+    function togglePre(b) {
+      var v = b.getAttribute("data-v"), on = b.getAttribute("aria-pressed") !== "true";
+      if (v === "Nada en especial" && on) { [].forEach.call(document.querySelectorAll("#pre .opt"), function (x) { x.setAttribute("aria-pressed", "false"); }); }
+      else if (on) { var n = $('#pre .opt[data-v="Nada en especial"]'); n.setAttribute("aria-pressed", "false"); }
+      b.setAttribute("aria-pressed", String(on));
+      data.pre = [].map.call(document.querySelectorAll('#pre .opt[aria-pressed="true"]'), function (x) { return x.getAttribute("data-v"); });
+    }
+    function pickCap(b) {
+      [].forEach.call(document.querySelectorAll("#cap .opt"), function (x) { x.setAttribute("aria-checked", String(x === b)); });
+      data.cap = b.getAttribute("data-v");
+      $("#e4").textContent = "";
+    }
+    $("#ok").addEventListener("change", function () { if (this.checked && data.cap) $("#e4").textContent = ""; });
+    $("#pre").addEventListener("click", function (e) { var b = e.target.closest(".opt"); if (b) togglePre(b); });
+    $("#cap").addEventListener("click", function (e) { var b = e.target.closest(".opt"); if (b) pickCap(b); });
+
+    // Prefijo con banderas
+    var menu = $("#ccMenu"), list = $("#ccList"), ccBtn = $("#cc"), ccQ = $("#ccQ");
+    function paintCC() { ccBtn.innerHTML = flag(data.pais) + "<span>+" + data.pais.code + '</span><span class="car" aria-hidden="true">▾</span>'; }
+    function renderList(q) {
+      q = (q || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/^\+/, "");
+      var items = PAISES.filter(function (p) { return !q || p.name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").indexOf(q) > -1 || p.code.indexOf(q) === 0; });
+      list.innerHTML = items.map(function (p, i) {
+        return '<li><button type="button" class="opt-cc' + (i === 0 ? " act" : "") + '" role="option" data-iso="' + p.iso + '" data-code="' + p.code + '">' + flag(p) + "<span>" + esc(p.name) + "</span><small>+" + p.code + "</small></button></li>";
+      }).join("") || '<li class="hint" style="padding:10px">Sin resultados</li>';
+    }
+    function openCC(open) {
+      menu.hidden = !open; ccBtn.setAttribute("aria-expanded", String(open));
+      if (open) { ccQ.value = ""; renderList(""); ccQ.focus(); }
+    }
+    function choose(btn) {
+      data.pais = PAISES.filter(function (p) { return p.iso === btn.getAttribute("data-iso") && p.code === btn.getAttribute("data-code"); })[0];
+      paintCC(); openCC(false); $("#tel").focus();
+    }
+    ccBtn.addEventListener("click", function () { openCC(menu.hidden); });
+    ccQ.addEventListener("input", function () { renderList(ccQ.value); });
+    ccQ.addEventListener("keydown", function (e) {
+      var items = [].slice.call(list.querySelectorAll(".opt-cc")), i = items.indexOf(list.querySelector(".act"));
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault(); if (!items.length) return;
+        if (i > -1) items[i].classList.remove("act");
+        i = (i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+        items[i].classList.add("act"); items[i].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); if (items[i]) choose(items[i]); }
+      else if (e.key === "Escape") { e.stopPropagation(); openCC(false); ccBtn.focus(); }
+    });
+    list.addEventListener("click", function (e) { var b = e.target.closest(".opt-cc"); if (b) choose(b); });
+    document.addEventListener("click", function (e) { if (!menu.hidden && !e.target.closest(".phone")) openCC(false); });
+    paintCC();
+
+    // Validación de cada paso
+    function valid(s) {
+      if (s === 1) {
+        var n = $("#nombre").value.trim();
+        $("#e1").textContent = n.length < 2 ? "Escribe tu nombre y apellidos." : "";
+        return n.length >= 2;
+      }
+      if (s === 2) {
+        var d = $("#tel").value.replace(/\D/g, "");
+        var ok = d.length >= 6 && d.length <= 14;
+        $("#e2").textContent = ok ? "" : "Escribe un número de teléfono válido.";
+        return ok;
+      }
+      if (s === 4) {
+        var m = !data.cap ? "Elige el capital que quieres invertir." : !$("#ok").checked ? "Acepta la política de privacidad para continuar." : "";
+        $("#e4").textContent = m;
+        return !m;
+      }
+      return true;
+    }
+
+    function go(n) {
+      if (n < 0 || n > slides.length - 1) return;
+      if (n > step && step >= 1 && step < LAST_Q && !valid(step)) { focusStep(step); return; }
+      slides.forEach(function (s, i) {
+        s.classList.toggle("on", i === n);
+        s.classList.toggle("up", i < n);
+        s.setAttribute("aria-hidden", String(i !== n));
+        if ("inert" in s) s.inert = i !== n;
+      });
+      step = n;
+      $("#bar").style.width = Math.min(100, (n / (slides.length - 1)) * 100) + "%";
+      $("#prev").disabled = n === 0 || n === slides.length - 1;
+      $("#next").disabled = n >= LAST_Q;
+      setTimeout(function () { focusStep(n); }, 350);
+    }
+    function focusStep(n) {
+      var s = slides[n], el = s.querySelector("input.line") || s.querySelector(".opt") || s.querySelector(".btn");
+      if (el) el.focus({ preventScroll: true });
+    }
+    [].forEach.call(document.querySelectorAll("[data-next]"), function (b) { b.addEventListener("click", function () { go(step + 1); }); });
+    $("#prev").addEventListener("click", function () { go(step - 1); });
+    $("#next").addEventListener("click", function () { if (step < LAST_Q) go(step + 1); });
+
+    // Teclado: Enter para avanzar, letras para elegir
+    document.addEventListener("keydown", function (e) {
+      if (!menu.hidden || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "Enter" && step < LAST_Q && !(e.target.closest && e.target.closest(".cc, a"))) { e.preventDefault(); go(step + 1); return; }
+      if (e.target.tagName === "INPUT") return;
+      var k = e.key.length === 1 ? e.key.toUpperCase().charCodeAt(0) - 65 : -1;
+      if (step === 3 && k >= 0 && k < PREOCUPACIONES.length) togglePre(document.querySelectorAll("#pre .opt")[k]);
+      if (step === 4 && k >= 0 && k < CAPITAL.length) pickCap(document.querySelectorAll("#cap .opt")[k]);
+    });
+    // Deslizar con el dedo arriba/abajo entre preguntas
+    var y0 = null;
+    document.addEventListener("touchstart", function (e) { y0 = e.target.closest(".cc-menu") ? null : e.touches[0].clientY; }, { passive: true });
+    document.addEventListener("touchend", function (e) {
+      if (y0 === null) return;
+      var dy = e.changedTouches[0].clientY - y0, s = slides[step];
+      if (Math.abs(dy) < 70 || s.scrollHeight > s.clientHeight + 4) return;
+      if (dy < 0 && step < LAST_Q) go(step + 1); else if (dy > 0 && step > 0 && step < slides.length - 1) go(step - 1);
+    }, { passive: true });
+
+    // Campañas (utm) del enlace, para saber de dónde viene el contacto
+    var utm = {};
+    try { var qs = new URLSearchParams(location.search); ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "fbclid"].forEach(function (k) { if (qs.get(k)) utm[k] = qs.get(k).slice(0, 200); }); } catch (e) {}
+
+    $("#f").addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (sending) return;
+      if (!valid(1)) return go(1);
+      if (!valid(2)) return go(2);
+      if (!valid(4)) return;
+      sending = true; $("#send").disabled = true; $("#send").textContent = "Enviando…";
+      var nombre = $("#nombre").value.trim();
+      var payload = {
+        formulario: "solicitud",
+        nombre: nombre,
+        telefono: "+" + data.pais.code + " " + $("#tel").value.trim(),
+        presupuesto: PRESUPUESTO_CRM[CAPITAL.indexOf(data.cap)],
+        mensaje: "Mayor preocupación: " + (data.pre.length ? data.pre.join(", ") : "no indicada") + "\nCapital a invertir: " + data.cap,
+        web: document.querySelector("[name=web]").value
+      };
+      Object.keys(utm).forEach(function (k) { payload[k] = utm[k]; });
+      fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); })
+        .then(function () {
+          $("#gracias").textContent = "¡Gracias, " + nombre.split(" ")[0] + "!";
+          go(slides.length - 1);
+          setTimeout(function () { location.href = REDIRECT; }, 4500);
+        })
+        .catch(function () {
+          sending = false; $("#send").disabled = false; $("#send").textContent = "Solicitar información";
+          $("#e4").textContent = "No se ha podido enviar. Revisa tu conexión e inténtalo de nuevo.";
+        });
+    });
+
+    go(0);
+  })();
+  </script>
+</body>
+</html>

@@ -20,7 +20,7 @@
     nurturing: "Aún no: seguir en contacto",
     discarded: "Descartado: no sigue adelante"
   };
-  var ORIGENES = ["Web · Guía", "Web · Boletín", "Web · Consultoría", "Web · Dossier", "Instagram", "YouTube", "Meta", "Referido", "Directo", "Otro"];
+  var ORIGENES = ["Web · Guía", "Web · Boletín", "Web · Consultoría", "Web · Dossier", "Formulario", "Instagram", "YouTube", "Meta", "Referido", "Directo", "Otro"];
   var PRESUPUESTOS = ["Por definir", "Menos de 250.000 €", "250.000 – 500.000 €", "500.000 – 1.000.000 €", "Más de 1.000.000 €"];
   var OBJETIVOS = ["Rentabilidad por alquiler", "Revalorización / reventa", "Golden Visa / residencia", "Segunda vivienda", "Crear empresa en Dubái"];
   // Colores de los eventos de Google según palabras del título (se cambian en Ajustes).

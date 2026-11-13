@@ -76,9 +76,16 @@ if ($action === 'lead') {
   if (!filter_var($email, FILTER_VALIDATE_EMAIL) && strlen(phone_digits($tel)) < 7) json_out(['error' => 'datos'], 422);
   if (!rate('lead', 20, 3600)) json_out(['error' => 'rate'], 429);
 
-  $forms = ['guia' => 'Web · Guía', 'newsletter' => 'Web · Boletín', 'consultoria' => 'Web · Consultoría', 'dossier' => 'Web · Dossier'];
+  $forms = ['guia' => 'Web · Guía', 'newsletter' => 'Web · Boletín', 'consultoria' => 'Web · Consultoría', 'dossier' => 'Web · Dossier', 'solicitud' => 'Formulario'];
   $form = cut($b['formulario'] ?? 'web', 30);
   $origen = $forms[$form] ?? 'Web';
+  // Formulario /solicitud/: si el enlace lleva ?utm_source=instagram (o meta, youtube…), ese es el origen.
+  if ($form === 'solicitud') {
+    $src = strtolower((string) ($b['utm_source'] ?? ''));
+    if (preg_match('/insta|^ig$/', $src)) $origen = 'Instagram';
+    elseif (preg_match('/meta|facebook|^fb$/', $src)) $origen = 'Meta';
+    elseif (strpos($src, 'youtube') !== false || $src === 'yt') $origen = 'YouTube';
+  }
   $utm = [];
   foreach (['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid'] as $k) {
     if (!empty($b[$k])) $utm[$k] = cut($b[$k], 200);
