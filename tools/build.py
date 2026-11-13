@@ -30,7 +30,7 @@ ORG_ID = SITE + "/#organizacion"
 WEB_ID = SITE + "/#web"
 AUTHOR = {"@type": "Person", "@id": PERSON_ID, "name": "Pascual Vidal", "url": SITE + "/sobre-pascual-vidal/",
           "jobTitle": "Consultor de inversión inmobiliaria en Dubái", "image": SITE + "/assets/img/pascual-retrato.webp",
-          "sameAs": ["https://www.instagram.com/pascual_vidal_dubai/", "https://www.youtube.com/@pascual.dubairealestate"]}
+          "sameAs": ["https://www.instagram.com/pascual.dubairealestate/", "https://www.youtube.com/@pascual.dubairealestate"]}
 PUBLISHER = {"@type": "Organization", "@id": ORG_ID, "name": "Tu inversión en Dubái", "url": SITE + "/",
              "logo": {"@type": "ImageObject", "url": SITE + "/assets/img/logo-pv-512.png", "width": 512, "height": 512}}
 WA_LINK = "https://wa.me/message/QI3A7Q5BXFTCA1"
@@ -733,7 +733,7 @@ ABOUT_FACTS = [
         "<strong>Compra en remoto:</strong> reserva, contratos, pagos y registro en el Dubai Land Department sin que tengas que viajar.",
         "<strong>Después de comprar:</strong> entrega de llaves, amueblado a medida, alquiler vacacional o anual, mantenimiento, reventa y Golden Visa.")),
     ("Dónde puedes verme", p(
-        'Explico el mercado de Dubái en mi canal de <a href="https://www.youtube.com/@pascual.dubairealestate" rel="me noopener" target="_blank">YouTube</a> y en <a href="https://www.instagram.com/pascual_vidal_dubai/" rel="me noopener" target="_blank">Instagram</a>, y por escrito en el <a href="/blog/">blog</a>.')),
+        'Explico el mercado de Dubái en mi canal de <a href="https://www.youtube.com/@pascual.dubairealestate" rel="me noopener" target="_blank">YouTube</a> y en <a href="https://www.instagram.com/pascual.dubairealestate/" rel="me noopener" target="_blank">Instagram</a>, y por escrito en el <a href="/blog/">blog</a>.')),
 ]
 about_secs = "".join(f'\n      <h2 id="a{i}">{H.escape(t)}</h2>\n{c}' for i, (t, c) in enumerate(ABOUT_FACTS, 1))
 about_posts = "".join(f'<li><a href="/blog/{a["slug"]}/">{H.escape(a["title"])}</a></li>' for a in ARTICLES)
@@ -805,7 +805,7 @@ llms = ["# Tu inversión en Dubái · Pascual Vidal", "",
         "- Idiomas: español e inglés. Clientes de España, México, Colombia, Argentina, Chile, Perú y Estados Unidos.",
         "- La compra se puede hacer entera en remoto; primera consultoría gratuita de 20 minutos.",
         "- Contacto: WhatsApp " + WA_LINK + " · formulario en " + SITE + "/#contacto",
-        "- YouTube: https://www.youtube.com/@pascual.dubairealestate · Instagram: https://www.instagram.com/pascual_vidal_dubai/", "",
+        "- YouTube: https://www.youtube.com/@pascual.dubairealestate · Instagram: https://www.instagram.com/pascual.dubairealestate/", "",
         "## Páginas principales", "",
         f"- [Inicio]({SITE}/): servicios, proyectos destacados y preguntas frecuentes sobre invertir en Dubái.",
         f"- [Quién es Pascual Vidal]({SITE}/sobre-pascual-vidal/): trayectoria, licencia RERA y forma de trabajar.",
