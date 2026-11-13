@@ -38,6 +38,8 @@ def page(path, title, desc, body, ld, og_image="/assets/img/pascual-dubai.webp",
   <title>{H.escape(title)}</title>
   <meta name="description" content="{H.escape(desc)}" />
   <link rel="canonical" href="{url}" />
+  <link rel="alternate" hreflang="es" href="{url}" />
+  <link rel="alternate" hreflang="x-default" href="{url}" />
   <meta property="og:type" content="{og_type}" />
   <meta property="og:locale" content="es_ES" />
   <meta property="og:site_name" content="Tu inversión en Dubái" />
