@@ -11,7 +11,7 @@
     cal: {}, calErr: "", month: null, day: null, calView: savedCalView(),
     tpls: null, docs: null, carpetas: [], carpeta: "", newFolder: false, docSort: "fecha", docDir: "desc", mail: { to: "", tpl: "", asunto: "", cuerpo: "", boletin: false, imagen: "", boton: false, lista: [], hechos: {}, forEmail: "" }
   };
-  var PAGES = { inicio: "Inicio", contactos: "Contactos", ventas: "Ventas", correo: "Correo", calendario: "Calendario", documentos: "Documentos" };
+  var PAGES = { inicio: "Inicio", contactos: "Contactos", ventas: "Ventas", busquedas: "Búsquedas potenciales", correo: "Correo", calendario: "Calendario", documentos: "Documentos" };
   var STAGE_HINT = {
     lead: "Acaba de llegar",
     qualified: "Presupuesto y plazo claros",
@@ -20,7 +20,7 @@
     nurturing: "Aún no: seguir en contacto",
     discarded: "Descartado: no sigue adelante"
   };
-  var ORIGENES = ["Web · Guía", "Web · Boletín", "Web · Consultoría", "Web · Dossier", "Formulario", "Instagram", "YouTube", "Meta", "Referido", "Directo", "Otro"];
+  var ORIGENES = ["Web · Guía", "Web · Boletín", "Web · Consultoría", "Web · Dossier", "Formulario", "Instagram", "YouTube", "Meta", "Referido", "LinkedIn", "Directo", "Otro"];
   var PRESUPUESTOS = ["Por definir", "Menos de 250.000 €", "250.000 – 500.000 €", "500.000 – 1.000.000 €", "Más de 1.000.000 €"];
   var OBJETIVOS = ["Rentabilidad por alquiler", "Revalorización / reventa", "Golden Visa / residencia", "Segunda vivienda", "Crear empresa en Dubái"];
   // Colores de los eventos de Google según palabras del título (se cambian en Ajustes).
@@ -187,7 +187,7 @@
   }
 
   function render() {
-    var fn = { inicio: renderHome, contactos: renderContacts, ventas: renderSales, correo: renderMail, calendario: renderCalendar, documentos: renderDocs }[S.page];
+    var fn = { inicio: renderHome, contactos: renderContacts, ventas: renderSales, busquedas: renderPros, correo: renderMail, calendario: renderCalendar, documentos: renderDocs }[S.page];
     $("#main").className = "page page-" + S.page;
     fn();
   }
@@ -1260,6 +1260,137 @@
     }).catch(function (e) { toast(e.message, true); });
   }
 
+  /* ---------- Búsquedas potenciales ---------- */
+  var PROS_ESTADOS = { pendiente: "Pendiente", contactado: "Contactado", respondio: "Respondió", descartado: "Descartado" };
+  var CLAUDE_PROMPT = [
+    "Estoy en LinkedIn. Busca hasta 10 perfiles de posibles clientes para mi asesoría de inversión inmobiliaria en Dubái: empresarios o inversores inmobiliarios que vivan o trabajen en países del Golfo (Emiratos Árabes Unidos, Arabia Saudí, Qatar, Kuwait, Baréin u Omán) y que hablen español.",
+    "",
+    "Para cada perfil:",
+    "1. Lee su perfil público: cargo, empresa, trayectoria, publicaciones recientes e intereses.",
+    "2. Escribe un resumen breve (3 a 5 líneas) de a qué se dedica y qué le puede interesar.",
+    "3. Apunta su teléfono y su email solo si aparecen públicamente en su perfil o en su información de contacto. Si no aparecen, déjalos vacíos: no los inventes ni los deduzcas.",
+    "4. Escribe un mensaje personalizado en español, de 3 a 5 frases, cercano y natural, para abrir una conversación genuina a partir de algo concreto de su perfil. No vendas nada ni hables de inversiones o propiedades de primeras. Termina con una pregunta abierta y firma como Pascual.",
+    "",
+    "No envíes mensajes ni solicitudes de conexión: solo investiga.",
+    "",
+    "Al terminar, dame el resultado solo como JSON (una lista) con estas claves: nombre, cargo, empresa, pais, ciudad, linkedin (URL del perfil), telefono, email, resumen, mensaje, asunto (un asunto corto por si le escribo por email).",
+    "",
+    "Después abre mi CRM en " + location.origin + "/crm/#busquedas, pulsa «Importar de Claude», pega el JSON y pulsa «Importar»."
+  ].join("\n");
+
+  function loadPros() {
+    return api("prospects").then(function (j) { S.pros = j.prospectos || []; return S.pros; });
+  }
+  function prosById(id) { return (S.pros || []).filter(function (p) { return p.id === id; })[0]; }
+  function gmailLink(p, msg) {
+    return "https://mail.google.com/mail/?view=cm&fs=1&to=" + encodeURIComponent(p.email) + "&su=" + encodeURIComponent(p.asunto || ("Hola " + String(p.nombre || "").split(" ")[0])) + "&body=" + encodeURIComponent(msg);
+  }
+  function copyText(txt, okMsg) {
+    var ok = function () { toast(okMsg); };
+    var fb = function () {
+      var ta = document.createElement("textarea"); ta.value = txt; ta.style.cssText = "position:fixed;left:-9999px"; document.body.appendChild(ta); ta.select();
+      var done = false; try { done = document.execCommand("copy"); } catch (err) {} document.body.removeChild(ta);
+      if (done) ok(); else toast("No se pudo copiar", true);
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(txt).then(ok, fb); else fb();
+  }
+
+  function prosCard(p) {
+    var wa = waLink(p.telefono), est = p.estado || "pendiente";
+    var sub = [p.cargo, p.empresa].filter(Boolean).join(" · ");
+    var where = [p.ciudad, p.pais].filter(Boolean).join(", ");
+    return '<article class="pros" data-pros="' + esc(p.id) + '">' +
+      '<header class="pros-h"><span class="avatar">' + esc(initials(p)) + '</span><div class="pros-who"><b>' + esc(up(p.nombre)) + "</b>" +
+      (sub ? "<small>" + esc(sub) + "</small>" : "") +
+      '<small class="muted">' + esc([where, "añadido " + fmtDate(p.creado)].filter(Boolean).join(" · ")) + (p.contactado ? " · contactado " + fmtDate(p.contactado) : "") + "</small></div>" +
+      '<select class="pros-estado st-' + esc(est) + '" aria-label="Estado">' + Object.keys(PROS_ESTADOS).map(function (k) {
+        return '<option value="' + k + '"' + (k === est ? " selected" : "") + ">" + PROS_ESTADOS[k] + "</option>";
+      }).join("") + "</select></header>" +
+      '<div class="pros-sec"><span class="pros-l">Resumen</span><p class="pros-sum">' + (p.resumen ? esc(p.resumen) : '<span class="muted">Sin resumen.</span>') + "</p>" +
+      '<p class="pros-data">' +
+      (p.telefono ? "<span>📞 " + esc(p.telefono) + "</span>" : '<span class="muted">Sin teléfono</span>') +
+      (p.email ? "<span>✉ " + esc(p.email) + "</span>" : '<span class="muted">Sin email</span>') +
+      (p.linkedin ? '<a href="' + esc(p.linkedin) + '" target="_blank" rel="noopener">Ver en LinkedIn ↗</a>' : "") + "</p></div>" +
+      '<div class="pros-sec"><label class="pros-l" for="pm-' + esc(p.id) + '">Mensaje para abrir conversación</label>' +
+      '<textarea class="pros-msg" id="pm-' + esc(p.id) + '" rows="5">' + esc(p.mensaje || "") + "</textarea></div>" +
+      '<footer class="pros-acts">' +
+      (wa ? '<a class="btn wa sm" data-act="pros-wa" href="' + esc(wa) + '" target="_blank" rel="noopener">Enviar por WhatsApp</a>' : "") +
+      (p.email ? '<a class="btn primary sm" data-act="pros-mail" href="#" target="_blank" rel="noopener">Enviar por email</a>' : "") +
+      '<button type="button" class="btn ghost sm" data-act="pros-copy">Copiar mensaje</button>' +
+      '<span class="pros-more">' +
+      (p.lead ? '<button type="button" class="btn ghost sm" data-act="pros-open-lead">Ver en Contactos</button>' : '<button type="button" class="btn ghost sm" data-act="pros-lead">Pasar a Contactos</button>') +
+      '<button type="button" class="btn ghost sm" data-act="pros-edit">Editar</button>' +
+      '<button type="button" class="btn icon sm danger" data-act="pros-del" aria-label="Borrar" title="Borrar">✕</button></span>' +
+      "</footer></article>";
+  }
+
+  function renderPros() {
+    if (!S.pros) {
+      $("#main").innerHTML = '<p class="muted">Cargando búsquedas…</p>';
+      loadPros().then(function () { if (S.page === "busquedas") renderPros(); }).catch(function (e) { toast(e.message, true); });
+      return;
+    }
+    var f = S.prosEstado || "", q = (S.prosQ || "").toLowerCase().trim();
+    var count = function (k) { return S.pros.filter(function (p) { return (p.estado || "pendiente") === k; }).length; };
+    var list = S.pros.filter(function (p) {
+      if (f && (p.estado || "pendiente") !== f) return false;
+      if (!f && p.estado === "descartado") return false;
+      return !q || [p.nombre, p.cargo, p.empresa, p.pais, p.ciudad, p.resumen].join(" ").toLowerCase().indexOf(q) > -1;
+    });
+    $("#main").innerHTML =
+      '<section class="pros-intro panel"><div><h3>Clientes potenciales encontrados con Claude</h3>' +
+      '<p class="muted small">1. Copia las instrucciones. 2. En LinkedIn, abre Claude en Chrome y pégaselas. 3. Claude investiga, te prepara un resumen y un mensaje por persona y lo importa aquí.</p></div>' +
+      '<div class="pros-btns"><button type="button" class="btn primary" data-act="pros-prompt">Copiar instrucciones para Claude</button>' +
+      '<button type="button" class="btn ghost" data-act="pros-import">Importar de Claude</button>' +
+      '<button type="button" class="btn ghost" data-act="pros-new">+ Añadir a mano</button></div></section>' +
+      (S.prosImport ? '<form id="pros-import-form" class="panel pros-import"><label class="f"><span>Pega aquí lo que te ha dado Claude</span>' +
+        '<textarea name="json" rows="8" placeholder=\'[{"nombre": "…", "cargo": "…", "resumen": "…", "mensaje": "…"}]\'></textarea></label>' +
+        '<div class="d-actions"><button class="btn primary" type="submit">Importar</button><button class="btn ghost" type="button" data-act="pros-import">Cancelar</button></div></form>' : "") +
+      '<nav class="toolbar"><input class="search" id="pros-q" type="search" placeholder="Buscar nombre, empresa, país…" value="' + esc(S.prosQ || "") + '" />' +
+      '<label class="sort-by"><span>Estado:</span><select id="pros-f"><option value="">Activos (' + (S.pros.length - count("descartado")) + ")</option>" +
+      Object.keys(PROS_ESTADOS).map(function (k) { return '<option value="' + k + '"' + (k === f ? " selected" : "") + ">" + PROS_ESTADOS[k] + " (" + count(k) + ")</option>"; }).join("") +
+      "</select></label></nav>" +
+      '<div id="pros-list" class="pros-list">' + (list.length ? list.map(prosCard).join("") :
+        '<p class="empty big">' + (S.pros.length ? "No hay búsquedas con este filtro." : "Aún no hay búsquedas. Copia las instrucciones y pídele a Claude que busque en LinkedIn.") + "</p>") + "</div>";
+  }
+
+  // Lee lo que pega el usuario: JSON (lista u objeto), aunque venga con texto o ``` alrededor.
+  function parseProsJson(txt) {
+    txt = String(txt || "").replace(/```(json)?/gi, "").trim();
+    var a = txt.indexOf("["), b = txt.lastIndexOf("]");
+    var tryParse = function (s) { try { return JSON.parse(s); } catch (e) { return null; } };
+    var out = a > -1 && b > a ? tryParse(txt.slice(a, b + 1)) : null;
+    if (!out) { var c = txt.indexOf("{"), d = txt.lastIndexOf("}"); out = c > -1 && d > c ? tryParse(txt.slice(c, d + 1)) : null; }
+    if (out && !Array.isArray(out)) out = Array.isArray(out.perfiles) ? out.perfiles : Array.isArray(out.prospectos) ? out.prospectos : [out];
+    return out;
+  }
+
+  function saveProsField(id, patch, via) {
+    return api("prospect_save", { id: id, p: patch, via: via || "" }).then(function (j) { S.pros = j.prospectos; return j; });
+  }
+
+  function openPros(id) {
+    var p = id ? prosById(id) : null;
+    if (id && !p) return;
+    p = p || {};
+    S.open = "_p" + (p.id || "new");
+    S.dirty = false;
+    var ta = function (name, label, rows, ph) { return '<label class="f full"><span>' + label + '</span><textarea name="' + name + '" rows="' + rows + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : "") + ">" + esc(p[name] || "") + "</textarea></label>"; };
+    $(".drawer-panel").innerHTML =
+      '<form id="pros-form" autocomplete="off"><input type="hidden" name="pid" value="' + esc(p.id || "") + '" />' +
+      '<header class="d-head"><div><h2 id="d-title">' + (p.id ? esc(up(p.nombre)) : "Nueva búsqueda") + "</h2></div>" +
+      '<button type="button" class="btn icon" data-close aria-label="Cerrar">✕</button></header>' +
+      '<div class="grid">' + field("nombre", "Nombre y apellidos", p.nombre) + field("cargo", "Cargo", p.cargo) +
+      field("empresa", "Empresa", p.empresa) + field("pais", "País", p.pais) + field("ciudad", "Ciudad", p.ciudad) +
+      field("linkedin", "Perfil de LinkedIn (URL)", p.linkedin) + field("telefono", "Teléfono (con prefijo)", p.telefono, "tel") + field("email", "Email", p.email, "email") + "</div>" +
+      ta("resumen", "Resumen", 5, "A qué se dedica, qué le puede interesar…") +
+      field("asunto", "Asunto (si le escribes por email)", p.asunto) +
+      ta("mensaje", "Mensaje para abrir conversación", 6) +
+      ta("notas", "Notas", 3) +
+      '<div class="d-actions"><button class="btn primary" type="submit">' + (p.id ? "Guardar" : "Añadir") + "</button></div></form>";
+    showDrawer();
+  }
+
   /* ---------- Eventos ---------- */
   window.addEventListener("hashchange", function () { go(location.hash.slice(1)); });
 
@@ -1271,6 +1402,31 @@
     if (act) {
       var a = act.getAttribute("data-act");
       if (a === "new") openLead(null);
+      if (a === "pros-prompt") { copyText(CLAUDE_PROMPT, "Instrucciones copiadas. Pégaselas a Claude en Chrome estando en LinkedIn."); return; }
+      if (a === "pros-import") { S.prosImport = !S.prosImport; renderPros(); if (S.prosImport) $("#pros-import-form textarea").focus(); return; }
+      if (a === "pros-new") { openPros(null); return; }
+      if (a.indexOf("pros-") === 0 && act.closest("[data-pros]")) {
+        var card = act.closest("[data-pros]"), pid = card.getAttribute("data-pros"), pr = prosById(pid), msg = $(".pros-msg", card).value;
+        if (a === "pros-edit") openPros(pid);
+        if (a === "pros-copy") copyText(msg, "Mensaje copiado");
+        if (a === "pros-wa" || a === "pros-mail") {
+          if (a === "pros-wa") act.href = waLink(pr.telefono) + "?text=" + encodeURIComponent(msg);
+          else act.href = gmailLink(pr, msg);
+          var patch = { mensaje: msg };
+          if ((pr.estado || "pendiente") === "pendiente") patch.estado = "contactado";
+          saveProsField(pid, patch, a === "pros-wa" ? "whatsapp" : "email").then(function () { if (S.page === "busquedas") renderPros(); }, function (err) { toast(err.message, true); });
+          return; // deja que el enlace se abra
+        }
+        if (a === "pros-del" && confirm("¿Borrar a " + up(pr.nombre) + " de Búsquedas potenciales?")) {
+          api("prospect_delete", { id: pid }).then(function (j) { S.pros = j.prospectos; renderPros(); toast("Borrado"); }, function (err) { toast(err.message, true); });
+        }
+        if (a === "pros-lead") {
+          api("prospect_lead", { id: pid }).then(function (j) { S.pros = j.prospectos; S.leads = j.leads; renderPros(); toast("Añadido a Contactos con origen LinkedIn"); }, function (err) { toast(err.message, true); });
+        }
+        if (a === "pros-open-lead") { location.hash = "contactos"; setTimeout(function () { openLead(pr.lead); }, 50); }
+        e.preventDefault();
+        return;
+      }
       if (a === "doc-dir") { S.docDir = S.docDir === "asc" ? "desc" : "asc"; renderDocs(); return; }
       if (a === "folder") { S.carpeta = act.getAttribute("data-folder"); renderDocs(); }
       if (a === "folder-new") { S.newFolder = true; renderDocs(); $("#folder-form [name=nombre]").focus(); }
@@ -1504,6 +1660,22 @@
     var f = e.target, fid = f.getAttribute("id"); // no f.id: un campo name="id" lo taparía
     if (fid === "lead-form") { e.preventDefault(); submitLead(f); }
     if (fid === "sale-form") { e.preventDefault(); submitSale(f); }
+    if (fid === "pros-form") {
+      e.preventDefault();
+      var pdata = {};
+      $$("input[name], textarea[name]", f).forEach(function (x) { if (x.name !== "pid") pdata[x.name] = x.value.trim(); });
+      if (!pdata.nombre) { toast("Pon al menos el nombre", true); return; }
+      saveProsField(f.elements.pid.value, pdata).then(function () { S.dirty = false; closeDrawer(true); renderPros(); toast("Guardado"); }, function (err) { toast(err.message, true); });
+    }
+    if (fid === "pros-import-form") {
+      e.preventDefault();
+      var items = parseProsJson(f.elements.json.value);
+      if (!items || !items.length) { toast("No entiendo el texto pegado. Pide a Claude que te lo dé en formato JSON.", true); return; }
+      api("prospect_import", { items: items }).then(function (j) {
+        S.pros = j.prospectos; S.prosImport = false; S.prosEstado = ""; renderPros();
+        toast(j.nuevos + (j.nuevos === 1 ? " persona nueva" : " personas nuevas") + (j.actualizados ? " · " + j.actualizados + " actualizadas" : ""));
+      }, function (err) { toast(err.message, true); });
+    }
     if (fid === "colors-form") {
       e.preventDefault();
       var rules = $$("#color-rules li", f).map(function (li) { return { p: $(".cr-p", li).value.trim(), c: $(".cr-c", li).value }; }).filter(function (r) { return r.p; });
@@ -1541,6 +1713,11 @@
 
   document.addEventListener("input", function (e) {
     var t = e.target;
+    if (t.id === "pros-q") {
+      S.prosQ = t.value;
+      var pos = t.selectionStart; renderPros(); var nq = $("#pros-q"); nq.focus(); try { nq.setSelectionRange(pos, pos); } catch (err) {}
+      return;
+    }
     if (t.closest(".drawer") && t.type !== "file" && !t.closest("#pick-form")) S.dirty = true;
     if (t.id === "q" || t.id === "q-docs") {
       S.q = t.value;
@@ -1556,6 +1733,16 @@
 
   document.addEventListener("change", function (e) {
     var t = e.target;
+    if (t.id === "pros-f") { S.prosEstado = t.value; renderPros(); return; }
+    if (t.classList.contains("pros-estado")) {
+      saveProsField(t.closest("[data-pros]").getAttribute("data-pros"), { estado: t.value }).then(function () { renderPros(); toast("Estado: " + PROS_ESTADOS[t.value]); }, function (err) { toast(err.message, true); });
+      return;
+    }
+    if (t.classList.contains("pros-msg")) {
+      var pid2 = t.closest("[data-pros]").getAttribute("data-pros");
+      if ((prosById(pid2) || {}).mensaje !== t.value) saveProsField(pid2, { mensaje: t.value }).then(function () { toast("Mensaje guardado"); }, function (err) { toast(err.message, true); });
+      return;
+    }
     if (t.id === "f-orden") { S.orden = t.value; storeSort(); refreshResults(); }
     if (t.classList.contains("h-chk") || t.classList.contains("h-date")) {
       var li = t.closest(".hito"), box = $(".h-chk", li), date = $(".h-date", li);

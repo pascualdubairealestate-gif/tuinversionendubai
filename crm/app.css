@@ -318,6 +318,7 @@ tbody tr:last-child td { border-bottom: 0; }
   .side .brand, .side-foot { display: none; }
   .nav { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); width: 100%; gap: 2px; }
   .nav-link { flex-direction: column; gap: 3px; padding: 6px 2px; font-size: 10.5px; text-align: center; justify-content: center; }
+  .nav-link .nav-long { display: none; }
   .content { padding: 0 16px 96px; }
   .mob-only { display: inline-flex; }
   .top { padding-top: 14px; }
@@ -474,3 +475,29 @@ tbody tr:last-child td { border-bottom: 0; }
 .wk-ev small { display: block; opacity: .85; font-size: 10.5px; }
 .wk-now { position: absolute; left: 0; right: 0; height: 2px; background: var(--red); pointer-events: none; }
 .wk-now::before { content: ""; position: absolute; left: -4px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+
+/* Búsquedas potenciales */
+.pros-intro { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
+.pros-intro h3 { font-size: 16px; font-weight: 800; margin: 0 0 4px; }
+.pros-intro p { margin: 0; max-width: 60ch; }
+.pros-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.pros-import { margin-bottom: 14px; display: grid; gap: 12px; }
+.pros-import textarea { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
+.pros-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 14px; margin-top: 12px; }
+.pros { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow); padding: 16px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.pros-h { display: flex; gap: 12px; align-items: flex-start; }
+.pros-who { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.pros-who b { font-size: 15px; }
+.pros-who small { font-size: 12px; overflow-wrap: anywhere; }
+.pros-estado { width: auto; min-height: 30px; padding: 2px 8px; font-size: 12px; font-weight: 700; border-radius: 99px; }
+.pros-estado.st-contactado { background: rgba(47, 125, 225, .1); color: #1d5fb8; }
+.pros-estado.st-respondio { background: rgba(31, 157, 99, .12); color: #17784b; }
+.pros-estado.st-descartado { color: var(--mute); }
+.pros-sec { display: grid; gap: 6px; min-width: 0; }
+.pros-l { font-size: 11px; font-weight: 800; color: var(--mute); text-transform: uppercase; letter-spacing: .05em; }
+.pros-sum { margin: 0; font-size: 14px; line-height: 1.55; white-space: pre-line; overflow-wrap: anywhere; }
+.pros-data { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 2px 0 0; font-size: 13px; }
+.pros-data a { color: var(--amber-ink); font-weight: 700; text-decoration: none; }
+.pros-msg { width: 100%; font-size: 14px; line-height: 1.5; resize: vertical; }
+.pros-acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding-top: 12px; border-top: 1px solid var(--line); }
+.pros-more { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }

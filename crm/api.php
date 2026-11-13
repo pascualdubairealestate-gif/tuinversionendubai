@@ -289,7 +289,7 @@ if ($action === 'export') {
   if ($fmt === 'json') {
     header('Content-Type: application/json; charset=utf-8');
     header("Content-Disposition: attachment; filename=\"crm-copia-$stamp.json\"");
-    echo json_encode(['contactos' => $leads, 'ventas' => store_read('ventas', [])], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    echo json_encode(['contactos' => $leads, 'ventas' => store_read('ventas', []), 'busquedas' => store_read('prospectos', [])], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
   }
   $onlyNl = ($_GET['solo'] ?? '') === 'boletin';
@@ -536,6 +536,135 @@ if ($action === 'doc') {
   }
   http_response_code(404);
   exit('No encontrado');
+}
+
+/* ---------- Búsquedas potenciales (personas encontradas con Claude en LinkedIn) ---------- */
+const PROS_FIELDS = ['nombre' => 120, 'cargo' => 160, 'empresa' => 160, 'pais' => 80, 'ciudad' => 80, 'linkedin' => 300, 'telefono' => 40, 'email' => 160, 'resumen' => 3000, 'mensaje' => 3000, 'asunto' => 160, 'notas' => 2000];
+const PROS_ESTADOS = ['pendiente', 'contactado', 'respondio', 'descartado'];
+
+function pros_clean(array $in, array $base = []) {
+  $p = $base;
+  foreach (PROS_FIELDS as $f => $max) if (array_key_exists($f, $in)) $p[$f] = cut(is_scalar($in[$f]) ? (string) $in[$f] : '', $max);
+  if (isset($in['estado']) && in_array($in['estado'], PROS_ESTADOS, true)) $p['estado'] = $in['estado'];
+  if (!empty($p['email'])) $p['email'] = strtolower($p['email']);
+  if (!empty($p['linkedin']) && !preg_match('~^https?://~i', $p['linkedin'])) $p['linkedin'] = 'https://' . ltrim($p['linkedin'], '/');
+  return $p;
+}
+function pros_key(array $p) {
+  if (!empty($p['linkedin'])) return 'in:' . strtolower(rtrim(preg_replace('~^https?://(www\.)?~i', '', $p['linkedin']), '/'));
+  if (!empty($p['email'])) return 'em:' . $p['email'];
+  return 'nm:' . strtolower(($p['nombre'] ?? '') . '|' . ($p['empresa'] ?? ''));
+}
+
+if ($action === 'prospects') {
+  require_auth(false);
+  json_out(['prospectos' => store_read('prospectos', [])]);
+}
+
+if ($action === 'prospect_save' && $method === 'POST') {
+  require_auth();
+  $b = body();
+  $id = (string) ($b['id'] ?? '');
+  $in = is_array($b['p'] ?? null) ? $b['p'] : [];
+  $list = with_lock('prospectos', function () use ($id, $in, $b) {
+    $list = store_read('prospectos', []);
+    foreach ($list as $i => $p) if ($p['id'] === $id) {
+      $prev = $p['estado'] ?? 'pendiente';
+      $list[$i] = pros_clean($in, $p);
+      if (($list[$i]['estado'] ?? '') === 'contactado' && $prev === 'pendiente') $list[$i]['contactado'] = now_iso();
+      if (!empty($b['via'])) $list[$i]['via'] = cut($b['via'], 20);
+      $list[$i]['actualizado'] = now_iso();
+      store_write('prospectos', $list);
+      return $list;
+    }
+    if ($id !== '') return null;
+    $p = pros_clean($in, ['id' => 'p' . substr(new_id(), 1), 'estado' => 'pendiente', 'creado' => now_iso()]);
+    if (trim($p['nombre'] ?? '') === '') return false;
+    array_unshift($list, $p);
+    store_write('prospectos', $list);
+    return $list;
+  });
+  if ($list === null) json_out(['error' => 'no existe'], 404);
+  if ($list === false) json_out(['error' => 'Falta el nombre'], 422);
+  json_out(['prospectos' => $list]);
+}
+
+if ($action === 'prospect_import' && $method === 'POST') {
+  require_auth();
+  $items = body()['items'] ?? [];
+  if (!is_array($items) || !$items) json_out(['error' => 'No hay perfiles para importar'], 422);
+  $res = with_lock('prospectos', function () use ($items) {
+    $list = store_read('prospectos', []);
+    $idx = [];
+    foreach ($list as $i => $p) $idx[pros_key($p)] = $i;
+    $nuevos = 0; $act = 0;
+    foreach (array_slice($items, 0, 200) as $it) {
+      if (!is_array($it)) continue;
+      $p = pros_clean($it);
+      if (trim($p['nombre'] ?? '') === '') continue;
+      $k = pros_key($p);
+      if (isset($idx[$k])) {
+        // Ya estaba: completa lo que falte y actualiza resumen y mensaje si aún no le has escrito.
+        $old = $list[$idx[$k]];
+        foreach ($p as $f => $v) if ($v !== '' && (($old[$f] ?? '') === '' || (($old['estado'] ?? '') === 'pendiente' && in_array($f, ['resumen', 'mensaje', 'asunto'], true)))) $old[$f] = $v;
+        $old['actualizado'] = now_iso();
+        $list[$idx[$k]] = $old; $act++;
+      } else {
+        $p += ['id' => 'p' . substr(new_id(), 1), 'estado' => 'pendiente', 'creado' => now_iso()];
+        array_unshift($list, $p);
+        $idx = []; foreach ($list as $i => $x) $idx[pros_key($x)] = $i;
+        $nuevos++;
+      }
+    }
+    store_write('prospectos', $list);
+    return [$list, $nuevos, $act];
+  });
+  json_out(['prospectos' => $res[0], 'nuevos' => $res[1], 'actualizados' => $res[2]]);
+}
+
+if ($action === 'prospect_delete' && $method === 'POST') {
+  require_auth();
+  $id = (string) (body()['id'] ?? '');
+  $list = with_lock('prospectos', function () use ($id) {
+    $list = array_values(array_filter(store_read('prospectos', []), function ($p) use ($id) { return $p['id'] !== $id; }));
+    store_write('prospectos', $list);
+    return $list;
+  });
+  json_out(['prospectos' => $list]);
+}
+
+// Pasa una búsqueda a Contactos (origen LinkedIn) con el resumen como nota.
+if ($action === 'prospect_lead' && $method === 'POST') {
+  require_auth();
+  $id = (string) (body()['id'] ?? '');
+  $pros = null;
+  foreach (store_read('prospectos', []) as $p) if ($p['id'] === $id) $pros = $p;
+  if (!$pros) json_out(['error' => 'no existe'], 404);
+  $lead = with_lock('leads', function () use ($pros) {
+    $leads = store_read('leads', []);
+    foreach ($leads as $l) {
+      if (!empty($pros['lead']) && $l['id'] === $pros['lead']) return $l;
+      if (!empty($pros['email']) && $l['email'] === $pros['email']) return $l;
+      if (strlen(phone_digits($pros['telefono'] ?? '')) >= 7 && phone_digits($l['telefono']) === phone_digits($pros['telefono'])) return $l;
+    }
+    $l = blank_lead();
+    $l['origen'] = 'LinkedIn';
+    $l = apply_patch($l, ['nombre' => $pros['nombre'] ?? '', 'email' => $pros['email'] ?? '', 'telefono' => $pros['telefono'] ?? '', 'pais' => $pros['pais'] ?? '', 'etiquetas' => 'linkedin']);
+    $txt = 'Desde Búsquedas potenciales' . (!empty($pros['cargo']) || !empty($pros['empresa']) ? ': ' . trim(($pros['cargo'] ?? '') . ' · ' . ($pros['empresa'] ?? ''), ' ·') : '');
+    if (!empty($pros['linkedin'])) $txt .= "\n" . $pros['linkedin'];
+    if (!empty($pros['resumen'])) $txt .= "\n\n" . $pros['resumen'];
+    activity($l, $txt, 'nota');
+    $leads[] = $l;
+    store_write('leads', $leads);
+    return $l;
+  });
+  $list = with_lock('prospectos', function () use ($id, $lead) {
+    $list = store_read('prospectos', []);
+    foreach ($list as $i => $p) if ($p['id'] === $id) { $list[$i]['lead'] = $lead['id']; }
+    store_write('prospectos', $list);
+    return $list;
+  });
+  json_out(['prospectos' => $list, 'lead' => $lead, 'leads' => store_read('leads', [])]);
 }
 
 json_out(['error' => 'acción desconocida'], 404);
