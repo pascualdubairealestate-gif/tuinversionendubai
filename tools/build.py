@@ -350,7 +350,7 @@ pages["colombia"] = article(
     "Invertir en Dubái <em>desde Colombia</em>",
     "Cómo comprar un piso en Dubái siendo colombiano: precios en pesos colombianos, cómo enviar el dinero por el mercado cambiario, qué declarar ante la DIAN y cómo comprar a distancia.",
     "Para un inversor colombiano, Dubái es una forma de tener patrimonio en una moneda ligada al dólar, con rentas de alquiler y sin impuesto sobre la renta en Emiratos. Te explico precios, envío del dinero e impuestos en Colombia.",
-    "/assets/img/proyecto-ciudad-mercedes.webp", "Proyecto residencial en Dubái",
+    "/assets/img/blog-colombia-emiratos.webp", "Bandera de Colombia junto a la bandera de Emiratos Árabes Unidos",
     [
         ("por-que", "Por qué Dubái atrae a inversores colombianos",
          ul("<strong>Patrimonio en dólares:</strong> el dírham va ligado al dólar y protege tu inversión de la devaluación del peso.",
@@ -400,7 +400,7 @@ pages["miami"] = article(
     "Invertir en Dubái <em>desde Miami</em>",
     "Guía para hispanos en Miami y Estados Unidos que quieren comprar en Dubái: sin riesgo de cambio con el dólar, cómo pagar, qué declarar al IRS y cómo comprar a distancia.",
     "Si vives en Miami o en cualquier parte de EE. UU., Dubái tiene una ventaja que pocos destinos ofrecen: el dírham va ligado al dólar. Te explico cómo se paga, qué declaras al IRS y por qué tantos inversores latinos de Florida lo están mirando.",
-    "/assets/img/pascual-llamada.webp", "Pascual Vidal en una videollamada con un inversor",
+    "/assets/img/blog-eeuu-emiratos.webp", "Bandera de Estados Unidos junto a la bandera de Emiratos Árabes Unidos",
     [
         ("por-que", "Por qué Dubái encaja con un inversor de Miami",
          ul("<strong>Sin riesgo de cambio:</strong> 1 USD = 3,6725 AED, fijo desde hace décadas. Compras, cobras y vendes prácticamente en dólares.",
