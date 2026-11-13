@@ -14,109 +14,105 @@
   <style>
     :root {
       --navy-950: #070d18; --navy-900: #0b1424; --navy-800: #12203a; --navy-700: #1b2c4b;
-      --ivory: #f4efe6; --sand: #d9c7a7; --mute: #9aa6b8; --line: rgba(244, 239, 230, .14);
+      --ivory: #f4efe6; --sand: #d9c7a7; --mute: #9aa6b8; --line: rgba(244, 239, 230, .16);
       --amber: #f7931e; --amber-2: #ffa326; --err: #ff8a7a;
       --f-display: "Cormorant Garamond", "Times New Roman", serif;
       --f-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
       --ease: cubic-bezier(.22, 1, .36, 1);
     }
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; }
+    html { scroll-behavior: smooth; }
     body {
-      margin: 0; overflow: hidden; color: var(--ivory); font-family: var(--f-body); -webkit-font-smoothing: antialiased;
-      background: radial-gradient(120% 80% at 85% 0%, #1b2c4b 0%, rgba(27, 44, 75, 0) 60%), radial-gradient(90% 70% at 0% 100%, rgba(247, 147, 30, .10) 0%, rgba(247, 147, 30, 0) 60%), var(--navy-950);
+      margin: 0; color: var(--ivory); font-family: var(--f-body); -webkit-font-smoothing: antialiased; font-variant-numeric: lining-nums;
+      background: radial-gradient(120% 60% at 85% 0%, #1b2c4b 0%, rgba(27, 44, 75, 0) 60%), radial-gradient(90% 50% at 0% 100%, rgba(247, 147, 30, .10) 0%, rgba(247, 147, 30, 0) 60%), var(--navy-950);
+      background-attachment: fixed;
     }
-    button, input { font: inherit; color: inherit; }
-    .top { position: fixed; inset: 0 0 auto; z-index: 5; display: flex; align-items: center; justify-content: space-between; padding: 18px max(20px, env(safe-area-inset-left)) 0; }
-    .brand { display: flex; align-items: center; gap: 12px; color: var(--ivory); text-decoration: none; }
-    .brand-mark { display: grid; place-items: center; width: 40px; height: 46px; border: 1.5px solid var(--sand); border-radius: 20px 20px 6px 6px; font: 600 17px/1 var(--f-display); color: var(--ivory); }
+    button, input, select { font: inherit; color: inherit; }
+    .wrap { width: 100%; max-width: 640px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)); }
+    .top { position: absolute; inset: 0 0 auto; z-index: 5; padding: 18px max(20px, env(safe-area-inset-left)) 0; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; color: var(--ivory); text-decoration: none; }
+    .brand-mark { display: grid; place-items: center; width: 40px; height: 46px; border: 1.5px solid var(--sand); border-radius: 20px 20px 6px 6px; font: 600 17px/1 var(--f-display); }
     .brand-text { display: grid; line-height: 1.15; }
     .brand-text strong { font-weight: 700; font-size: 14px; }
     .brand-text small { font: italic 500 14px var(--f-display); color: var(--amber); }
-    .progress { position: fixed; inset: 0 0 auto; height: 4px; background: rgba(244, 239, 230, .08); z-index: 6; }
-    .progress i { display: block; height: 100%; width: 0; background: var(--amber); transition: width .5s var(--ease); }
 
-    .deck { position: relative; height: 100%; }
-    .slide {
-      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      padding: 96px max(20px, env(safe-area-inset-left)) 110px; overflow-y: auto;
-      opacity: 0; visibility: hidden; transform: translateY(60px);
-      transition: opacity .55s var(--ease), transform .55s var(--ease), visibility 0s .55s;
-    }
-    .slide.on { opacity: 1; visibility: visible; transform: none; transition: opacity .55s var(--ease), transform .55s var(--ease), visibility 0s; }
-    .slide.up { transform: translateY(-60px); }
-    .q { width: 100%; max-width: 680px; }
-    .intro { margin: 0 0 22px; font: 500 clamp(19px, 2.6vw, 22px)/1.35 var(--f-display); color: var(--sand); }
-    .intro em { color: var(--amber); }
-    h1, h2, .intro { font-variant-numeric: lining-nums; }
-    .num { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; color: var(--amber); margin-bottom: 10px; }
-    h1, h2 { font-family: var(--f-display); font-weight: 500; letter-spacing: -.01em; margin: 0 0 10px; }
-    h1 { font-size: clamp(40px, 7vw, 64px); line-height: 1.02; }
-    h2 { font-size: clamp(28px, 4.6vw, 40px); line-height: 1.1; }
+    /* Introducción: ocupa la pantalla y se desliza hacia abajo al formulario */
+    .hero { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding-block: 110px 120px; position: relative; }
+    .eyebrow { font-weight: 700; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); margin: 0 0 16px; }
+    h1 { font: 500 clamp(44px, 9vw, 72px)/1 var(--f-display); letter-spacing: -.01em; margin: 0 0 18px; }
     h1 em, h2 em { color: var(--amber); }
-    .req { color: var(--amber); }
-    .help { color: var(--mute); font-size: 15px; margin: 0 0 26px; line-height: 1.5; }
+    .lead { color: #c9d1dd; font-size: clamp(16px, 2.2vw, 18px); line-height: 1.6; margin: 0; max-width: 520px; }
+    .ticks { list-style: none; padding: 0; margin: 26px 0 0; display: grid; gap: 10px; color: var(--sand); font-size: 15px; }
+    .ticks li::before { content: "✓"; color: var(--amber); font-weight: 800; margin-right: 10px; }
+    .cue { position: absolute; left: 50%; bottom: max(28px, env(safe-area-inset-bottom)); transform: translateX(-50%); display: grid; justify-items: center; gap: 8px; color: var(--mute); font-size: 13px; font-weight: 600; text-decoration: none; }
+    .cue i { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid rgba(247, 147, 30, .6); color: var(--amber); font-style: normal; font-size: 18px; animation: bob 1.8s var(--ease) infinite; }
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
 
-    .line { width: 100%; border: 0; border-bottom: 2px solid var(--line); background: transparent; padding: 10px 2px; font-size: clamp(22px, 3.4vw, 28px); outline: none; transition: border-color .2s; }
-    .line::placeholder { color: rgba(244, 239, 230, .3); }
-    .line:focus { border-bottom-color: var(--amber); }
+    /* Formulario */
+    .form { padding-block: 40px 90px; }
+    h2 { font: 500 clamp(32px, 5vw, 44px)/1.08 var(--f-display); margin: 0 0 8px; }
+    .sub { color: var(--mute); margin: 0 0 30px; font-size: 15px; }
+    .field { margin: 0 0 26px; }
+    .lbl { display: flex; align-items: baseline; gap: 8px; font-weight: 700; font-size: 15px; margin-bottom: 10px; }
+    .lbl .req { color: var(--amber); }
+    .lbl .opt-t { color: var(--mute); font-weight: 500; font-size: 13px; }
+    .box { width: 100%; min-height: 54px; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: rgba(244, 239, 230, .04); outline: none; font-size: 17px; transition: border-color .2s, background .2s; }
+    .box::placeholder { color: rgba(244, 239, 230, .35); }
+    .box:focus, .box:focus-within, .dd > button[aria-expanded="true"] { border-color: var(--amber); background: rgba(244, 239, 230, .07); }
+    .field.bad .box { border-color: var(--err); }
+    .err { margin: 8px 0 0; color: var(--err); font-size: 14px; font-weight: 600; }
+    .err:empty { display: none; }
 
-    .phone { display: flex; align-items: stretch; gap: 12px; position: relative; }
-    .cc { display: inline-flex; align-items: center; gap: 8px; flex: none; padding: 0 12px; border: 0; border-bottom: 2px solid var(--line); background: transparent; cursor: pointer; font-size: clamp(18px, 3vw, 24px); }
-    .cc:focus-visible, .cc[aria-expanded="true"] { border-bottom-color: var(--amber); outline: none; }
-    .cc img, .opt-cc img { width: 28px; height: 20px; border-radius: 3px; object-fit: cover; box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); }
-    .cc .car { font-size: 12px; color: var(--mute); }
-    .cc-menu { position: absolute; z-index: 10; top: calc(100% + 8px); left: 0; width: min(360px, 100%); max-height: 320px; display: flex; flex-direction: column; background: var(--navy-800); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 20px 50px rgba(0, 0, 0, .45); overflow: hidden; }
-    .cc-menu[hidden] { display: none; }
-    .cc-menu input { margin: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--navy-950); outline: none; font-size: 15px; }
-    .cc-menu input:focus { border-color: var(--amber); }
-    .cc-list { overflow-y: auto; margin: 0; padding: 0 6px 6px; list-style: none; }
+    .phone { display: flex; gap: 10px; position: relative; }
+    .cc { display: inline-flex; align-items: center; gap: 8px; flex: none; width: auto; cursor: pointer; }
+    .cc img, .opt-cc img { width: 26px; height: 18px; border-radius: 3px; object-fit: cover; box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); }
+    .car { font-size: 11px; color: var(--mute); margin-left: auto; }
+    .phone .box[type="tel"] { flex: 1; min-width: 0; }
+
+    .menu { position: absolute; z-index: 10; top: calc(100% + 8px); left: 0; right: 0; max-height: 320px; display: flex; flex-direction: column; background: var(--navy-800); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 20px 50px rgba(0, 0, 0, .45); overflow: hidden; }
+    .menu[hidden] { display: none; }
+    .menu input[type="search"] { margin: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--navy-950); outline: none; font-size: 15px; }
+    .menu input[type="search"]:focus { border-color: var(--amber); }
+    .menu ul { overflow-y: auto; margin: 0; padding: 6px; list-style: none; }
     .opt-cc { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border: 0; background: none; border-radius: 9px; cursor: pointer; text-align: left; font-size: 15px; }
     .opt-cc span { flex: 1; }
     .opt-cc small { color: var(--mute); font-size: 14px; }
     .opt-cc:hover, .opt-cc.act { background: rgba(247, 147, 30, .14); }
 
-    .opts { display: grid; gap: 10px; margin: 0; padding: 0; border: 0; }
-    .opt { display: flex; align-items: center; gap: 14px; width: 100%; max-width: 460px; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(247, 147, 30, .35); background: rgba(247, 147, 30, .06); cursor: pointer; text-align: left; font-size: 17px; transition: background .2s, border-color .2s, transform .15s; }
-    .opt:hover { background: rgba(247, 147, 30, .14); }
-    .opt:active { transform: scale(.99); }
-    .opt kbd { display: grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 6px; border: 1px solid rgba(247, 147, 30, .6); font: 700 12px var(--f-body); color: var(--amber); }
-    .opt .tick { margin-left: auto; opacity: 0; color: var(--amber); font-weight: 800; }
-    .opt[aria-pressed="true"], .opt[aria-checked="true"] { background: rgba(247, 147, 30, .2); border-color: var(--amber); }
-    .opt[aria-pressed="true"] kbd, .opt[aria-checked="true"] kbd { background: var(--amber); color: var(--navy-950); }
-    .opt[aria-pressed="true"] .tick, .opt[aria-checked="true"] .tick { opacity: 1; }
-    .opt:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+    /* Desplegables */
+    .dd { position: relative; }
+    .dd > button { display: flex; align-items: center; gap: 10px; text-align: left; cursor: pointer; }
+    .dd > button span:first-child { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dd > button.empty span:first-child { color: rgba(244, 239, 230, .45); }
+    .chk { display: flex; align-items: center; gap: 12px; padding: 11px 10px; border-radius: 9px; cursor: pointer; font-size: 15px; }
+    .chk:hover { background: rgba(247, 147, 30, .12); }
+    .chk input { width: 18px; height: 18px; accent-color: var(--amber); flex: none; margin: 0; }
+    .menu .done { margin: 0 10px 10px; min-height: 40px; border: 0; border-radius: 10px; background: var(--amber); color: var(--navy-950); font-weight: 800; cursor: pointer; }
 
-    .actions { display: flex; align-items: center; gap: 14px; margin-top: 28px; flex-wrap: wrap; }
-    .btn { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 24px; border: 0; border-radius: 999px; background: var(--amber); color: var(--navy-950); font-weight: 800; font-size: 16px; cursor: pointer; text-decoration: none; transition: background .2s, transform .15s; }
-    .btn:hover { background: var(--amber-2); }
-    .btn:active { transform: scale(.98); }
-    .btn[disabled] { opacity: .6; cursor: wait; }
-    .hint { color: var(--mute); font-size: 13px; }
-    .hint b { color: var(--ivory); font-weight: 700; }
-    .err { min-height: 22px; margin: 10px 0 0; color: var(--err); font-size: 14px; font-weight: 600; }
-    .consent { display: flex; gap: 10px; align-items: flex-start; margin-top: 22px; color: var(--mute); font-size: 13px; line-height: 1.5; max-width: 460px; }
-    .consent input { width: 18px; height: 18px; accent-color: var(--amber); margin-top: 1px; flex: none; }
+    .consent { display: flex; gap: 12px; align-items: flex-start; margin: 4px 0 0; color: var(--mute); font-size: 14px; line-height: 1.5; cursor: pointer; }
+    .consent input { width: 20px; height: 20px; accent-color: var(--amber); margin: 1px 0 0; flex: none; }
     .consent a { color: var(--ivory); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 56px; margin-top: 26px; padding: 0 24px; border: 0; border-radius: 999px; background: var(--amber); color: var(--navy-950); font-weight: 800; font-size: 17px; cursor: pointer; text-decoration: none; transition: background .2s, transform .15s; }
+    .btn:hover { background: var(--amber-2); }
+    .btn:active { transform: scale(.99); }
+    .btn[disabled] { opacity: .6; cursor: wait; }
+    .safe { text-align: center; color: var(--mute); font-size: 13px; margin: 14px 0 0; }
     .hp { position: absolute; left: -9999px; }
+    :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
 
-    .nav { position: fixed; right: max(20px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); z-index: 5; display: flex; gap: 2px; }
-    .nav button { width: 42px; height: 38px; border: 0; background: var(--amber); color: var(--navy-950); font-size: 18px; font-weight: 800; cursor: pointer; }
-    .nav button:first-child { border-radius: 8px 0 0 8px; }
-    .nav button:last-child { border-radius: 0 8px 8px 0; }
-    .nav button[disabled] { opacity: .35; cursor: default; }
+    .thanks { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding-block: 100px; }
+    .thanks[hidden] { display: none; }
     .done-ic { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--amber); color: var(--navy-950); font-size: 30px; font-weight: 800; margin-bottom: 22px; }
-    @media (max-width: 560px) {
-      .top { padding-top: 14px; }
-      .brand-text { display: none; }
-      .slide { align-items: flex-start; padding-top: 90px; }
-      .opt { font-size: 16px; }
-    }
-    @media (prefers-reduced-motion: reduce) { .slide, .slide.on { transition: none; transform: none; } }
+    .thanks .btn { width: auto; align-self: flex-start; }
+
+    /* Aparición suave al deslizar */
+    .rv { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+    .rv.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .rv { opacity: 1; transform: none; transition: none; } .cue i { animation: none; } }
+    @media (max-width: 560px) { .brand-text { display: none; } }
   </style>
 </head>
 <body>
-  <div class="progress" aria-hidden="true"><i id="bar"></i></div>
   <header class="top">
     <a class="brand" href="/" aria-label="Tu inversión en Dubái · Pascual Vidal">
       <span class="brand-mark">PV</span>
@@ -124,75 +120,81 @@
     </a>
   </header>
 
-  <form class="deck" id="f" novalidate>
-    <input class="hp" type="text" name="web" tabindex="-1" autocomplete="off" aria-hidden="true" />
-
-    <section class="slide" data-step="0">
-      <div class="q">
-        <p class="intro">Invierte en Dubái <em>con criterio</em>. Cuéntame tu caso en 30 segundos.</p>
-        <div class="num">1 →</div>
-        <h2><label for="nombre">Nombre y apellidos <span class="req">*</span></label></h2>
-        <p class="help">Para saber cómo dirigirme a ti.</p>
-        <input class="line" id="nombre" name="nombre" autocomplete="name" placeholder="Escribe aquí tu nombre…" maxlength="120" />
-        <p class="err" id="e1" role="alert"></p>
-        <div class="actions"><button type="button" class="btn" data-next>Continuar ✓</button><span class="hint">pulsa <b>Enter ↵</b></span></div>
-      </div>
+  <main id="main">
+    <section class="hero wrap">
+      <p class="eyebrow rv">Asesoría gratuita</p>
+      <h1 class="rv">Invierte en Dubái <em>con criterio</em></h1>
+      <p class="lead rv">Cuéntame tu caso en 30 segundos y te escribo por WhatsApp para asesorarte, sin compromiso.</p>
+      <ul class="ticks rv">
+        <li>Proyectos seleccionados según tu objetivo</li>
+        <li>Sin comisiones para ti: las paga el promotor</li>
+        <li>Te acompaño en todo el proceso, de la reserva a las llaves</li>
+      </ul>
+      <a class="cue" href="#form" aria-label="Ir al formulario"><span>Desliza</span><i aria-hidden="true">↓</i></a>
     </section>
 
-    <section class="slide" data-step="1">
-      <div class="q">
-        <div class="num">2 →</div>
-        <h2><label for="tel">Número de teléfono <span class="req">*</span></label></h2>
-        <p class="help">Te escribiré por WhatsApp.</p>
-        <div class="phone">
-          <button type="button" class="cc" id="cc" aria-haspopup="listbox" aria-expanded="false" aria-label="Prefijo del país"></button>
-          <input class="line" id="tel" name="tel" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="600 000 000" maxlength="20" />
-          <div class="cc-menu" id="ccMenu" hidden>
-            <input type="search" id="ccQ" placeholder="Buscar país o prefijo…" aria-label="Buscar país" autocomplete="off" />
-            <ul class="cc-list" id="ccList" role="listbox" aria-label="Países"></ul>
+    <section class="form wrap" id="form">
+      <h2 class="rv">Solicita <em>información</em></h2>
+      <p class="sub rv">Solo te llevará unos segundos.</p>
+      <form id="f" novalidate>
+        <input class="hp" type="text" name="web" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+        <div class="field rv" id="fNombre">
+          <label class="lbl" for="nombre">Nombre y apellidos <span class="req">*</span></label>
+          <input class="box" id="nombre" name="nombre" autocomplete="name" placeholder="Tu nombre y apellidos" maxlength="120" required />
+          <p class="err" id="eNombre" role="alert"></p>
+        </div>
+
+        <div class="field rv" id="fTel">
+          <label class="lbl" for="tel">Número de teléfono <span class="req">*</span></label>
+          <div class="phone">
+            <button type="button" class="box cc" id="cc" aria-haspopup="listbox" aria-expanded="false" aria-label="Prefijo del país"></button>
+            <input class="box" id="tel" name="tel" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="600 000 000" maxlength="20" required />
+            <div class="menu" id="ccMenu" hidden>
+              <input type="search" id="ccQ" placeholder="Buscar país o prefijo…" aria-label="Buscar país" autocomplete="off" />
+              <ul id="ccList" role="listbox" aria-label="Países"></ul>
+            </div>
+          </div>
+          <p class="err" id="eTel" role="alert"></p>
+        </div>
+
+        <div class="field rv">
+          <span class="lbl" id="preL">Mayor preocupación antes de invertir <span class="opt-t">(opcional · puedes elegir varias)</span></span>
+          <div class="dd" id="preDD">
+            <button type="button" class="box empty" aria-haspopup="true" aria-expanded="false" aria-labelledby="preL preTxt"><span id="preTxt">Elige una o varias</span><span class="car" aria-hidden="true">▾</span></button>
+            <div class="menu" hidden>
+              <ul id="preList" role="group" aria-labelledby="preL"></ul>
+              <button type="button" class="done">Hecho</button>
+            </div>
           </div>
         </div>
-        <p class="err" id="e2" role="alert"></p>
-        <div class="actions"><button type="button" class="btn" data-next>Continuar ✓</button><span class="hint">pulsa <b>Enter ↵</b></span></div>
-      </div>
-    </section>
 
-    <section class="slide" data-step="2">
-      <div class="q">
-        <div class="num">3 →</div>
-        <h2>Mayor preocupación antes de invertir</h2>
-        <p class="help">Elige todas las que quieras.</p>
-        <div class="opts" id="pre" role="group" aria-label="Mayor preocupación antes de invertir"></div>
-        <div class="actions"><button type="button" class="btn" data-next>Continuar ✓</button><span class="hint">pulsa <b>Enter ↵</b></span></div>
-      </div>
-    </section>
+        <div class="field rv">
+          <span class="lbl" id="capL">Capital a invertir <span class="opt-t">(opcional)</span></span>
+          <div class="dd" id="capDD">
+            <button type="button" class="box empty" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="capL capTxt"><span id="capTxt">Elige una opción</span><span class="car" aria-hidden="true">▾</span></button>
+            <div class="menu" hidden>
+              <ul id="capList" role="listbox" aria-labelledby="capL"></ul>
+            </div>
+          </div>
+        </div>
 
-    <section class="slide" data-step="3">
-      <div class="q">
-        <div class="num">4 →</div>
-        <h2>Capital a invertir <span class="req">*</span></h2>
-        <p class="help">Una aproximación es suficiente.</p>
-        <div class="opts" id="cap" role="radiogroup" aria-label="Capital a invertir"></div>
-        <label class="consent"><input type="checkbox" id="ok" /> <span>Acepto la <a href="/privacidad/" target="_blank" rel="noopener">política de privacidad</a> y que Pascual Vidal me contacte.</span></label>
-        <p class="err" id="e4" role="alert"></p>
-        <div class="actions"><button type="submit" class="btn" id="send">Solicitar información</button></div>
-      </div>
+        <div class="rv">
+          <label class="consent"><input type="checkbox" id="ok" /> <span>Acepto la <a href="/privacidad/" target="_blank" rel="noopener">política de privacidad</a> y que Pascual Vidal me contacte.</span></label>
+          <p class="err" id="eOk" role="alert"></p>
+          <button type="submit" class="btn" id="send">Enviar formulario</button>
+          <p class="safe">Tus datos solo los veo yo. Nada de spam.</p>
+        </div>
+      </form>
     </section>
+  </main>
 
-    <section class="slide" data-step="4">
-      <div class="q">
-        <div class="done-ic" aria-hidden="true">✓</div>
-        <h2 id="gracias">¡Gracias!</h2>
-        <p class="help">He recibido tus datos. Te escribiré por WhatsApp muy pronto.<br />Ahora te llevo a la web…</p>
-        <div class="actions"><a class="btn" href="/">Ir a la web →</a></div>
-      </div>
-    </section>
-  </form>
-
-  <div class="nav" aria-label="Navegación">
-    <button type="button" id="prev" aria-label="Anterior">↑</button>
-    <button type="button" id="next" aria-label="Siguiente">↓</button>
-  </div>
+  <section class="thanks wrap" id="thanks" hidden>
+    <div class="done-ic" aria-hidden="true">✓</div>
+    <h2 id="gracias" tabindex="-1">¡Gracias!</h2>
+    <p class="sub">He recibido tus datos. Te escribiré por WhatsApp muy pronto.<br />Ahora te llevo a la web…</p>
+    <a class="btn" href="/">Ir a la web →</a>
+  </section>
 
   <script>
   (function () {
@@ -214,136 +216,130 @@
     PAISES.unshift(first);
 
     var $ = function (s) { return document.querySelector(s); };
-    var slides = [].slice.call(document.querySelectorAll(".slide"));
-    var LAST_Q = 3, step = 0, sending = false;
-    var data = { pais: PAISES[0], pre: [], cap: "" };
+    var $$ = function (s) { return [].slice.call(document.querySelectorAll(s)); };
+    var data = { pais: PAISES[0], pre: [], cap: "" }, sending = false;
 
     function emoji(iso) { return iso.replace(/./g, function (c) { return String.fromCodePoint(127397 + c.charCodeAt(0)); }); }
     // Bandera en imagen (se ve igual en todos los móviles); si no carga, se usa el emoji.
-    function flag(p) { return '<img src="https://flagcdn.com/w40/' + p.iso.toLowerCase() + '.png" alt="" width="28" height="20" loading="lazy" onerror="this.outerHTML=\'<span aria-hidden=true>' + emoji(p.iso) + '</span>\'" />'; }
+    function flag(p) { return '<img src="https://flagcdn.com/w40/' + p.iso.toLowerCase() + '.png" alt="" width="26" height="18" loading="lazy" onerror="this.outerHTML=\'<span aria-hidden=true>' + emoji(p.iso) + '</span>\'" />'; }
     function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-    function letter(i) { return String.fromCharCode(65 + i); }
+    function norm(t) { return t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
 
-    // Opciones
-    $("#pre").innerHTML = PREOCUPACIONES.map(function (t, i) {
-      return '<button type="button" class="opt" aria-pressed="false" data-v="' + esc(t) + '"><kbd>' + letter(i) + "</kbd>" + esc(t) + '<span class="tick">✓</span></button>';
-    }).join("");
-    $("#cap").innerHTML = CAPITAL.map(function (t, i) {
-      return '<button type="button" class="opt" role="radio" aria-checked="false" data-v="' + esc(t) + '"><kbd>' + letter(i) + "</kbd>" + esc(t) + '<span class="tick">✓</span></button>';
-    }).join("");
-
-    function togglePre(b) {
-      var v = b.getAttribute("data-v"), on = b.getAttribute("aria-pressed") !== "true";
-      if (v === "Nada en especial" && on) { [].forEach.call(document.querySelectorAll("#pre .opt"), function (x) { x.setAttribute("aria-pressed", "false"); }); }
-      else if (on) { var n = $('#pre .opt[data-v="Nada en especial"]'); n.setAttribute("aria-pressed", "false"); }
-      b.setAttribute("aria-pressed", String(on));
-      data.pre = [].map.call(document.querySelectorAll('#pre .opt[aria-pressed="true"]'), function (x) { return x.getAttribute("data-v"); });
+    // Abre y cierra menús (solo uno a la vez)
+    function menuOf(btn) { return btn.id === "cc" ? document.getElementById("ccMenu") : btn.nextElementSibling; }
+    function closeAll(except) {
+      $$("[aria-haspopup]").forEach(function (b) { var m = menuOf(b); if (m !== except) { m.hidden = true; b.setAttribute("aria-expanded", "false"); } });
     }
-    function pickCap(b) {
-      [].forEach.call(document.querySelectorAll("#cap .opt"), function (x) { x.setAttribute("aria-checked", String(x === b)); });
-      data.cap = b.getAttribute("data-v");
-      $("#e4").textContent = "";
-    }
-    $("#ok").addEventListener("change", function () { if (this.checked && data.cap) $("#e4").textContent = ""; });
-    $("#pre").addEventListener("click", function (e) { var b = e.target.closest(".opt"); if (b) togglePre(b); });
-    $("#cap").addEventListener("click", function (e) { var b = e.target.closest(".opt"); if (b) pickCap(b); });
+    document.addEventListener("click", function (e) { if (!e.target.closest(".phone, .dd")) closeAll(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAll(); });
 
     // Prefijo con banderas
-    var menu = $("#ccMenu"), list = $("#ccList"), ccBtn = $("#cc"), ccQ = $("#ccQ");
+    var ccMenu = $("#ccMenu"), ccList = $("#ccList"), ccBtn = $("#cc"), ccQ = $("#ccQ");
     function paintCC() { ccBtn.innerHTML = flag(data.pais) + "<span>+" + data.pais.code + '</span><span class="car" aria-hidden="true">▾</span>'; }
-    function renderList(q) {
-      q = (q || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/^\+/, "");
-      var items = PAISES.filter(function (p) { return !q || p.name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").indexOf(q) > -1 || p.code.indexOf(q) === 0; });
-      list.innerHTML = items.map(function (p, i) {
+    function renderCC(q) {
+      q = norm(q || "").replace(/^\+/, "");
+      var items = PAISES.filter(function (p) { return !q || norm(p.name).indexOf(q) > -1 || p.code.indexOf(q) === 0; });
+      ccList.innerHTML = items.map(function (p, i) {
         return '<li><button type="button" class="opt-cc' + (i === 0 ? " act" : "") + '" role="option" data-iso="' + p.iso + '" data-code="' + p.code + '">' + flag(p) + "<span>" + esc(p.name) + "</span><small>+" + p.code + "</small></button></li>";
-      }).join("") || '<li class="hint" style="padding:10px">Sin resultados</li>';
+      }).join("") || '<li style="padding:10px;color:var(--mute)">Sin resultados</li>';
     }
     function openCC(open) {
-      menu.hidden = !open; ccBtn.setAttribute("aria-expanded", String(open));
-      if (open) { ccQ.value = ""; renderList(""); ccQ.focus(); }
+      closeAll(open ? ccMenu : null);
+      ccMenu.hidden = !open; ccBtn.setAttribute("aria-expanded", String(open));
+      if (open) { ccQ.value = ""; renderCC(""); ccQ.focus(); }
     }
-    function choose(btn) {
+    function chooseCC(btn) {
       data.pais = PAISES.filter(function (p) { return p.iso === btn.getAttribute("data-iso") && p.code === btn.getAttribute("data-code"); })[0];
       paintCC(); openCC(false); $("#tel").focus();
     }
-    ccBtn.addEventListener("click", function () { openCC(menu.hidden); });
-    ccQ.addEventListener("input", function () { renderList(ccQ.value); });
+    ccBtn.addEventListener("click", function () { openCC(ccMenu.hidden); });
+    ccQ.addEventListener("input", function () { renderCC(ccQ.value); });
     ccQ.addEventListener("keydown", function (e) {
-      var items = [].slice.call(list.querySelectorAll(".opt-cc")), i = items.indexOf(list.querySelector(".act"));
+      var items = [].slice.call(ccList.querySelectorAll(".opt-cc")), i = items.indexOf(ccList.querySelector(".act"));
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault(); if (!items.length) return;
         if (i > -1) items[i].classList.remove("act");
         i = (i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
         items[i].classList.add("act"); items[i].scrollIntoView({ block: "nearest" });
-      } else if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); if (items[i]) choose(items[i]); }
-      else if (e.key === "Escape") { e.stopPropagation(); openCC(false); ccBtn.focus(); }
+      } else if (e.key === "Enter") { e.preventDefault(); if (items[i]) chooseCC(items[i]); }
+      else if (e.key === "Escape") { openCC(false); ccBtn.focus(); }
     });
-    list.addEventListener("click", function (e) { var b = e.target.closest(".opt-cc"); if (b) choose(b); });
-    document.addEventListener("click", function (e) { if (!menu.hidden && !e.target.closest(".phone")) openCC(false); });
+    ccList.addEventListener("click", function (e) { var b = e.target.closest(".opt-cc"); if (b) chooseCC(b); });
     paintCC();
 
-    // Validación de cada paso
-    function valid(s) {
-      if (s === 0) {
-        var n = $("#nombre").value.trim();
-        $("#e1").textContent = n.length < 2 ? "Escribe tu nombre y apellidos." : "";
-        return n.length >= 2;
-      }
-      if (s === 1) {
-        var d = $("#tel").value.replace(/\D/g, "");
-        var ok = d.length >= 6 && d.length <= 14;
-        $("#e2").textContent = ok ? "" : "Escribe un número de teléfono válido.";
-        return ok;
-      }
-      if (s === 3) {
-        var m = !data.cap ? "Elige el capital que quieres invertir." : !$("#ok").checked ? "Acepta la política de privacidad para continuar." : "";
-        $("#e4").textContent = m;
-        return !m;
-      }
-      return true;
+    // Desplegable de preocupaciones (varias)
+    var preDD = $("#preDD"), preBtn = preDD.querySelector("button"), preMenu = preDD.querySelector(".menu");
+    $("#preList").innerHTML = PREOCUPACIONES.map(function (t) {
+      return '<li><label class="chk"><input type="checkbox" value="' + esc(t) + '" /> ' + esc(t) + "</label></li>";
+    }).join("");
+    function paintPre() {
+      $("#preTxt").textContent = data.pre.length ? data.pre.join(", ") : "Elige una o varias";
+      preBtn.classList.toggle("empty", !data.pre.length);
     }
-
-    function go(n) {
-      if (n < 0 || n > slides.length - 1) return;
-      if (n > step && step < LAST_Q && !valid(step)) { focusStep(step); return; }
-      slides.forEach(function (s, i) {
-        s.classList.toggle("on", i === n);
-        s.classList.toggle("up", i < n);
-        s.setAttribute("aria-hidden", String(i !== n));
-        if ("inert" in s) s.inert = i !== n;
-      });
-      step = n;
-      $("#bar").style.width = Math.min(100, (n / (slides.length - 1)) * 100) + "%";
-      $("#prev").disabled = n === 0 || n === slides.length - 1;
-      $("#next").disabled = n >= LAST_Q;
-      setTimeout(function () { focusStep(n); }, 350);
-    }
-    function focusStep(n) {
-      var s = slides[n], el = s.querySelector("input.line") || s.querySelector(".opt") || s.querySelector(".btn");
-      if (el) el.focus({ preventScroll: true });
-    }
-    [].forEach.call(document.querySelectorAll("[data-next]"), function (b) { b.addEventListener("click", function () { go(step + 1); }); });
-    $("#prev").addEventListener("click", function () { go(step - 1); });
-    $("#next").addEventListener("click", function () { if (step < LAST_Q) go(step + 1); });
-
-    // Teclado: Enter para avanzar, letras para elegir
-    document.addEventListener("keydown", function (e) {
-      if (!menu.hidden || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.key === "Enter" && step < LAST_Q && !(e.target.closest && e.target.closest(".cc, a"))) { e.preventDefault(); go(step + 1); return; }
-      if (e.target.tagName === "INPUT") return;
-      var k = e.key.length === 1 ? e.key.toUpperCase().charCodeAt(0) - 65 : -1;
-      if (step === 2 && k >= 0 && k < PREOCUPACIONES.length) togglePre(document.querySelectorAll("#pre .opt")[k]);
-      if (step === 3 && k >= 0 && k < CAPITAL.length) pickCap(document.querySelectorAll("#cap .opt")[k]);
+    $("#preList").addEventListener("change", function (e) {
+      var t = e.target;
+      if (t.checked && t.value === "Nada en especial") $$("#preList input").forEach(function (x) { if (x !== t) x.checked = false; });
+      else if (t.checked) $$('#preList input[value="Nada en especial"]').forEach(function (x) { x.checked = false; });
+      data.pre = $$("#preList input:checked").map(function (x) { return x.value; });
+      paintPre();
     });
-    // Deslizar con el dedo arriba/abajo entre preguntas
-    var y0 = null;
-    document.addEventListener("touchstart", function (e) { y0 = e.target.closest(".cc-menu") ? null : e.touches[0].clientY; }, { passive: true });
-    document.addEventListener("touchend", function (e) {
-      if (y0 === null) return;
-      var dy = e.changedTouches[0].clientY - y0, s = slides[step];
-      if (Math.abs(dy) < 70 || s.scrollHeight > s.clientHeight + 4) return;
-      if (dy < 0 && step < LAST_Q) go(step + 1); else if (dy > 0 && step > 0 && step < slides.length - 1) go(step - 1);
-    }, { passive: true });
+    function toggleDD(btn, menu) {
+      var open = menu.hidden;
+      closeAll(open ? menu : null);
+      menu.hidden = !open; btn.setAttribute("aria-expanded", String(open));
+      if (open) { var f = menu.querySelector("input, [role=option]"); if (f) f.focus(); }
+    }
+    preBtn.addEventListener("click", function () { toggleDD(preBtn, preMenu); });
+    preMenu.querySelector(".done").addEventListener("click", function () { toggleDD(preBtn, preMenu); preBtn.focus(); });
+
+    // Desplegable de capital (una)
+    var capDD = $("#capDD"), capBtn = capDD.querySelector("button"), capMenu = capDD.querySelector(".menu");
+    function paintCap() {
+      $("#capList").innerHTML = CAPITAL.map(function (t) {
+        return '<li><button type="button" class="opt-cc" role="option" aria-selected="' + (t === data.cap) + '" data-v="' + esc(t) + '"><span>' + esc(t) + "</span>" + (t === data.cap ? '<small style="color:var(--amber)">✓</small>' : "") + "</button></li>";
+      }).join("");
+      $("#capTxt").textContent = data.cap || "Elige una opción";
+      capBtn.classList.toggle("empty", !data.cap);
+    }
+    paintCap();
+    capBtn.addEventListener("click", function () { toggleDD(capBtn, capMenu); });
+    $("#capList").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-v]"); if (!b) return;
+      data.cap = data.cap === b.getAttribute("data-v") ? "" : b.getAttribute("data-v");
+      paintCap(); toggleDD(capBtn, capMenu); capBtn.focus();
+    });
+
+    // Validación
+    function check(field) {
+      var ok = true;
+      if (!field || field === "nombre") {
+        var n = $("#nombre").value.trim().length >= 2;
+        $("#eNombre").textContent = n ? "" : "Escribe tu nombre y apellidos.";
+        $("#fNombre").classList.toggle("bad", !n); ok = ok && n;
+      }
+      if (!field || field === "tel") {
+        var d = $("#tel").value.replace(/\D/g, ""), t = d.length >= 6 && d.length <= 14;
+        $("#eTel").textContent = t ? "" : "Escribe un número de teléfono válido.";
+        $("#fTel").classList.toggle("bad", !t); ok = ok && t;
+      }
+      if (!field || field === "ok") {
+        var c = $("#ok").checked;
+        $("#eOk").textContent = c ? "" : "Acepta la política de privacidad para enviar.";
+        ok = ok && c;
+      }
+      return ok;
+    }
+    $("#nombre").addEventListener("blur", function () { if (this.value) check("nombre"); });
+    $("#tel").addEventListener("blur", function () { if (this.value) check("tel"); });
+    $("#nombre").addEventListener("input", function () { if ($("#fNombre").classList.contains("bad")) check("nombre"); });
+    $("#tel").addEventListener("input", function () { if ($("#fTel").classList.contains("bad")) check("tel"); });
+    $("#ok").addEventListener("change", function () { check("ok"); });
+
+    // Aparición al deslizar
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }); }, { threshold: .12 });
+      $$(".rv").forEach(function (el) { io.observe(el); });
+    } else $$(".rv").forEach(function (el) { el.classList.add("in"); });
 
     // Campañas (utm) del enlace, para saber de dónde viene el contacto
     var utm = {};
@@ -352,34 +348,36 @@
     $("#f").addEventListener("submit", function (e) {
       e.preventDefault();
       if (sending) return;
-      if (!valid(0)) return go(0);
-      if (!valid(1)) return go(1);
-      if (!valid(3)) return;
+      closeAll();
+      if (!check()) {
+        var bad = $(".field.bad input") || (!$("#ok").checked && $("#ok"));
+        if (bad) { bad.scrollIntoView({ block: "center" }); bad.focus({ preventScroll: true }); }
+        return;
+      }
       sending = true; $("#send").disabled = true; $("#send").textContent = "Enviando…";
       var nombre = $("#nombre").value.trim();
       var payload = {
         formulario: "solicitud",
         nombre: nombre,
         telefono: "+" + data.pais.code + " " + $("#tel").value.trim(),
-        presupuesto: PRESUPUESTO_CRM[CAPITAL.indexOf(data.cap)],
-        mensaje: "Mayor preocupación: " + (data.pre.length ? data.pre.join(", ") : "no indicada") + "\nCapital a invertir: " + data.cap,
+        mensaje: "Mayor preocupación: " + (data.pre.length ? data.pre.join(", ") : "no indicada") + "\nCapital a invertir: " + (data.cap || "no indicado"),
         web: document.querySelector("[name=web]").value
       };
+      if (data.cap) payload.presupuesto = PRESUPUESTO_CRM[CAPITAL.indexOf(data.cap)];
       Object.keys(utm).forEach(function (k) { payload[k] = utm[k]; });
       fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
         .then(function (r) { if (!r.ok) throw new Error(r.status); })
         .then(function () {
           $("#gracias").textContent = "¡Gracias, " + nombre.split(" ")[0] + "!";
-          go(slides.length - 1);
+          $("#main").hidden = true; $("#thanks").hidden = false;
+          window.scrollTo(0, 0); $("#gracias").focus();
           setTimeout(function () { location.href = REDIRECT; }, 4500);
         })
         .catch(function () {
-          sending = false; $("#send").disabled = false; $("#send").textContent = "Solicitar información";
-          $("#e4").textContent = "No se ha podido enviar. Revisa tu conexión e inténtalo de nuevo.";
+          sending = false; $("#send").disabled = false; $("#send").textContent = "Enviar formulario";
+          $("#eOk").textContent = "No se ha podido enviar. Revisa tu conexión e inténtalo de nuevo.";
         });
     });
-
-    go(0);
   })();
   </script>
 </body>
