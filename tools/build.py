@@ -79,8 +79,8 @@ def page(path, title, desc, body, ld, og_image="/assets/img/pascual-dubai.webp",
 ARTICLES = []
 
 
-def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related):
-    ARTICLES.append(dict(slug=slug, title=title, h1=h1, desc=desc, lead=lead, image=image, alt=alt))
+def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related, date=DATE, date_txt=DATE_TXT, wa_msg=None):
+    ARTICLES.append(dict(slug=slug, title=title, h1=h1, desc=desc, lead=lead, image=image, alt=alt, date=date, date_txt=date_txt))
     toc = "".join(f'<li><a href="#{sid}">{H.escape(t)}</a></li>' for sid, t, _ in sections)
     secs = "".join(f'\n      <h2 id="{sid}">{H.escape(t)}</h2>\n{c}' for sid, t, c in sections)
     faq_html = "".join(
@@ -88,10 +88,11 @@ def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related):
         for q, a in faqs)
     rel = "".join(f'<a class="related-card" href="/blog/{s}/"><small>Artículo</small><b>{H.escape(t)}</b><span>Leer →</span></a>' for s, t in related)
     path = f"/blog/{slug}/"
+    wa_text = H.escape(wa_msg or ("Hola Pascual, he leído tu artículo «" + re.sub("<[^>]+>", "", h1) + "» y quiero consultarte mi caso."))
     body = f"""    <article class="article">
       <header class="article-head container">
         <nav class="crumbs" aria-label="Migas de pan"><a href="/">Inicio</a><span>/</span><a href="/blog/">Blog</a></nav>
-        <p class="eyebrow"><span class="dot"></span>Guía para inversores · Actualizado el {DATE_TXT}</p>
+        <p class="eyebrow"><span class="dot"></span>Guía para inversores · Actualizado el {date_txt}</p>
         <h1>{h1}</h1>
         <p class="article-lead">{lead}</p>
         <div class="article-author"><img src="/assets/img/pascual-retrato.webp" alt="Pascual Vidal" width="48" height="48" loading="lazy" /><span><b>Pascual Vidal</b><small>Consultor inmobiliario en Dubái · RERA #97799</small></span></div>
@@ -109,7 +110,7 @@ def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related):
           <p>En 20 minutos vemos tu presupuesto, tu objetivo y qué zonas encajan contigo. Sin compromiso.</p>
         </div>
         <div class="article-cta-actions">
-          <a class="btn btn-wa" data-wa data-wa-msg="Hola Pascual, he leído tu artículo «{H.escape(h1)}» y quiero consultarte mi caso." href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg><span>Escríbeme por WhatsApp</span></a>
+          <a class="btn btn-wa" data-wa data-wa-msg="{wa_text}" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg><span>Escríbeme por WhatsApp</span></a>
           <button class="btn btn-dark" type="button" data-open-guide>Descargar la guía gratis</button>
         </div>
       </div>
@@ -120,7 +121,7 @@ def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related):
     </article>"""
     ld = [
         {"@context": "https://schema.org", "@type": "Article", "headline": h1.replace("<em>", "").replace("</em>", ""), "description": desc,
-         "image": SITE + image, "datePublished": DATE, "dateModified": DATE, "inLanguage": "es", "author": AUTHOR,
+         "image": SITE + image, "datePublished": date, "dateModified": date, "inLanguage": "es", "author": AUTHOR,
          "publisher": {"@type": "Organization", "name": "Tu inversión en Dubái", "url": SITE + "/"}, "mainEntityOfPage": SITE + path},
         {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"},
@@ -289,10 +290,164 @@ pages["golden-visa-dubai-inversion-inmobiliaria"] = article(
     [("cuanto-cuesta-comprar-piso-dubai", "Cuánto cuesta comprar un piso en Dubái"), ("impuestos-invertir-dubai-espanol", "Impuestos al invertir en Dubái siendo español")],
 )
 
+# ---------------------------------------------------------------- países (noviembre 2026)
+D2, D2_TXT = "2026-11-13", "13 de noviembre de 2026"
+FX_NOTE = "Cifras aproximadas: el dírham (AED) va ligado al dólar (1 USD = 3,6725 AED), así que lo que cambia es tu moneda frente al dólar. Revisa el tipo de cambio del día."
+
+pages["mexico"] = article(
+    "invertir-en-dubai-desde-mexico",
+    "Invertir en Dubái desde México: guía práctica",
+    "Invertir en Dubái <em>desde México</em>",
+    "Cómo comprar un piso en Dubái siendo mexicano: precios en pesos, cómo enviar el dinero, qué declarar ante el SAT y cómo hacerlo todo sin viajar.",
+    "Cada vez más mexicanos compran en Dubái para cobrar rentas en una moneda ligada al dólar. Te explico cuánto cuesta en pesos, cómo se envía el dinero, qué declaras en México y cómo se compra a distancia.",
+    "/assets/img/proyecto-expo-city.webp", "Proyecto de obra nueva en Expo City, Dubái",
+    [
+        ("por-que", "Por qué Dubái atrae a inversores mexicanos",
+         ul("<strong>Rentas en una moneda estable:</strong> el dírham va ligado al dólar, así que tus ingresos no dependen del peso.",
+            "<strong>Compra 100 % a tu nombre:</strong> los extranjeros pueden comprar en plena propiedad (<em>freehold</em>) en las zonas habilitadas, con registro oficial en el Dubai Land Department.",
+            "<strong>Obra nueva con planes de pago:</strong> reservas con un 10–20 % y pagas el resto por fases.",
+            "<strong>Seguridad jurídica:</strong> en obra nueva tus pagos van a una cuenta <em>escrow</em> supervisada por el gobierno.")),
+        ("precios", "Cuánto cuesta en pesos",
+         p(FX_NOTE + " Con un dólar entre 18 y 20 pesos, un dírham ronda los <strong>5 pesos</strong>.") +
+         table(["Propiedad (ejemplo)", "En dírhams", "En pesos (aprox.)"], [
+             ["Estudio en zona en crecimiento", "650.000 AED", "≈ 3,3 millones MXN"],
+             ["Apartamento de 1 dormitorio", "1.000.000 AED", "≈ 5 millones MXN"],
+             ["Apartamento de 2 dormitorios", "1.800.000 AED", "≈ 9 millones MXN"],
+             ["Mínimo para la Golden Visa", "2.000.000 AED", "≈ 10 millones MXN"],
+         ]) +
+         p("Súmale alrededor de un 4–5 % de gastos de compra en obra nueva. Te lo detallo en <a href=\"/blog/cuanto-cuesta-comprar-piso-dubai/\">cuánto cuesta comprar un piso en Dubái</a>.")),
+        ("dinero", "Cómo enviar el dinero desde México",
+         "      <ol>" + "".join(f"<li>{x}</li>" for x in [
+             "<strong>Transferencia internacional (SWIFT)</strong> desde tu banco en México a la cuenta <em>escrow</em> del proyecto o a la del promotor. Pregunta la comisión fija y, sobre todo, el tipo de cambio que te aplican: ahí está el coste real.",
+             "<strong>Plataformas como Wise o Revolut:</strong> suelen dar mejor tipo de cambio. Comprueba el límite por envío y que el destinatario acepta pagos desde ellas.",
+             "<strong>Envía en dólares si puedes:</strong> como el dírham está ligado al dólar, convertir pesos a dólares y enviar dólares suele ser lo más sencillo.",
+             "<strong>Justifica el origen de los fondos:</strong> el promotor y el banco te pedirán documentos que demuestren de dónde sale el dinero, por las normas contra el blanqueo. Tenlos listos.",
+         ]) + "</ol>\n"),
+        ("impuestos", "Impuestos en México",
+         p("Si eres <strong>residente fiscal en México</strong>, tributas por tus ingresos de cualquier país, también por tu piso en Dubái:") +
+         ul("<strong>Rentas del alquiler:</strong> se declaran en México en tu declaración anual.",
+            "<strong>Al vender:</strong> la ganancia se declara en México como enajenación de inmuebles.",
+            "<strong>En Emiratos:</strong> como particular no pagas impuesto sobre la renta ni sobre plusvalías, solo el 4 % del registro al comprar.",
+            "<strong>Si compras con una empresa en Emiratos:</strong> ojo con el régimen de REFIPRE (regímenes fiscales preferentes) y sus declaraciones informativas.") +
+         p("México y Emiratos firmaron un convenio para evitar la doble imposición. Cómo se aplica depende de tu caso: consúltalo con tu contador <strong>antes</strong> de comprar.")),
+        ("distancia", "Comprar sin viajar",
+         p("Todo el proceso se puede hacer en remoto: elección de la propiedad, reserva, firma electrónica del contrato y pagos. Yo vivo en Dubái todo el año y me ocupo de lo que requiere estar presente, incluida la entrega de llaves. Si quieres venir a verlo, consulta los requisitos de entrada vigentes para tu pasaporte.")),
+        ("golden-visa", "Golden Visa para mexicanos",
+         p("Con una inversión de 2 millones de AED (unos 10 millones de pesos) puedes pedir la residencia de 10 años para ti y tu familia, sin obligación de vivir en Emiratos. Todos los requisitos, en la <a href=\"/blog/golden-visa-dubai-inversion-inmobiliaria/\">guía de la Golden Visa</a>.")),
+    ],
+    [
+        ("¿Un mexicano puede comprar una propiedad en Dubái?", "Sí. Los extranjeros pueden comprar en plena propiedad en las zonas habilitadas, sin necesidad de residir en Emiratos ni de tener visado."),
+        ("¿Tengo que declarar al SAT un piso en Dubái?", "Si eres residente fiscal en México, sí debes declarar las rentas y, al vender, la ganancia. Consulta con tu contador cómo hacerlo en tu caso."),
+        ("¿Cuál es la forma más barata de mandar dinero de México a Dubái?", "Depende del importe. Compara la comisión y, sobre todo, el tipo de cambio de tu banco con plataformas como Wise o Revolut; enviar en dólares suele simplificarlo."),
+    ],
+    [("invertir-en-dubai-desde-colombia", "Invertir en Dubái desde Colombia"), ("cuanto-cuesta-comprar-piso-dubai", "Cuánto cuesta comprar un piso en Dubái")],
+    date=D2, date_txt=D2_TXT, wa_msg="Hola Pascual, te escribo desde México. Quiero información para invertir en Dubái.",
+)
+
+pages["colombia"] = article(
+    "invertir-en-dubai-desde-colombia",
+    "Invertir en Dubái desde Colombia: guía práctica",
+    "Invertir en Dubái <em>desde Colombia</em>",
+    "Cómo comprar un piso en Dubái siendo colombiano: precios en pesos colombianos, cómo enviar el dinero por el mercado cambiario, qué declarar ante la DIAN y cómo comprar a distancia.",
+    "Para un inversor colombiano, Dubái es una forma de tener patrimonio en una moneda ligada al dólar, con rentas de alquiler y sin impuesto sobre la renta en Emiratos. Te explico precios, envío del dinero e impuestos en Colombia.",
+    "/assets/img/proyecto-ciudad-mercedes.webp", "Proyecto residencial en Dubái",
+    [
+        ("por-que", "Por qué Dubái atrae a inversores colombianos",
+         ul("<strong>Patrimonio en dólares:</strong> el dírham va ligado al dólar y protege tu inversión de la devaluación del peso.",
+            "<strong>Rentas de alquiler:</strong> demanda alta de alquiler anual y vacacional.",
+            "<strong>Planes de pago en obra nueva:</strong> reservas con un 10–20 % y pagas el resto durante la construcción.",
+            "<strong>Compra segura y registrada:</strong> cada compra queda inscrita en el Dubai Land Department.")),
+        ("precios", "Cuánto cuesta en pesos colombianos",
+         p(FX_NOTE + " Con un dólar entre 3.900 y 4.300 pesos, un dírham ronda los <strong>1.100 pesos</strong>.") +
+         table(["Propiedad (ejemplo)", "En dírhams", "En pesos colombianos (aprox.)"], [
+             ["Estudio en zona en crecimiento", "650.000 AED", "≈ 715 millones COP"],
+             ["Apartamento de 1 habitación", "1.000.000 AED", "≈ 1.100 millones COP"],
+             ["Apartamento de 2 habitaciones", "1.800.000 AED", "≈ 2.000 millones COP"],
+             ["Mínimo para la Golden Visa", "2.000.000 AED", "≈ 2.200 millones COP"],
+         ]) +
+         p("En obra nueva no pagas todo de golpe: con la entrada del 10–20 % empiezas, y el resto va por plazos. Gastos de compra: <a href=\"/blog/cuanto-cuesta-comprar-piso-dubai/\">aquí, uno por uno</a>.")),
+        ("dinero", "Cómo enviar el dinero desde Colombia",
+         "      <ol>" + "".join(f"<li>{x}</li>" for x in [
+             "<strong>Por el mercado cambiario:</strong> una inversión en el exterior se canaliza a través de tu banco (intermediario del mercado cambiario) con la declaración de cambio que corresponda. Tu banco te indica el formulario.",
+             "<strong>Transferencia en dólares</strong> a la cuenta <em>escrow</em> del proyecto o del promotor. Pregunta la comisión y el tipo de cambio que te aplican.",
+             "<strong>Documenta el origen de los fondos:</strong> en Dubái te lo pedirán por las normas contra el blanqueo, y en Colombia te conviene tenerlo todo en orden.",
+             "<strong>Guarda cada comprobante:</strong> los necesitarás para la declaración de renta y la de activos en el exterior.",
+         ]) + "</ol>\n"),
+        ("impuestos", "Impuestos en Colombia",
+         p("Si eres <strong>residente fiscal en Colombia</strong>, declaras tus rentas y tu patrimonio de cualquier país:") +
+         ul("<strong>Declaración de renta:</strong> incluye las rentas del alquiler en Dubái y, al vender, la ganancia ocasional.",
+            "<strong>Declaración de activos en el exterior:</strong> si tus activos fuera superan el límite que fija la DIAN cada año, tienes que presentarla.",
+            "<strong>Impuesto al patrimonio:</strong> si tu patrimonio total supera el umbral, el piso cuenta.",
+            "<strong>En Emiratos:</strong> como particular no pagas impuesto sobre la renta ni sobre plusvalías; solo el 4 % del registro al comprar.") +
+         p("Colombia y Emiratos firmaron un convenio para evitar la doble imposición. Habla con tu contador <strong>antes</strong> de comprar para hacerlo bien desde el principio.")),
+        ("distancia", "Comprar sin viajar",
+         p("La reserva, el contrato y los pagos se hacen a distancia. Yo estoy en Dubái todo el año y me encargo de lo presencial: revisión de la vivienda, entrega de llaves, amueblado y alquiler. Si quieres venir, consulta antes los requisitos de entrada vigentes para tu pasaporte.")),
+        ("golden-visa", "Golden Visa para colombianos",
+         p("Invirtiendo 2 millones de AED en propiedad puedes solicitar la residencia de 10 años para ti y tu familia. Requisitos y pasos en la <a href=\"/blog/golden-visa-dubai-inversion-inmobiliaria/\">guía de la Golden Visa</a>.")),
+    ],
+    [
+        ("¿Un colombiano puede comprar vivienda en Dubái?", "Sí. Los extranjeros pueden comprar en plena propiedad en las zonas habilitadas, sin residir en Emiratos."),
+        ("¿Tengo que declarar en Colombia un piso en Dubái?", "Si eres residente fiscal en Colombia, sí: en la declaración de renta y, si superas el límite, en la de activos en el exterior. Confírmalo con tu contador."),
+        ("¿Cómo envío el dinero desde Colombia?", "A través de tu banco, como operación del mercado cambiario con su declaración de cambio, normalmente en dólares a la cuenta escrow del proyecto."),
+    ],
+    [("invertir-en-dubai-desde-mexico", "Invertir en Dubái desde México"), ("invertir-en-dubai-desde-miami", "Invertir en Dubái desde Miami")],
+    date=D2, date_txt=D2_TXT, wa_msg="Hola Pascual, te escribo desde Colombia. Quiero información para invertir en Dubái.",
+)
+
+pages["miami"] = article(
+    "invertir-en-dubai-desde-miami",
+    "Invertir en Dubái desde Miami y EE. UU.: guía para hispanos",
+    "Invertir en Dubái <em>desde Miami</em>",
+    "Guía para hispanos en Miami y Estados Unidos que quieren comprar en Dubái: sin riesgo de cambio con el dólar, cómo pagar, qué declarar al IRS y cómo comprar a distancia.",
+    "Si vives en Miami o en cualquier parte de EE. UU., Dubái tiene una ventaja que pocos destinos ofrecen: el dírham va ligado al dólar. Te explico cómo se paga, qué declaras al IRS y por qué tantos inversores latinos de Florida lo están mirando.",
+    "/assets/img/pascual-llamada.webp", "Pascual Vidal en una videollamada con un inversor",
+    [
+        ("por-que", "Por qué Dubái encaja con un inversor de Miami",
+         ul("<strong>Sin riesgo de cambio:</strong> 1 USD = 3,6725 AED, fijo desde hace décadas. Compras, cobras y vendes prácticamente en dólares.",
+            "<strong>Sin impuesto sobre la renta en Emiratos</strong> para particulares, ni impuesto anual sobre la propiedad.",
+            "<strong>Diversificación:</strong> un mercado con dinámica distinta a la de Florida, con fuerte demanda de alquiler.",
+            "<strong>Compra a distancia</strong> y gestión completa desde Dubái, en español.")),
+        ("precios", "Cuánto cuesta en dólares",
+         table(["Propiedad (ejemplo)", "En dírhams", "En dólares"], [
+             ["Estudio en zona en crecimiento", "650.000 AED", "≈ 177.000 USD"],
+             ["Apartamento de 1 dormitorio", "1.000.000 AED", "≈ 272.000 USD"],
+             ["Apartamento de 2 dormitorios", "1.800.000 AED", "≈ 490.000 USD"],
+             ["Mínimo para la Golden Visa", "2.000.000 AED", "≈ 545.000 USD"],
+         ]) +
+         p("Como el cambio es fijo, estos importes apenas varían. Suma alrededor de un 4–5 % de gastos de compra en obra nueva: <a href=\"/blog/cuanto-cuesta-comprar-piso-dubai/\">el desglose completo</a>.")),
+        ("pagos", "Cómo se paga desde EE. UU.",
+         "      <ol>" + "".join(f"<li>{x}</li>" for x in [
+             "<strong>Wire transfer en dólares</strong> desde tu banco en EE. UU. a la cuenta <em>escrow</em> del proyecto o a la del promotor. Sin conversión de moneda que te haga perder.",
+             "<strong>Planes de pago del promotor:</strong> los bancos de EE. UU. no suelen financiar propiedades en el extranjero, así que la obra nueva con pagos por fases es lo más habitual.",
+             "<strong>Origen de los fondos:</strong> ten a mano extractos y documentos que lo justifiquen; te los pedirán.",
+         ]) + "</ol>\n"),
+        ("impuestos", "Impuestos en EE. UU.",
+         p("Si eres ciudadano, residente permanente (green card) o residente fiscal en EE. UU., el IRS grava tus ingresos de cualquier país:") +
+         ul("<strong>Rentas del alquiler:</strong> se declaran en tu declaración federal, con sus gastos y la amortización que corresponda a una propiedad en el extranjero.",
+            "<strong>Al vender:</strong> la ganancia tributa en EE. UU.",
+            "<strong>Cuentas en Emiratos:</strong> si abres una cuenta bancaria allí y el saldo total de tus cuentas en el extranjero supera 10.000 USD, tienes que presentar el FBAR. Según tus activos, también puede aplicar el formulario 8938.",
+            "<strong>Florida</strong> no tiene impuesto estatal sobre la renta.",
+            "<strong>Sin convenio de doble imposición</strong> entre EE. UU. y Emiratos; como Emiratos no grava al particular, en la práctica tributas en EE. UU.") +
+         p("Revísalo con tu CPA o asesor fiscal <strong>antes</strong> de comprar, sobre todo si vas a comprar a través de una LLC.")),
+        ("distancia", "Comprar sin viajar",
+         p("Reserva, contrato, pagos y registro se hacen en remoto. Yo estoy en Dubái todo el año y me ocupo de la entrega, la revisión de desperfectos, el amueblado y el alquiler. Hay vuelos directos desde Miami a Dubái si quieres venir a verlo.")),
+        ("golden-visa", "Golden Visa",
+         p("Con 2 millones de AED (unos 545.000 USD) en propiedad puedes pedir la residencia de 10 años para ti y tu familia, compatible con seguir viviendo en Miami. Requisitos en la <a href=\"/blog/golden-visa-dubai-inversion-inmobiliaria/\">guía de la Golden Visa</a>.")),
+    ],
+    [
+        ("¿Hay riesgo de cambio al invertir en Dubái desde EE. UU.?", "Muy poco: el dírham está ligado al dólar a 3,6725 AED por dólar desde hace décadas."),
+        ("¿Tengo que declarar al IRS un piso en Dubái?", "Sí, si eres ciudadano o residente fiscal en EE. UU.: las rentas y la ganancia al vender. Si tienes cuentas en Emiratos, revisa también el FBAR."),
+        ("¿Puedo financiar la compra con un banco de EE. UU.?", "Normalmente no para una propiedad en el extranjero. Lo habitual es usar el plan de pagos del promotor en obra nueva."),
+    ],
+    [("invertir-en-dubai-desde-mexico", "Invertir en Dubái desde México"), ("impuestos-invertir-dubai-espanol", "Impuestos al invertir en Dubái siendo español")],
+    date=D2, date_txt=D2_TXT, wa_msg="Hola Pascual, te escribo desde Miami / EE. UU. Quiero información para invertir en Dubái.",
+)
+
 # ---------------------------------------------------------------- índice
+ARTICLES.sort(key=lambda a: a["date"], reverse=True)
 cards = "".join(
     f'<a class="post-card" href="/blog/{a["slug"]}/"><span class="post-img"><img src="{a["image"]}" alt="{H.escape(a["alt"])}" loading="lazy" /></span>'
-    f'<span class="post-body"><small>Guía · {DATE_TXT}</small><b>{H.escape(a["title"])}</b><span>{H.escape(a["desc"])}</span><i>Leer artículo →</i></span></a>'
+    f'<span class="post-body"><small>Guía · {a["date_txt"]}</small><b>{H.escape(a["title"])}</b><span>{H.escape(a["desc"])}</span><i>Leer artículo →</i></span></a>'
     for a in ARTICLES)
 idx_body = f"""    <section class="blog-index container">
       <nav class="crumbs" aria-label="Migas de pan"><a href="/">Inicio</a><span>/</span><span>Blog</span></nav>
