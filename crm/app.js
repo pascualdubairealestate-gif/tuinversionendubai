@@ -318,8 +318,9 @@
       (withStage ? '<select id="f-etapa" aria-label="Etapa"><option value="">Todas las etapas</option>' + Object.keys(S.stages).map(function (k) {
         return '<option value="' + k + '"' + (k === S.etapa ? " selected" : "") + ">" + esc(S.stages[k]) + "</option>";
       }).join("") + "</select>" : "") +
-      '<label class="sort-by tag-by"><span>Origen:</span><select id="f-origen"><option value="">Todos</option><option value="-"' + (S.origen === "-" ? " selected" : "") + '>Sin origen (' + S.leads.filter(function (l) { return !String(l.origen || "").trim(); }).length + ')</option>' + origins.map(function (o) {
-        return "<option" + (o === S.origen ? " selected" : "") + ">" + esc(o) + "</option>";
+      '<label class="sort-by tag-by"><span>Origen:</span><select id="f-origen"><option value="">Todos (' + S.leads.length + ')</option><option value="-"' + (S.origen === "-" ? " selected" : "") + '>Sin origen (' + S.leads.filter(function (l) { return !String(l.origen || "").trim(); }).length + ')</option>' + origins.map(function (o) {
+        var n = S.leads.filter(function (l) { return l.origen === o; }).length;
+        return '<option value="' + esc(o) + '"' + (o === S.origen ? " selected" : "") + ">" + esc(o) + " (" + n + ")</option>";
       }).join("") + "</select></label>" +
       '<button type="button" class="btn ghost sm" data-act="copy-emails">Copiar emails</button>' +
       '<label class="chk"><input type="checkbox" id="f-hoy"' + (S.hoy ? " checked" : "") + " /> Seguimientos pendientes</label></nav>";
