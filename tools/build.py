@@ -4,7 +4,7 @@ import json, re, sys, html as H
 
 ROOT = sys.argv[1] if len(sys.argv) > 1 else "."
 SITE = "https://tuinversionendubai.com"
-V = "20261031c"
+V = "20261113a"
 DATE = "2026-10-28"
 DATE_TXT = "28 de octubre de 2026"
 
@@ -25,10 +25,36 @@ sprite = grab('  <!-- Iconos -->', '</svg>\n')
 toast = '  <div class="toast" data-toast role="status" aria-live="polite"></div>\n'
 favicon = re.search(r'<link rel="icon"[^>]*>', src).group(0)
 
-AUTHOR = {"@type": "Person", "name": "Pascual Vidal", "url": SITE + "/#sobre-mi"}
+PERSON_ID = SITE + "/sobre-pascual-vidal/#pascual"
+ORG_ID = SITE + "/#organizacion"
+WEB_ID = SITE + "/#web"
+AUTHOR = {"@type": "Person", "@id": PERSON_ID, "name": "Pascual Vidal", "url": SITE + "/sobre-pascual-vidal/",
+          "jobTitle": "Consultor de inversión inmobiliaria en Dubái", "image": SITE + "/assets/img/pascual-retrato.webp",
+          "sameAs": ["https://www.instagram.com/pascual_vidal_dubai/", "https://www.youtube.com/@pascual.dubairealestate"]}
+PUBLISHER = {"@type": "Organization", "@id": ORG_ID, "name": "Tu inversión en Dubái", "url": SITE + "/",
+             "logo": {"@type": "ImageObject", "url": SITE + "/assets/img/logo-pv-512.png", "width": 512, "height": 512}}
+WA_LINK = "https://wa.me/message/QI3A7Q5BXFTCA1"
+TODAY = "2026-11-13"
+
+from PIL import Image as _Img
+import os as _os
 
 
-def page(path, title, desc, body, ld, og_image="/assets/img/pascual-dubai.webp", og_type="article", body_attrs=""):
+def dims(src):
+    """Ancho y alto reales de una imagen local (para evitar saltos de maquetación)."""
+    w, h = _Img.open(ROOT + src).size
+    return f'width="{w}" height="{h}"'
+
+
+def og_jpg(image):
+    """Versión JPG 1200x630 de la imagen para redes (generada por tools/seo_assets.py)."""
+    name = _os.path.basename(image).rsplit(".", 1)[0]
+    j = f"/assets/img/og/{name}.jpg"
+    return j if _os.path.exists(ROOT + j) else "/assets/img/og/pascual-vidal.jpg"
+
+
+
+def page(path, title, desc, body, ld, og_image="/assets/img/og/pascual-vidal.jpg", og_type="article", body_attrs="", og_alt="Pascual Vidal, consultor inmobiliario español en Dubái"):
     url = SITE + path
     return f"""<!doctype html>
 <html lang="es" class="no-js">
@@ -47,9 +73,17 @@ def page(path, title, desc, body, ld, og_image="/assets/img/pascual-dubai.webp",
   <meta property="og:title" content="{H.escape(title)}" />
   <meta property="og:description" content="{H.escape(desc)}" />
   <meta property="og:image" content="{SITE}{og_image}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="{H.escape(og_alt)}" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="author" content="Pascual Vidal" />
   <meta name="theme-color" content="#ffffff" />
   {favicon}
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -80,7 +114,10 @@ ARTICLES = []
 
 
 def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related, date=DATE, date_txt=DATE_TXT, wa_msg=None):
-    ARTICLES.append(dict(slug=slug, title=title, h1=h1, desc=desc, lead=lead, image=image, alt=alt, date=date, date_txt=date_txt))
+    summary = SUMMARIES.get(slug, [])
+    ARTICLES.append(dict(slug=slug, title=title, h1=h1, desc=desc, lead=lead, image=image, alt=alt, date=date, date_txt=date_txt, summary=summary,
+                         faqs=faqs, sections=[t for _, t, _ in sections]))
+    tldr = ('\n      <div class="tldr" id="resumen"><b>En resumen</b><ul>' + "".join(f"<li>{x}</li>" for x in summary) + "</ul></div>") if summary else ""
     toc = "".join(f'<li><a href="#{sid}">{H.escape(t)}</a></li>' for sid, t, _ in sections)
     secs = "".join(f'\n      <h2 id="{sid}">{H.escape(t)}</h2>\n{c}' for sid, t, c in sections)
     faq_html = "".join(
@@ -95,12 +132,12 @@ def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related, da
         <p class="eyebrow"><span class="dot"></span>Guía para inversores · Actualizado el {date_txt}</p>
         <h1>{h1}</h1>
         <p class="article-lead">{lead}</p>
-        <div class="article-author"><img src="/assets/img/pascual-retrato.webp" alt="Pascual Vidal" width="48" height="48" loading="lazy" /><span><b>Pascual Vidal</b><small>Consultor inmobiliario en Dubái · RERA #97799</small></span></div>
+        <div class="article-author"><img src="/assets/img/pascual-retrato.webp" alt="Pascual Vidal" width="48" height="48" loading="lazy" /><span><a href="/sobre-pascual-vidal/" rel="author"><b>Pascual Vidal</b></a><small>Consultor inmobiliario en Dubái · RERA #97799 · <time datetime="{date}">{date_txt}</time></small></span></div>
       </header>
-      <figure class="article-cover container"><img src="{image}" alt="{H.escape(alt)}" loading="eager" /></figure>
+      <figure class="article-cover container"><img src="{image}" alt="{H.escape(alt)}" {dims(image)} loading="eager" fetchpriority="high" /></figure>
       <div class="article-layout container">
         <aside class="toc"><b>En este artículo</b><ol>{toc}</ol></aside>
-        <div class="prose">{secs}
+        <div class="prose">{tldr}{secs}
       <h2 id="preguntas">Preguntas frecuentes</h2>
       <div class="article-faq">{faq_html}</div>
       <div class="article-cta">
@@ -110,7 +147,7 @@ def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related, da
           <p>En 20 minutos vemos tu presupuesto, tu objetivo y qué zonas encajan contigo. Sin compromiso.</p>
         </div>
         <div class="article-cta-actions">
-          <a class="btn btn-wa" data-wa data-wa-msg="{wa_text}" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg><span>Escríbeme por WhatsApp</span></a>
+          <a class="btn btn-wa" data-wa data-wa-msg="{wa_text}" href="{WA_LINK}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg><span>Escríbeme por WhatsApp</span></a>
           <button class="btn btn-dark" type="button" data-open-guide>Descargar la guía gratis</button>
         </div>
       </div>
@@ -120,9 +157,12 @@ def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related, da
       <section class="related container"><h2>Sigue leyendo</h2><div class="related-grid">{rel}</div></section>
     </article>"""
     ld = [
-        {"@context": "https://schema.org", "@type": "Article", "headline": h1.replace("<em>", "").replace("</em>", ""), "description": desc,
-         "image": SITE + image, "datePublished": date, "dateModified": date, "inLanguage": "es", "author": AUTHOR,
-         "publisher": {"@type": "Organization", "name": "Tu inversión en Dubái", "url": SITE + "/"}, "mainEntityOfPage": SITE + path},
+        {"@context": "https://schema.org", "@type": "BlogPosting", "@id": SITE + path + "#articulo", "headline": re.sub("<[^>]+>", "", h1), "description": desc,
+         "abstract": " ".join(re.sub("<[^>]+>", "", x) for x in summary) or desc,
+         "image": [SITE + og_jpg(image), SITE + image], "datePublished": date, "dateModified": date, "inLanguage": "es", "author": AUTHOR,
+         "publisher": PUBLISHER, "mainEntityOfPage": {"@type": "WebPage", "@id": SITE + path}, "isPartOf": {"@id": WEB_ID},
+         "articleSection": "Guías para inversores", "about": [{"@type": "Place", "name": "Dubái"}, {"@type": "Thing", "name": "Inversión inmobiliaria"}],
+         "speakable": {"@type": "SpeakableSpecification", "cssSelector": [".article-lead", ".tldr"]}},
         {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "Inicio", "item": SITE + "/"},
             {"@type": "ListItem", "position": 2, "name": "Blog", "item": SITE + "/blog/"},
@@ -130,7 +170,7 @@ def article(slug, title, h1, desc, lead, image, alt, sections, faqs, related, da
         {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
             {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": re.sub("<[^>]+>", "", a)}} for q, a in faqs]},
     ]
-    return path, page(path, title + " · Pascual Vidal", desc, body, ld, og_image=image)
+    return path, page(path, title + " · Pascual Vidal", desc, body, ld, og_image=og_jpg(image), og_alt=alt)
 
 
 def p(*paras):
@@ -152,6 +192,52 @@ def note(x):
 
 
 pages = {}
+
+# Resumen al inicio de cada artículo: respuestas directas y citables (lectores con prisa, Google y buscadores con IA).
+SUMMARIES = {
+    "cuanto-cuesta-comprar-piso-dubai": [
+        "En Dubái hay estudios y apartamentos de 1 dormitorio por debajo de <strong>200.000 €</strong> en zonas en crecimiento; en obra nueva reservas con un <strong>10–20 %</strong> y pagas el resto por fases.",
+        "El gasto principal es el <strong>4 % del Dubai Land Department</strong>, que se paga una sola vez.",
+        "Calcula unos gastos totales del <strong>6–8 %</strong> en segunda mano y del <strong>4–5 %</strong> en obra nueva, donde normalmente no hay comisión de agencia.",
+        "Cada año pagarás sobre todo la <strong>cuota de comunidad</strong> (<em>service charge</em>); en Emiratos no hay IBI.",
+    ],
+    "impuestos-invertir-dubai-espanol": [
+        "En Emiratos, un particular no paga impuesto sobre la renta, ni sobre plusvalías, ni IBI: solo el <strong>4 % del DLD</strong> al comprar.",
+        "Si eres residente fiscal en España, declaras el piso en el <strong>IRPF</strong> (alquiler, imputación de rentas o ganancia al vender).",
+        "Con más de <strong>50.000 €</strong> en inmuebles en el extranjero debes presentar el <strong>modelo 720</strong>; según tu caso, también cuenta para Patrimonio.",
+        "Existe un convenio de doble imposición España–Emiratos; la Golden Visa por sí sola no cambia tu residencia fiscal.",
+    ],
+    "golden-visa-dubai-inversion-inmobiliaria": [
+        "La Golden Visa es una residencia de <strong>10 años</strong>, renovable, que no te obliga a vivir en Emiratos.",
+        "Por inversión inmobiliaria necesitas un mínimo de <strong>2 millones de AED</strong> (unos 500.000 €) en una o varias propiedades; vale la obra nueva y, con condiciones, la compra con hipoteca.",
+        "Puedes incluir a tu cónyuge, a tus hijos y, en muchos casos, a tus padres.",
+        "Si no llegas al mínimo, existe un visado de inversor de 2 años con un umbral más bajo.",
+    ],
+    "invertir-en-dubai-desde-mexico": [
+        "Un dírham ronda los <strong>5 pesos</strong>: un apartamento de 1 dormitorio de 1.000.000 AED son unos <strong>5 millones MXN</strong>.",
+        "El dinero se envía por transferencia internacional (mejor en dólares) a la cuenta <em>escrow</em> del proyecto, justificando su origen.",
+        "Como residente fiscal en México, declaras las rentas y la ganancia al vender; en Emiratos no pagas impuesto sobre la renta.",
+        "Todo el proceso se puede hacer a distancia, sin viajar a Dubái.",
+    ],
+    "invertir-en-dubai-desde-colombia": [
+        "Un dírham ronda los <strong>1.100 pesos colombianos</strong>: un apartamento de 1 habitación de 1.000.000 AED son unos <strong>1.100 millones COP</strong>.",
+        "La inversión se canaliza por el mercado cambiario a través de tu banco, con la declaración de cambio que corresponda.",
+        "Como residente fiscal en Colombia declaras rentas, ganancia ocasional y, si superas el límite de la DIAN, activos en el exterior.",
+        "Comprar en Dubái te da patrimonio ligado al dólar y se puede hacer sin viajar.",
+    ],
+    "invertir-en-dubai-desde-miami": [
+        "El dírham está fijado al dólar (<strong>1 USD = 3,6725 AED</strong>): compras, cobras y vendes sin riesgo de cambio.",
+        "Un apartamento de 1 dormitorio de 1.000.000 AED cuesta unos <strong>272.000 USD</strong>; la Golden Visa empieza en unos 545.000 USD.",
+        "Emiratos no grava al particular, pero el IRS sí: rentas y ganancias se declaran en EE. UU. (y FBAR si tienes cuentas allí por encima de 10.000 USD).",
+        "Se paga por <em>wire transfer</em> en dólares y la compra se hace en remoto.",
+    ],
+    "invertir-en-dubai-desde-espana": [
+        "Un dírham ronda los <strong>0,24 €</strong>: un estudio en zona en crecimiento cuesta unos <strong>155.000 €</strong> y un apartamento de 1 dormitorio, unos 240.000 €.",
+        "En obra nueva reservas con un <strong>10–20 %</strong>; los bancos españoles no suelen financiar, pero algunos bancos de Emiratos dan hipoteca a no residentes (50–60 %).",
+        "En Emiratos no hay IBI ni impuesto sobre la renta para particulares; en España declaras IRPF, modelo 720 si superas 50.000 € y, según tu caso, Patrimonio.",
+        "Se puede comprar todo desde España, sin viajar.",
+    ],
+}
 
 # ---------------------------------------------------------------- 1
 pages["cuanto-cuesta-comprar-piso-dubai"] = article(
@@ -494,7 +580,7 @@ pages["espana"] = article(
 # ---------------------------------------------------------------- índice
 ARTICLES.sort(key=lambda a: a["date"], reverse=True)
 cards = "".join(
-    f'<a class="post-card" href="/blog/{a["slug"]}/"><span class="post-img"><img src="{a["image"]}" alt="{H.escape(a["alt"])}" loading="lazy" /></span>'
+    f'<a class="post-card" href="/blog/{a["slug"]}/"><span class="post-img"><img src="{a["image"]}" alt="{H.escape(a["alt"])}" {dims(a["image"])} loading="lazy" /></span>'
     f'<span class="post-body"><small>Guía · {a["date_txt"]}</small><b>{H.escape(a["title"])}</b><span>{H.escape(a["desc"])}</span><i>Leer artículo →</i></span></a>'
     for a in ARTICLES)
 idx_body = f"""    <section class="blog-index container">
@@ -504,8 +590,10 @@ idx_body = f"""    <section class="blog-index container">
       <p class="article-lead">Costes reales, impuestos, Golden Visa, zonas y alquiler. Lo que te contaría en una consultoría, por escrito y en español.</p>
       <div class="post-grid">{cards}</div>
     </section>"""
-idx_ld = {"@context": "https://schema.org", "@type": "Blog", "name": "Blog · Tu inversión en Dubái", "url": SITE + "/blog/", "inLanguage": "es",
-          "blogPost": [{"@type": "BlogPosting", "headline": a["title"], "url": f'{SITE}/blog/{a["slug"]}/'} for a in ARTICLES]}
+idx_ld = {"@context": "https://schema.org", "@type": "Blog", "@id": SITE + "/blog/#blog", "name": "Blog · Tu inversión en Dubái", "url": SITE + "/blog/", "inLanguage": "es",
+          "author": {"@id": PERSON_ID}, "publisher": PUBLISHER, "isPartOf": {"@id": WEB_ID},
+          "blogPost": [{"@type": "BlogPosting", "@id": f'{SITE}/blog/{a["slug"]}/#articulo', "headline": a["title"], "url": f'{SITE}/blog/{a["slug"]}/',
+                        "datePublished": a["date"], "image": SITE + og_jpg(a["image"]), "author": {"@id": PERSON_ID}} for a in ARTICLES]}
 pages["_index"] = ("/blog/", page("/blog/", "Blog sobre invertir en Dubái · Pascual Vidal",
                                   "Guías en español sobre invertir en Dubái: cuánto cuesta comprar, impuestos para españoles, Golden Visa, zonas y alquiler.",
                                   idx_body, idx_ld, og_type="website"))
@@ -536,7 +624,7 @@ def legal_page(slug, title, intro, sections):
     path = f"/{slug}/"
     ld = {"@context": "https://schema.org", "@type": "WebPage", "name": title, "url": SITE + path, "inLanguage": "es"}
     doc = page(path, title + " · Tu inversión en Dubái", re.sub("<[^>]+>", "", intro), body, ld, og_type="website")
-    return path, doc.replace('<meta name="theme-color"', '<meta name="robots" content="noindex, follow" />\n  <meta name="theme-color"', 1)
+    return path, doc.replace('<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />', '<meta name="robots" content="noindex, follow" />', 1)
 
 
 pages["_aviso"] = legal_page("aviso-legal", "Aviso legal",
@@ -630,7 +718,113 @@ lp_ld = {"@context": "https://schema.org", "@type": "WebPage", "name": "Consulto
 lp_doc = page("/consultoria/", "Consultoría gratuita para invertir en Dubái · Pascual Vidal",
               "Reserva una llamada gratuita de 20 minutos con un consultor inmobiliario español en Dubái. Te acompaño antes, durante y después de la compra.",
               lp_body, lp_ld, og_type="website", body_attrs=" data-no-guide-popup")
-pages["_consultoria"] = ("/consultoria/", lp_doc.replace('<meta name="theme-color"', '<meta name="robots" content="noindex, follow" />\n  <meta name="theme-color"', 1))
+pages["_consultoria"] = ("/consultoria/", lp_doc.replace('<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />', '<meta name="robots" content="noindex, follow" />', 1))
+
+
+# ---------------------------------------------------------------- página de autor (E-E-A-T: quién está detrás de los contenidos)
+ABOUT_FACTS = [
+    ("Quién soy", p(
+        "Soy <strong>Pascual Vidal</strong>, consultor inmobiliario español afincado en Dubái. Llevo tres años en el mercado inmobiliario de Emiratos y vivo aquí los 12 meses del año.",
+        "Estoy registrado como agente en <strong>RERA</strong> (Real Estate Regulatory Agency, el regulador del Dubai Land Department) con el número <strong>97799</strong>. He gestionado más de <strong>90 operaciones</strong> en Dubái.")),
+    ("A quién ayudo", p(
+        "A inversores hispanohablantes —de España, México, Colombia, Argentina, Chile, Perú y Estados Unidos— que quieren comprar una propiedad en Dubái, Abu Dabi o Ras Al Khaimah, sobre todo de obra nueva, y que no quieren quedarse solos una vez firmada la compra.")),
+    ("Cómo trabajo", ul(
+        "<strong>Consultor, no comercial:</strong> antes de recomendarte una propiedad analizamos tu objetivo y tu presupuesto y hacemos los números reales.",
+        "<strong>Compra en remoto:</strong> reserva, contratos, pagos y registro en el Dubai Land Department sin que tengas que viajar.",
+        "<strong>Después de comprar:</strong> entrega de llaves, amueblado a medida, alquiler vacacional o anual, mantenimiento, reventa y Golden Visa.")),
+    ("Dónde puedes verme", p(
+        'Explico el mercado de Dubái en mi canal de <a href="https://www.youtube.com/@pascual.dubairealestate" rel="me noopener" target="_blank">YouTube</a> y en <a href="https://www.instagram.com/pascual_vidal_dubai/" rel="me noopener" target="_blank">Instagram</a>, y por escrito en el <a href="/blog/">blog</a>.')),
+]
+about_secs = "".join(f'\n      <h2 id="a{i}">{H.escape(t)}</h2>\n{c}' for i, (t, c) in enumerate(ABOUT_FACTS, 1))
+about_posts = "".join(f'<li><a href="/blog/{a["slug"]}/">{H.escape(a["title"])}</a></li>' for a in ARTICLES)
+about_body = f"""    <article class="article">
+      <header class="article-head container">
+        <nav class="crumbs" aria-label="Migas de pan"><a href="/">Inicio</a><span>/</span><span>Pascual Vidal</span></nav>
+        <p class="eyebrow"><span class="dot"></span>Consultor inmobiliario en Dubái · RERA #97799</p>
+        <h1>Pascual Vidal, <em>consultor inmobiliario</em> español en Dubái</h1>
+        <p class="article-lead">Ayudo a hispanohablantes a invertir en propiedades en Dubái y Emiratos, y sigo a su lado después de la compra.</p>
+      </header>
+      <figure class="article-cover container"><img src="/assets/img/pascual-dubai.webp" alt="Pascual Vidal en Dubái" {dims("/assets/img/pascual-dubai.webp")} loading="eager" fetchpriority="high" style="aspect-ratio:16/9;object-position:center 30%" /></figure>
+      <div class="article-layout container">
+        <aside class="toc"><b>En esta página</b><ol>{"".join(f'<li><a href="#a{i}">{H.escape(t)}</a></li>' for i, (t, _) in enumerate(ABOUT_FACTS, 1))}</ol></aside>
+        <div class="prose">{about_secs}
+      <h2 id="articulos">Mis guías</h2>
+      <ul>{about_posts}</ul>
+      <div class="article-cta">
+        <div>
+          <p class="eyebrow"><span class="dot"></span>Consultoría gratuita</p>
+          <h3>¿Hablamos de tu inversión?</h3>
+          <p>En 20 minutos vemos tu presupuesto, tu objetivo y qué zonas encajan contigo. Sin compromiso.</p>
+        </div>
+        <div class="article-cta-actions">
+          <a class="btn btn-wa" data-wa data-wa-msg="Hola Pascual, he leído quién eres en tu web y quiero hablar de mi inversión en Dubái." href="{WA_LINK}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg><span>Escríbeme por WhatsApp</span></a>
+          <a class="btn btn-dark" href="/#contacto">Reservar llamada</a>
+        </div>
+      </div>
+        </div>
+      </div>
+    </article>"""
+about_ld = {"@context": "https://schema.org", "@type": "ProfilePage", "@id": SITE + "/sobre-pascual-vidal/", "url": SITE + "/sobre-pascual-vidal/",
+            "name": "Pascual Vidal, consultor inmobiliario español en Dubái", "inLanguage": "es", "isPartOf": {"@id": WEB_ID}, "dateModified": TODAY,
+            "mainEntity": dict(AUTHOR, **{
+                "description": "Consultor inmobiliario español en Dubái, registrado en RERA con el n.º 97799. Asesora a inversores hispanohablantes en la compra, alquiler y reventa de propiedades en Emiratos.",
+                "nationality": {"@type": "Country", "name": "España"}, "knowsLanguage": ["es", "en"], "homeLocation": {"@type": "City", "name": "Dubái"},
+                "worksFor": {"@id": ORG_ID},
+                "hasCredential": {"@type": "EducationalOccupationalCredential", "credentialCategory": "Licencia profesional",
+                                  "name": "Agente inmobiliario registrado en RERA n.º 97799",
+                                  "recognizedBy": {"@type": "GovernmentOrganization", "name": "Dubai Land Department (RERA)", "url": "https://dubailand.gov.ae/"}},
+                "knowsAbout": ["Inversión inmobiliaria en Dubái", "Obra nueva sobre plano", "Golden Visa de Emiratos", "Alquiler vacacional en Dubái",
+                               "Fiscalidad de inversores españoles y latinoamericanos en Dubái"]})}
+pages["_autor"] = ("/sobre-pascual-vidal/", page("/sobre-pascual-vidal/", "Pascual Vidal, consultor inmobiliario español en Dubái (RERA #97799)",
+    "Quién es Pascual Vidal: consultor inmobiliario español en Dubái registrado en RERA (n.º 97799), con más de 90 operaciones. Inversión, postventa, alquiler y Golden Visa.",
+    about_body, about_ld, og_type="profile"))
+
+# ---------------------------------------------------------------- 404
+nf_body = """    <section class="notfound container">
+      <p class="eyebrow"><span class="dot"></span>Error 404</p>
+      <h1>Esta página <em>no existe</em></h1>
+      <p class="article-lead">Puede que el enlace esté mal o que la hayamos movido. Esto es lo más leído:</p>
+      <div class="post-links">""" + "".join(f'<a class="btn btn-dark btn-sm" href="/blog/{a["slug"]}/">{H.escape(a["title"])}</a>' for a in ARTICLES[:4]) + """</div>
+      <p><a class="btn btn-primary" href="/">Volver al inicio</a></p>
+    </section>"""
+nf = page("/404/", "Página no encontrada · Tu inversión en Dubái", "La página que buscas no existe.", nf_body,
+          {"@context": "https://schema.org", "@type": "WebPage", "name": "Página no encontrada"}, og_type="website")
+nf = nf.replace('<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />', '<meta name="robots" content="noindex, follow" />')
+nf = re.sub(r'\s*<link rel="(canonical|alternate)"[^>]*>', "", nf)
+open(ROOT + "/404.html", "w").write(nf)
+
+# ---------------------------------------------------------------- llms.txt (resumen para buscadores con IA: ChatGPT, Perplexity, Gemini, Claude…)
+def _txt(x):
+    return H.unescape(re.sub("<[^>]+>", "", x))
+
+llms = ["# Tu inversión en Dubái · Pascual Vidal", "",
+        "> Consultoría de inversión inmobiliaria en Dubái para hispanohablantes, dirigida por Pascual Vidal, consultor español registrado en RERA "
+        "(Dubai Land Department) con el n.º 97799, que vive en Dubái y ha gestionado más de 90 operaciones. Ayuda a comprar propiedades —sobre todo de "
+        "obra nueva— en Dubái, Abu Dabi y Ras Al Khaimah, y se ocupa de la postventa: entrega, amueblado, alquiler vacacional y anual, reventa y Golden Visa.", "",
+        "Datos clave:",
+        "- Idiomas: español e inglés. Clientes de España, México, Colombia, Argentina, Chile, Perú y Estados Unidos.",
+        "- La compra se puede hacer entera en remoto; primera consultoría gratuita de 20 minutos.",
+        "- Contacto: WhatsApp " + WA_LINK + " · formulario en " + SITE + "/#contacto",
+        "- YouTube: https://www.youtube.com/@pascual.dubairealestate · Instagram: https://www.instagram.com/pascual_vidal_dubai/", "",
+        "## Páginas principales", "",
+        f"- [Inicio]({SITE}/): servicios, proyectos destacados y preguntas frecuentes sobre invertir en Dubái.",
+        f"- [Quién es Pascual Vidal]({SITE}/sobre-pascual-vidal/): trayectoria, licencia RERA y forma de trabajar.",
+        f"- [Consultoría gratuita]({SITE}/consultoria/): reserva de llamada.", "",
+        "## Guías (blog)", ""]
+for a in ARTICLES:
+    llms.append(f"- [{a['title']}]({SITE}/blog/{a['slug']}/): {a['desc']}")
+llms += ["", "## Preguntas frecuentes", ""]
+for q, a in home_faq.items():
+    llms.append(f"- **{_txt(q)}** {_txt(a)}")
+llms += ["", "## Resúmenes de las guías", ""]
+for a in ARTICLES:
+    if a["summary"]:
+        llms.append(f"### {a['title']}")
+        llms.append(f"Fuente: {SITE}/blog/{a['slug']}/ (actualizado {a['date']})")
+        llms += [f"- {_txt(x)}" for x in a["summary"]]
+        llms.append("")
+llms.append("Información orientativa, no asesoramiento fiscal ni legal. Cifras y normas sujetas a cambios.")
+open(ROOT + "/llms.txt", "w").write("\n".join(llms) + "\n")
 
 import os
 for key, (path, doc) in pages.items():
@@ -639,7 +833,9 @@ for key, (path, doc) in pages.items():
     open(d + "index.html", "w").write(doc)
     print("ok", path)
 
-urls = ["/"] + [p for k, (p, _) in pages.items() if k in ("_index",) or not k.startswith("_")]
+LASTMOD = {"/": TODAY, "/blog/": max(a["date"] for a in ARTICLES), "/sobre-pascual-vidal/": TODAY}
+LASTMOD.update({f'/blog/{a["slug"]}/': a["date"] for a in ARTICLES})
+urls = ["/", "/sobre-pascual-vidal/", "/blog/"] + [f'/blog/{a["slug"]}/' for a in ARTICLES]
 sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
-    f"  <url><loc>{SITE}{u}</loc><lastmod>{DATE}</lastmod></url>\n" for u in urls) + "</urlset>\n"
+    f"  <url><loc>{SITE}{u}</loc><lastmod>{LASTMOD[u]}</lastmod></url>\n" for u in urls) + "</urlset>\n"
 open(ROOT + "/sitemap.xml", "w").write(sm)

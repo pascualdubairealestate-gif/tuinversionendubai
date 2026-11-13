@@ -45,7 +45,7 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
-img { max-width: 100%; display: block; }
+img { max-width: 100%; height: auto; display: block; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
 svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
@@ -844,3 +844,14 @@ body, .splash { background: var(--sand-bg); }
 
 /* Guía: números modernos en el título (Cormorant dibuja el 10 como «io») */
 .guide-card h3, .guide-card .book b { font-variant-numeric: lining-nums; }
+
+/* Resumen al inicio de cada artículo (respuesta rápida para lectores, Google e IAs) */
+.tldr { background: #f6f1e8; border: 1px solid #e6dcc9; border-radius: var(--radius, 16px); padding: 20px 24px; margin: 0 0 8px; max-width: 720px; }
+.tldr b { display: block; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px; }
+.tldr ul { margin: 0; padding-left: 1.1em; }
+.tldr li { margin: 6px 0; line-height: 1.5; }
+.article-author a { color: inherit; text-decoration: none; }
+.article-author a:hover b { text-decoration: underline; }
+/* Página 404 */
+.notfound { min-height: 60vh; display: grid; place-content: center; text-align: center; gap: 14px; padding: 140px 20px 80px; }
+.notfound .post-links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
