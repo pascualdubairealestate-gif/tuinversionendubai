@@ -30,11 +30,13 @@ ORG_ID = SITE + "/#organizacion"
 WEB_ID = SITE + "/#web"
 AUTHOR = {"@type": "Person", "@id": PERSON_ID, "name": "Pascual Vidal", "url": SITE + "/sobre-pascual-vidal/",
           "jobTitle": "Consultor de inversión inmobiliaria en Dubái", "image": SITE + "/assets/img/pascual-retrato.webp",
-          "sameAs": ["https://www.instagram.com/pascual.dubairealestate/", "https://www.youtube.com/@pascual.dubairealestate"]}
+          "sameAs": ["https://www.instagram.com/pascual.dubairealestate/", "https://www.youtube.com/@pascual.dubairealestate"],
+          "telephone": "+971507963006",
+          "affiliation": {"@type": "RealEstateAgent", "name": "Dubana Real Estate", "address": {"@type": "PostalAddress", "addressLocality": "Dubái", "addressCountry": "AE"}}}
 PUBLISHER = {"@type": "Organization", "@id": ORG_ID, "name": "Tu inversión en Dubái", "url": SITE + "/",
-             "logo": {"@type": "ImageObject", "url": SITE + "/assets/img/logo-pv-512.png", "width": 512, "height": 512}}
+             "logo": {"@type": "ImageObject", "url": SITE + "/assets/img/logo-pv-512.png", "width": 512, "height": 512}, "telephone": "+971507963006"}
 WA_LINK = "https://wa.me/message/QI3A7Q5BXFTCA1"
-TODAY = "2026-11-13"
+TODAY = "2026-11-15"
 
 from PIL import Image as _Img
 import os as _os
@@ -577,6 +579,281 @@ pages["espana"] = article(
     date=D2, date_txt=D2_TXT, wa_msg="Hola Pascual, te escribo desde España. Quiero información para invertir en Dubái.",
 )
 
+
+# ---------------------------------------------------------------- tanda 3 (15 nov 2026): rentabilidad, sobre plano, zonas, RAK, Argentina
+D3, D3_TXT = "2026-11-15", "15 de noviembre de 2026"
+
+SUMMARIES.update({
+    "rentabilidad-alquiler-dubai": [
+        "La rentabilidad <strong>bruta</strong> media del alquiler residencial en Dubái ronda el <strong>6,5–7 %</strong>; los apartamentos rinden más que las villas.",
+        "Las cifras de «hasta un 20 %» no son la media del mercado: suelen sumar revalorización de obra nueva o contar solo ingresos brutos de alquiler vacacional.",
+        "La rentabilidad <strong>neta</strong> realista, tras comunidad, gestión y meses vacíos, suele quedar entre <strong>1 y 2,5 puntos</strong> por debajo de la bruta.",
+        "Los estudios y apartamentos de 1 dormitorio en zonas de precio medio son los que mejor rentabilidad dan en porcentaje.",
+    ],
+    "comprar-sobre-plano-dubai": [
+        "Comprar sobre plano (<em>off-plan</em>) es comprar una vivienda en construcción: reservas con un <strong>10–20 %</strong> y pagas el resto por fases.",
+        "Tus pagos van a una <strong>cuenta escrow</strong> del proyecto, regulada por ley, y la compra se registra en el Dubai Land Department (Oqood).",
+        "El 4 % del DLD se paga al principio; en obra nueva normalmente no pagas comisión de agencia.",
+        "Los riesgos reales son el retraso en la entrega, un promotor débil y tener que vender antes de terminar de pagar: se reducen eligiendo bien promotor, proyecto y plan de pagos.",
+    ],
+    "mejores-zonas-invertir-dubai": [
+        "No hay una «mejor zona»: depende de si buscas <strong>rentabilidad por alquiler</strong>, <strong>revalorización</strong> o un piso para uso propio.",
+        "Para rentabilidad, zonas de precio medio como <strong>JVC</strong> o Dubai Sports City superan el 8 % bruto; las zonas prime como Downtown rondan el 5 %.",
+        "Business Bay y Dubai Marina equilibran alquiler, liquidez y demanda internacional.",
+        "Dubai South / Expo City y Dubai Islands son apuestas de crecimiento a medio plazo ligadas a grandes infraestructuras.",
+    ],
+    "invertir-ras-al-khaimah-al-marjan": [
+        "Ras Al Khaimah está a unos <strong>50 minutos</strong> del aeropuerto de Dubái y permite a extranjeros comprar en plena propiedad en zonas como <strong>Al Marjan Island</strong>.",
+        "El gran motor es <strong>Wynn Al Marjan Island</strong>, el primer resort integrado con casino de Emiratos, con apertura prevista en <strong>septiembre de 2027</strong>.",
+        "Los precios de entrada son más bajos que en las zonas prime de Dubái, con planes de pago en obra nueva.",
+        "Es una inversión más especulativa que Dubái: depende de que el turismo crezca como se espera; conviene elegir bien promotor y ubicación.",
+    ],
+    "invertir-en-dubai-desde-argentina": [
+        "Un argentino puede comprar en plena propiedad en Dubái sin residir allí, y todo el proceso se puede hacer a distancia.",
+        "El dírham va ligado al dólar: tu inversión y tus rentas quedan en una moneda dura.",
+        "Si eres residente fiscal en Argentina, declaras las rentas en <strong>Ganancias</strong> y el inmueble en <strong>Bienes Personales</strong>.",
+        "Las normas cambiarias argentinas cambian a menudo: confirma con tu banco cómo comprar y transferir dólares al exterior antes de reservar.",
+    ],
+})
+
+pages["rentabilidad"] = article(
+    "rentabilidad-alquiler-dubai",
+    "Rentabilidad del alquiler en Dubái en 2026: cifras reales",
+    "Rentabilidad del alquiler en Dubái: <em>cifras reales</em>",
+    "Cuánto rinde de verdad un piso en Dubái: rentabilidad bruta y neta por tipo de vivienda y zona, alquiler anual frente a vacacional y por qué desconfiar del «hasta 20 %».",
+    "Seguro que has visto anuncios de «rentabilidades de hasta el 20 %» en Dubái. Te explico qué cifras da hoy el mercado, cómo pasar de rentabilidad bruta a neta y qué tipo de propiedad rinde más.",
+    "/assets/img/video-airbnb.webp", "Apartamento amueblado en Dubái preparado para alquiler vacacional",
+    [
+        ("media", "Cuánto rinde un piso en Dubái hoy",
+         p("Según datos de Property Monitor publicados por Engel &amp; Völkers, en noviembre de 2026 la rentabilidad bruta media del residencial en Dubái era del <strong>6,66 %</strong>: <strong>6,96 %</strong> en apartamentos, 5,20 % en adosados y 4,67 % en villas. Es muy superior a la de ciudades como Madrid, Londres o Nueva York, donde lo normal es moverse entre el 2 % y el 4 %.") +
+         table(["Tipo de propiedad", "Rentabilidad bruta media (nov. 2026)"], [
+             ["Apartamentos", "≈ 7,0 %"],
+             ["Adosados (townhouses)", "≈ 5,2 %"],
+             ["Villas", "≈ 4,7 %"],
+             ["Media residencial", "≈ 6,7 %"],
+         ]) +
+         p("Los apartamentos rinden más porque su precio de compra es más bajo en proporción al alquiler que cobran. Los estudios y los de 1 dormitorio suelen dar los mejores porcentajes.")),
+        ("veinte", "¿Y lo del «hasta un 20 %»?",
+         p("Esa cifra no es la rentabilidad del alquiler. Cuando ves un 15–20 % suele ser una de estas tres cosas:") +
+         ul("<strong>Revalorización de obra nueva:</strong> lo que ha subido el precio entre que reservaste y la entrega. Es real en un mercado alcista, pero no está garantizado y no es un ingreso anual.",
+            "<strong>Rentabilidad sobre lo pagado, no sobre el precio:</strong> si solo has pagado el 20 % y el piso se revaloriza un 4 %, sobre tu dinero eso es un 20 %. El riesgo crece en la misma proporción.",
+            "<strong>Ingresos brutos de alquiler vacacional</strong> en temporada alta, sin restar gestión, limpieza, suministros ni las semanas vacías.") +
+         note("Mi regla: si alguien te promete una rentabilidad, pídele que te la desglose en <strong>alquiler neto</strong> y <strong>revalorización estimada</strong> por separado. Si no puede, no es una cifra, es publicidad.")),
+        ("neta", "De rentabilidad bruta a neta",
+         p("La rentabilidad bruta es el alquiler anual dividido entre el precio. Para saber lo que de verdad te queda hay que restar:") +
+         ul("<strong>Cuota de comunidad</strong> (<em>service charge</em>): se paga por pie cuadrado y varía mucho de un edificio a otro.",
+            "<strong>Gestión:</strong> en alquiler anual, una comisión moderada; en vacacional, la empresa gestora se queda un porcentaje de los ingresos.",
+            "<strong>Meses vacíos</strong> entre inquilinos o semanas sin reservas.",
+            "<strong>Mantenimiento</strong> y, en vacacional, limpieza, suministros, internet y la licencia de <em>holiday home</em>.",
+            "<strong>Los gastos de compra</strong> (sobre todo el 4 % del DLD) si quieres calcular la rentabilidad sobre lo que de verdad has invertido.") +
+         p("En la práctica, la neta suele quedar entre 1 y 2,5 puntos por debajo de la bruta. Un apartamento con un 7 % bruto puede dejarte un 5 % neto, que sigue siendo muy buena cifra en un activo en moneda ligada al dólar. Te explico todos los gastos en <a href=\"/blog/cuanto-cuesta-comprar-piso-dubai/\">cuánto cuesta comprar un piso en Dubái</a>.")),
+        ("anual-vacacional", "Alquiler anual o vacacional",
+         table(["", "Alquiler anual", "Alquiler vacacional"], [
+             ["Ingresos", "Estables, normalmente cobrados en 1 a 4 cheques al año", "Más altos en bruto, variables según temporada"],
+             ["Gastos", "Bajos", "Gestión, limpieza, suministros y amueblado"],
+             ["Trabajo", "Mínimo", "Alto, salvo que lo delegues en una gestora"],
+             ["Requisitos", "Contrato registrado en Ejari", "Licencia de holiday home del Departamento de Turismo"],
+         ]) +
+         p("El vacacional suele rendir más en zonas turísticas (Marina, Downtown, Palm, Business Bay), pero solo si el piso está bien amueblado y bien gestionado. En zonas residenciales el anual suele ganar en neto y en tranquilidad.")),
+        ("que-rinde", "Qué propiedad rinde más",
+         ul("<strong>Tamaño:</strong> estudios y 1 dormitorio, mejor porcentaje; 2–3 dormitorios, inquilinos más estables (familias).",
+            "<strong>Zona:</strong> las zonas de precio medio dan más rentabilidad; las prime, más liquidez y revalorización. Lo comparo zona por zona en <a href=\"/blog/mejores-zonas-invertir-dubai/\">las mejores zonas para invertir en Dubái</a>.",
+            "<strong>Edificio:</strong> una comunidad cara se come la rentabilidad. Pregunta siempre la cuota por pie cuadrado antes de comprar.",
+            "<strong>Obra nueva o segunda mano:</strong> la segunda mano alquila desde el primer día; la obra nueva da mejor precio de entrada y plan de pagos, pero no rinde hasta la entrega.")),
+    ],
+    [
+        ("¿Qué rentabilidad da un piso en Dubái?", "La rentabilidad bruta media del residencial ronda el 6,5–7 % (en torno al 7 % en apartamentos y algo menos del 5 % en villas). La neta suele quedar entre 1 y 2,5 puntos por debajo."),
+        ("¿Es real una rentabilidad del 20 % en Dubái?", "No como rentabilidad del alquiler. Esas cifras suelen mezclar la revalorización de la obra nueva, calcular sobre lo pagado y no sobre el precio, o contar ingresos brutos de alquiler vacacional."),
+        ("¿Se pagan impuestos por el alquiler en Dubái?", "En Emiratos, un particular no paga impuesto sobre la renta por el alquiler. Si eres residente fiscal en otro país, normalmente tendrás que declararlo allí."),
+        ("¿Qué rinde más, alquiler anual o vacacional?", "El vacacional suele dar más ingresos brutos en zonas turísticas, pero con más gastos y gestión. En zonas residenciales, el anual suele ganar en neto."),
+    ],
+    [("mejores-zonas-invertir-dubai", "Las mejores zonas para invertir en Dubái"), ("cuanto-cuesta-comprar-piso-dubai", "Cuánto cuesta comprar un piso en Dubái")],
+    date=D3, date_txt=D3_TXT, wa_msg="Hola Pascual, he leído tu artículo sobre la rentabilidad del alquiler en Dubái. ¿Me haces los números de una propiedad?",
+)
+
+pages["sobre-plano"] = article(
+    "comprar-sobre-plano-dubai",
+    "Comprar sobre plano en Dubái: cómo funciona y qué riesgos tiene",
+    "Comprar sobre plano en Dubái: <em>guía completa</em>",
+    "Cómo funciona comprar una propiedad sobre plano (off-plan) en Dubái: planes de pago, cuenta escrow, registro Oqood, gastos, riesgos reales y cómo elegir promotor.",
+    "La mayoría de mis clientes compran sobre plano: entras con un 10–20 % y pagas el resto mientras se construye. Te explico cómo funciona paso a paso, qué te protege y en qué fijarte para no equivocarte de proyecto.",
+    "/assets/img/proyecto-dubai-islands.webp", "Proyecto de obra nueva en Dubai Islands frente al mar",
+    [
+        ("que-es", "Qué es comprar sobre plano",
+         p("Comprar sobre plano (<em>off-plan</em>) es comprar una vivienda que todavía se está construyendo, directamente al promotor. A cambio de esperar a la entrega consigues normalmente <strong>mejor precio de entrada</strong> que en un edificio terminado y un <strong>plan de pagos</strong> repartido en el tiempo, sin necesidad de hipoteca.")),
+        ("pasos", "El proceso paso a paso",
+         "      <ol>" + "".join(f"<li>{x}</li>" for x in [
+             "<strong>Selección:</strong> comparamos proyectos según tu presupuesto y objetivo (alquiler, revalorización, Golden Visa, uso propio).",
+             "<strong>Reserva:</strong> se bloquea la unidad con un depósito y se firma el formulario de reserva.",
+             "<strong>Contrato (SPA):</strong> el contrato de compraventa con el promotor, que fija precio, plan de pagos y fecha estimada de entrega. Se puede firmar en remoto.",
+             "<strong>Registro Oqood:</strong> el promotor registra tu compra en el Dubai Land Department. Aquí se paga el 4 % del DLD.",
+             "<strong>Pagos por fases</strong> durante la construcción, siempre a la cuenta <em>escrow</em> del proyecto.",
+             "<strong>Entrega (handover):</strong> revisión de la vivienda, pago final y título de propiedad. A partir de aquí puedes alquilar o vender.",
+         ]) + "</ol>\n"),
+        ("planes", "Planes de pago habituales",
+         table(["Plan", "Cómo funciona", "Para quién"], [
+             ["Durante la obra (ej. 60/40)", "60 % durante la construcción y 40 % a la entrega", "Quien tiene liquidez o hipotecará al final"],
+             ["Post-handover (ej. 50/50)", "Parte se paga después de la entrega, a veces en 2–5 años", "Quien quiere pagar con el propio alquiler"],
+             ["Mensual o trimestral", "Cuotas pequeñas y constantes", "Quien prefiere repartir el esfuerzo"],
+         ]) +
+         p("Los porcentajes son ejemplos: cada promotor y proyecto tiene el suyo, y a veces se negocian.")),
+        ("proteccion", "Qué te protege como comprador",
+         ul("<strong>Cuenta escrow:</strong> tu dinero va a una cuenta del proyecto que el promotor solo puede usar para construir, según el avance de obra.",
+            "<strong>Proyecto registrado en RERA</strong> y compra inscrita en el DLD: puedes comprobar promotor y proyecto en los canales oficiales del Dubai Land Department.",
+            "<strong>Si un proyecto se cancela</strong>, la normativa prevé la devolución de lo depositado en la cuenta escrow.") +
+         note("Antes de reservar, compruebo contigo que el proyecto está registrado, que el número de cuenta escrow coincide con el oficial y que nunca pagas a una cuenta personal ni de un intermediario.")),
+        ("costes", "Gastos de comprar sobre plano",
+         ul("<strong>4 % del Dubai Land Department</strong>, al registrar la compra.",
+            "<strong>Tasa de registro Oqood y trámites</strong> del promotor (unos 1.000 € en total, según proyecto).",
+            "<strong>Sin comisión de agencia</strong> en la mayoría de casos: la paga el promotor.",
+            "<strong>A la entrega:</strong> conexión de suministros, amueblado si vas a alquilar y la primera cuota de comunidad.") +
+         p("En total, calcula alrededor de un 4–5 % sobre el precio. Desglose completo en <a href=\"/blog/cuanto-cuesta-comprar-piso-dubai/\">cuánto cuesta comprar un piso en Dubái</a>.")),
+        ("riesgos", "Riesgos reales y cómo reducirlos",
+         ul("<strong>Retrasos en la entrega:</strong> son frecuentes. Elige promotores con historial de entregas y revisa qué dice el contrato sobre retrasos.",
+            "<strong>Promotor pequeño o nuevo:</strong> no siempre es malo, pero exige revisar más (proyectos entregados, avance real de obra, solvencia).",
+            "<strong>Vender antes de la entrega:</strong> muchos promotores solo permiten traspasar el contrato cuando has pagado un porcentaje mínimo, a menudo en torno al 30–40 %, y cobran una tasa.",
+            "<strong>Comprar caro:</strong> en zonas con mucha oferta nueva, los alquileres pueden bajar en el momento de la entrega. Compara siempre con precios de segunda mano cercanos.",
+            "<strong>Plan de pagos que no puedes cumplir:</strong> si dejas de pagar, puedes perder parte de lo aportado. Asegúrate de que el calendario encaja con tu liquidez.")),
+        ("promotor", "Cómo elegir promotor y proyecto",
+         p("Miro cuatro cosas: el <strong>historial de entregas</strong> del promotor, la <strong>ubicación</strong> (demanda de alquiler real hoy, no solo en el folleto), el <strong>precio por pie cuadrado</strong> frente a lo terminado en la zona y la <strong>cuota de comunidad</strong> prevista. Si buscas la residencia, revisa también los requisitos de la <a href=\"/blog/golden-visa-dubai-inversion-inmobiliaria/\">Golden Visa</a>, que se puede conseguir con obra nueva.")),
+    ],
+    [
+        ("¿Es seguro comprar sobre plano en Dubái?", "Es un sistema regulado: el proyecto debe estar registrado, tus pagos van a una cuenta escrow y la compra se inscribe en el Dubai Land Department. El riesgo principal es el retraso o elegir un mal promotor, que se reduce revisando bien antes de reservar."),
+        ("¿Cuánto necesito para comprar sobre plano?", "Normalmente una entrada del 10–20 % del precio más el 4 % del DLD y las tasas de registro. El resto se paga por fases."),
+        ("¿Puedo vender antes de que entreguen el piso?", "Sí, traspasando el contrato, pero muchos promotores exigen haber pagado un porcentaje mínimo (a menudo en torno al 30–40 %) y cobran una tasa por el traspaso."),
+        ("¿Puedo comprar sobre plano sin viajar?", "Sí. Reserva, contrato y pagos se hacen en remoto. Yo me encargo de lo presencial, incluida la revisión y la entrega de llaves."),
+    ],
+    [("rentabilidad-alquiler-dubai", "Rentabilidad del alquiler en Dubái"), ("golden-visa-dubai-inversion-inmobiliaria", "Golden Visa de Dubái por inversión")],
+    date=D3, date_txt=D3_TXT, wa_msg="Hola Pascual, he leído tu guía sobre comprar sobre plano en Dubái y quiero ver proyectos.",
+)
+
+pages["zonas"] = article(
+    "mejores-zonas-invertir-dubai",
+    "Las mejores zonas para invertir en Dubái en 2026",
+    "Las mejores zonas para invertir <em>en Dubái</em>",
+    "Qué zonas de Dubái convienen según tu objetivo: rentabilidad por alquiler (JVC, Sports City), equilibrio (Business Bay, Marina), prime (Downtown) y crecimiento (Dubai South, Dubai Islands).",
+    "La pregunta que más me hacen es «¿dónde compro?». La respuesta depende de lo que busques: renta mensual, revalorización o un piso para disfrutar. Te comparo las zonas que más recomiendo, con datos de rentabilidad.",
+    "/assets/img/pascual-dubai.webp", "Pascual Vidal en Dubái con el skyline de la ciudad al fondo",
+    [
+        ("objetivo", "Primero, tu objetivo",
+         ul("<strong>Rentabilidad por alquiler:</strong> zonas de precio medio, con mucha demanda de inquilinos y precio de entrada bajo.",
+            "<strong>Revalorización:</strong> zonas nuevas ligadas a grandes infraestructuras, normalmente comprando sobre plano.",
+            "<strong>Seguridad y liquidez:</strong> zonas consolidadas y conocidas internacionalmente, donde es más fácil revender.",
+            "<strong>Golden Visa:</strong> llegar a 2 millones de AED con una o varias propiedades.")),
+        ("tabla", "Comparativa de zonas",
+         table(["Zona", "Perfil", "Rentabilidad bruta aprox. (apartamentos)"], [
+             ["Jumeirah Village Circle (JVC)", "Rentabilidad, precio de entrada bajo", "≈ 8–9 %"],
+             ["Dubai Sports City", "Rentabilidad", "≈ 8 %"],
+             ["Business Bay", "Equilibrio: céntrica, muy demandada", "≈ 6,3 %"],
+             ["Dubai Marina", "Turística, alquiler vacacional, liquidez", "≈ 5,9 %"],
+             ["Dubai Creek Harbour", "Nueva zona prime (Emaar)", "≈ 5,4 %"],
+             ["Downtown Dubai", "Prime, máxima liquidez", "≈ 5,3 %"],
+         ]) +
+         p("Rentabilidades brutas medias orientativas de 2026 (Property Monitor, vía Engel &amp; Völkers, y REIDIN). Varían según edificio, tamaño y precio de compra.")),
+        ("rentabilidad", "Para rentabilidad: JVC y Dubai Sports City",
+         p("Son zonas residenciales de precio medio con mucha demanda de profesionales que buscan alquiler asequible. Los estudios y apartamentos de 1 dormitorio dan los mejores porcentajes de la ciudad. La contrapartida: hay mucha oferta nueva, así que importa elegir bien el edificio y no pagar de más.")),
+        ("equilibrio", "Equilibrio: Business Bay y Dubai Marina",
+         p("<strong>Business Bay</strong>, junto a Downtown, combina demanda de ejecutivos, alquiler vacacional y buena reventa. <strong>Dubai Marina</strong> es la zona más turística junto al mar: ideal para alquiler vacacional bien gestionado y muy líquida, aunque el precio de entrada es más alto.")),
+        ("prime", "Prime: Downtown y Dubai Creek Harbour",
+         p("Junto al Burj Khalifa, <strong>Downtown</strong> es la dirección más reconocida de Dubái. Rinde menos en porcentaje, pero es de lo más fácil de revender y tiende a mantener valor. <strong>Dubai Creek Harbour</strong> es la gran apuesta de Emaar como «nuevo Downtown», con precios aún por debajo.")),
+        ("crecimiento", "Crecimiento: Dubai South, Expo City y Dubai Islands",
+         p("Son zonas para comprar sobre plano pensando en el medio plazo. <strong>Dubai South y Expo City</strong> crecen alrededor del aeropuerto Al Maktoum, que está previsto que sea el principal de Dubái. <strong>Dubai Islands</strong> es un frente marítimo nuevo con playas y hoteles. Hay más potencial de revalorización y también más incertidumbre. Cómo funciona comprar en construcción: <a href=\"/blog/comprar-sobre-plano-dubai/\">guía de compra sobre plano</a>.")),
+        ("fuera", "¿Y fuera de Dubái?",
+         p("Abu Dabi (Yas y Saadiyat) y Ras Al Khaimah ofrecen precios de entrada más bajos y sus propios motores de crecimiento. Te explico el caso de Al Marjan en <a href=\"/blog/invertir-ras-al-khaimah-al-marjan/\">invertir en Ras Al Khaimah</a>.")),
+    ],
+    [
+        ("¿Cuál es la mejor zona para invertir en Dubái?", "Depende del objetivo. Para rentabilidad, zonas de precio medio como JVC o Dubai Sports City; para equilibrio, Business Bay o Dubai Marina; para liquidez, Downtown; para crecimiento, Dubai South o Dubai Islands."),
+        ("¿Qué zona de Dubái da más rentabilidad por alquiler?", "Las zonas de precio medio, como JVC, Dubai Sports City o International City, superan el 8 % bruto en apartamentos, frente a cerca del 5 % en Downtown."),
+        ("¿Dónde comprar para alquiler vacacional en Dubái?", "En zonas turísticas como Dubai Marina, Downtown, Business Bay o Palm Jumeirah, con una buena gestión y la licencia de holiday home."),
+    ],
+    [("rentabilidad-alquiler-dubai", "Rentabilidad del alquiler en Dubái"), ("comprar-sobre-plano-dubai", "Comprar sobre plano en Dubái")],
+    date=D3, date_txt=D3_TXT, wa_msg="Hola Pascual, he leído tu artículo sobre las mejores zonas de Dubái. ¿Qué zona me recomiendas para mi caso?",
+)
+
+pages["rak"] = article(
+    "invertir-ras-al-khaimah-al-marjan",
+    "Invertir en Ras Al Khaimah y Al Marjan Island: guía 2026",
+    "Invertir en Ras Al Khaimah <em>y Al Marjan Island</em>",
+    "Por qué los inversores miran Ras Al Khaimah y Al Marjan Island: el resort Wynn (apertura en 2027), precios frente a Dubái, compra en plena propiedad, riesgos y Golden Visa.",
+    "Ras Al Khaimah es el emirato del que más me preguntan después de Dubái, sobre todo por Al Marjan Island y el resort de Wynn. Te explico qué está pasando allí, cuánto cuesta y qué riesgos tiene.",
+    "/assets/img/emirato-ras-al-khaimah-wynn.webp", "Al Marjan Island en Ras Al Khaimah con el resort Wynn en construcción",
+    [
+        ("donde", "Dónde está y por qué interesa",
+         p("Ras Al Khaimah (RAK) es el emirato más al norte de Emiratos, a unos 50 minutos por carretera del aeropuerto internacional de Dubái. <strong>Al Marjan Island</strong> es un conjunto de islas artificiales frente a su costa, con playas, hoteles y residencias donde los extranjeros pueden comprar en plena propiedad (<em>freehold</em>), igual que en Al Hamra o Mina Al Arab.")),
+        ("wynn", "El motor: Wynn Al Marjan Island",
+         p("Wynn Resorts está construyendo en Al Marjan Island el primer resort integrado con casino de Emiratos, con más de 1.500 habitaciones, teatro, puerto deportivo y playa privada. En octubre de 2024 obtuvo la primera licencia de juego comercial del país. Tras un retraso por la situación regional, Wynn ha confirmado la <strong>apertura en septiembre de 2027</strong> y ha elevado el presupuesto a unos 5.700 millones de dólares.") +
+         p("Para el inversor, eso significa más turismo internacional, más empleo y más demanda de alojamiento alrededor de la isla. Ras Al Khaimah tuvo su mejor primer semestre de visitantes en 2026, con más de 670.000.")),
+        ("precios", "Precios frente a Dubái",
+         p("El precio por metro cuadrado en Al Marjan sigue por debajo del de las zonas prime de Dubái frente al mar, como Dubai Marina o Palm Jumeirah. La mayoría de la oferta es <strong>obra nueva con planes de pago</strong>, con entradas del 10–20 % como en Dubái. Cada proyecto tiene sus cifras: te las preparo con la disponibilidad real del momento.")),
+        ("riesgos", "Los riesgos, sin rodeos",
+         ul("<strong>Es una apuesta por el futuro:</strong> gran parte del valor depende de que el turismo crezca como se espera tras la apertura del resort.",
+            "<strong>Mucha oferta nueva</strong> que se entregará en pocos años: importa la ubicación dentro de la isla y la calidad del promotor.",
+            "<strong>Mercado más pequeño y menos líquido</strong> que Dubái: revender puede llevar más tiempo.",
+            "<strong>Fechas de entrega:</strong> como en cualquier obra nueva, revisa el historial del promotor y el contrato.") +
+         note("Mi recomendación: RAK como complemento, no como primera y única inversión si tu presupuesto es ajustado. Si ya tienes algo en Dubái o buscas más potencial de revalorización asumiendo más riesgo, encaja muy bien.")),
+        ("compra", "Cómo se compra",
+         p("El proceso es muy parecido al de Dubái: reserva, contrato con el promotor, registro y pagos por fases, todo a distancia. Las tasas de registro no son las mismas que las del Dubai Land Department; te las detallo en cada proyecto. Cómo funciona la obra nueva: <a href=\"/blog/comprar-sobre-plano-dubai/\">guía para comprar sobre plano</a>.")),
+        ("golden-visa", "Golden Visa",
+         p("La Golden Visa por inversión inmobiliaria es un programa federal de Emiratos, así que una propiedad en Ras Al Khaimah que cumpla los requisitos también puede dar acceso a ella. Revisa los requisitos generales en la <a href=\"/blog/golden-visa-dubai-inversion-inmobiliaria/\">guía de la Golden Visa</a> y confirmamos los del emirato para tu caso.")),
+    ],
+    [
+        ("¿Pueden los extranjeros comprar en Ras Al Khaimah?", "Sí, en plena propiedad en las zonas habilitadas, como Al Marjan Island, Al Hamra o Mina Al Arab."),
+        ("¿Cuándo abre el resort Wynn de Al Marjan Island?", "Wynn ha confirmado su apertura para septiembre de 2027."),
+        ("¿Es mejor invertir en Ras Al Khaimah o en Dubái?", "Dubái es un mercado más grande, consolidado y líquido. Ras Al Khaimah ofrece precios de entrada más bajos y más potencial de revalorización, con más riesgo. Para muchos inversores tiene sentido como complemento."),
+    ],
+    [("mejores-zonas-invertir-dubai", "Las mejores zonas para invertir en Dubái"), ("comprar-sobre-plano-dubai", "Comprar sobre plano en Dubái")],
+    date=D3, date_txt=D3_TXT, wa_msg="Hola Pascual, he leído tu artículo sobre Ras Al Khaimah y Al Marjan. Quiero ver proyectos.",
+)
+
+pages["argentina"] = article(
+    "invertir-en-dubai-desde-argentina",
+    "Invertir en Dubái desde Argentina: guía práctica",
+    "Invertir en Dubái <em>desde Argentina</em>",
+    "Cómo comprar un piso en Dubái siendo argentino: precios en dólares, cómo transferir el dinero, qué declarar en Ganancias y Bienes Personales y cómo comprar a distancia.",
+    "Para un argentino, Dubái es una forma de tener patrimonio y rentas en una moneda ligada al dólar, en un mercado con seguridad jurídica. Te explico precios, cómo se envía el dinero, qué declaras en Argentina y cómo se compra sin viajar.",
+    "/assets/img/pascual-llamada.webp", "Pascual Vidal en una videollamada de consultoría con un inversor",
+    [
+        ("por-que", "Por qué Dubái atrae a inversores argentinos",
+         ul("<strong>Patrimonio en moneda dura:</strong> el dírham está ligado al dólar a 3,6725 AED por dólar.",
+            "<strong>Rentas de alquiler</strong> con rentabilidades brutas medias en torno al 6,5–7 %. Detalle en <a href=\"/blog/rentabilidad-alquiler-dubai/\">rentabilidad del alquiler en Dubái</a>.",
+            "<strong>Seguridad jurídica:</strong> compra registrada en el Dubai Land Department y cuentas escrow en obra nueva.",
+            "<strong>Planes de pago:</strong> en obra nueva entras con un 10–20 % y pagas el resto por fases, sin hipoteca.")),
+        ("precios", "Cuánto cuesta en dólares",
+         table(["Propiedad (ejemplo)", "En dírhams", "En dólares"], [
+             ["Estudio en zona en crecimiento", "650.000 AED", "≈ 177.000 USD"],
+             ["Apartamento de 1 dormitorio", "1.000.000 AED", "≈ 272.000 USD"],
+             ["Apartamento de 2 dormitorios", "1.800.000 AED", "≈ 490.000 USD"],
+             ["Mínimo para la Golden Visa", "2.000.000 AED", "≈ 545.000 USD"],
+         ]) +
+         p("Como el cambio con el dólar es fijo, estos importes apenas varían. Suma alrededor de un 4–5 % de gastos en obra nueva: <a href=\"/blog/cuanto-cuesta-comprar-piso-dubai/\">el desglose completo</a>.")),
+        ("dinero", "Cómo enviar el dinero desde Argentina",
+         "      <ol>" + "".join(f"<li>{x}</li>" for x in [
+             "<strong>Confirma las reglas cambiarias vigentes:</strong> las normas para comprar dólares y transferirlos al exterior han cambiado mucho en los últimos años. Pregunta a tu banco o asesor qué aplica hoy a tu caso.",
+             "<strong>Transferencia en dólares</strong> a la cuenta <em>escrow</em> del proyecto o del promotor, desde tu cuenta en Argentina o desde una cuenta tuya en el exterior.",
+             "<strong>Justifica el origen de los fondos:</strong> en Dubái te pedirán documentos que lo demuestren, por las normas contra el blanqueo. Es más fácil si los fondos están declarados.",
+             "<strong>Guarda todos los comprobantes</strong> para tus declaraciones en Argentina.",
+         ]) + "</ol>\n"),
+        ("impuestos", "Impuestos en Argentina",
+         p("Si eres <strong>residente fiscal en Argentina</strong>, tributas por tu renta y tu patrimonio de cualquier país:") +
+         ul("<strong>Impuesto a las Ganancias:</strong> declaras las rentas del alquiler en Dubái y, al vender, el resultado de la venta.",
+            "<strong>Bienes Personales:</strong> el inmueble en el exterior forma parte de tu patrimonio a declarar.",
+            "<strong>En Emiratos:</strong> como particular no pagas impuesto sobre la renta ni sobre plusvalías, solo el 4 % del registro al comprar.") +
+         p("Las alícuotas, mínimos y regímenes cambian a menudo. Revísalo con tu contador <strong>antes</strong> de comprar.")),
+        ("distancia", "Comprar sin viajar",
+         p("Reserva, contrato y pagos se hacen a distancia con firma electrónica. Yo estoy en Dubái todo el año y me ocupo de lo presencial: revisión, entrega de llaves, amueblado y alquiler. Si quieres venir a verlo, consulta antes los requisitos de entrada vigentes para tu pasaporte.")),
+        ("golden-visa", "Golden Visa para argentinos",
+         p("Con 2 millones de AED (unos 545.000 USD) en propiedad puedes pedir la residencia de 10 años para ti y tu familia, sin obligación de vivir en Emiratos. Requisitos en la <a href=\"/blog/golden-visa-dubai-inversion-inmobiliaria/\">guía de la Golden Visa</a>.")),
+    ],
+    [
+        ("¿Un argentino puede comprar una propiedad en Dubái?", "Sí. Los extranjeros pueden comprar en plena propiedad en las zonas habilitadas, sin residir en Emiratos ni tener visado."),
+        ("¿Tengo que declarar en Argentina un piso en Dubái?", "Si eres residente fiscal en Argentina, sí: las rentas en Ganancias y el inmueble en Bienes Personales. Confírmalo con tu contador."),
+        ("¿Cómo mando el dinero de Argentina a Dubái?", "Normalmente con una transferencia en dólares a la cuenta escrow del proyecto. Antes, confirma con tu banco las normas cambiarias vigentes para transferir al exterior."),
+    ],
+    [("invertir-en-dubai-desde-miami", "Invertir en Dubái desde Miami"), ("invertir-en-dubai-desde-colombia", "Invertir en Dubái desde Colombia")],
+    date=D3, date_txt=D3_TXT, wa_msg="Hola Pascual, te escribo desde Argentina. Quiero información para invertir en Dubái.",
+)
+
+
 # ---------------------------------------------------------------- índice
 ARTICLES.sort(key=lambda a: a["date"], reverse=True)
 cards = "".join(
@@ -804,7 +1081,8 @@ llms = ["# Tu inversión en Dubái · Pascual Vidal", "",
         "Datos clave:",
         "- Idiomas: español e inglés. Clientes de España, México, Colombia, Argentina, Chile, Perú y Estados Unidos.",
         "- La compra se puede hacer entera en remoto; primera consultoría gratuita de 20 minutos.",
-        "- Contacto: WhatsApp " + WA_LINK + " · formulario en " + SITE + "/#contacto",
+        "- Agencia: opera con Dubana Real Estate (Dubái).",
+        "- Contacto: teléfono y WhatsApp +971 50 796 3006 · WhatsApp " + WA_LINK + " · formulario en " + SITE + "/#contacto",
         "- YouTube: https://www.youtube.com/@pascual.dubairealestate · Instagram: https://www.instagram.com/pascual.dubairealestate/", "",
         "## Páginas principales", "",
         f"- [Inicio]({SITE}/): servicios, proyectos destacados y preguntas frecuentes sobre invertir en Dubái.",
