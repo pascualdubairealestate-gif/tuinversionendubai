@@ -67,7 +67,7 @@ if ($action === 'feed') {
 
 /* ---------- Entrada pública: formularios de la web ---------- */
 if ($action === 'lead') {
-  // La página de la guía vive en un subdominio (guia.tuinversionendubai.com) y envía aquí sus datos.
+  // Permite enviar datos desde páginas del propio dominio (con o sin www / tilde).
   $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
   if (preg_match('#^https://([a-z0-9-]+\.)?(tuinversionendubai\.com|xn--tuinversinendubai-oyb\.com)$#i', $origin)) {
     header("Access-Control-Allow-Origin: $origin");
