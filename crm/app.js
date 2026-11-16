@@ -89,6 +89,8 @@
   }
   function num(v) { var n = parseFloat(String(v || "").replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")); return isNaN(n) ? 0 : n; }
   function money(n) { return n ? n.toLocaleString("es-ES", { maximumFractionDigits: 0 }) + " €" : "—"; }
+  // Ventas: en dírhams (AED)
+  function aed(n) { return n ? n.toLocaleString("es-ES", { maximumFractionDigits: 0 }) + " AED" : "—"; }
   function size(b) { return b > 1048576 ? (b / 1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round(b / 1024)) + " KB"; }
   function initials(l) {
     var s = (l.nombre || l.email || "?").trim().split(/\s+/);
@@ -444,9 +446,9 @@
     var pagado = V.filter(function (v) { return ((v.hitos || {}).pagado || "").slice(0, 4) === y; }).reduce(function (s, v) { return s + num(v.comision); }, 0);
     return '<section class="stats">' + [
       ["Ventas en curso", open.length, ""],
-      ["Volumen en curso", money(open.reduce(function (s, v) { return s + num(v.precio); }, 0)), "Suma de precios"],
-      ["Comisión por cobrar", money(porCobrar), "Aún no recibida"],
-      ["Pagado en " + y, money(pagado), "Comisiones que ya cobraste"]
+      ["Volumen en curso", aed(open.reduce(function (s, v) { return s + num(v.precio); }, 0)), "Suma de precios"],
+      ["Comisión por cobrar", aed(porCobrar), "Aún no recibida"],
+      ["Pagado en " + y, aed(pagado), "Comisiones que ya cobraste"]
     ].map(function (s) {
       return '<div class="stat"><span>' + s[0] + "</span><b>" + esc(s[1]) + "</b>" + (s[2] ? "<small>" + esc(s[2]) + "</small>" : "") + "</div>";
     }).join("") + "</section>";
@@ -466,9 +468,9 @@
     var done = saleStep(v) >= Object.keys(S.hitos).length - 1;
     return '<article class="card sale" draggable="true" data-sale="' + esc(v.id) + '" tabindex="0">' +
       '<div class="card-top"><span class="avatar">' + esc(initials(leadById(v.lead) || { nombre: v.proyecto })) + '</span><div class="who"><b>' + esc(saleTitle(v)) + "</b><small>" + esc(where) + "</small></div></div>" +
-      (num(v.precio) ? '<span class="val">' + money(num(v.precio)) + "</span>" : "") +
+      (num(v.precio) ? '<span class="val">' + aed(num(v.precio)) + "</span>" : "") +
       stepsHtml(v) +
-      '<span class="due' + (done ? " ok" : "") + '">' + esc(nextStep(v)) + (num(v.comision) ? " · comisión " + money(num(v.comision)) : "") + "</span></article>";
+      '<span class="due' + (done ? " ok" : "") + '">' + esc(nextStep(v)) + (num(v.comision) ? " · comisión " + aed(num(v.comision)) : "") + "</span></article>";
   }
 
   function renderSales() {
@@ -523,8 +525,8 @@
         return '<option value="' + esc(l.id) + '"' + (l.id === v.lead ? " selected" : "") + ">" + esc(up(l.nombre) || l.email) + "</option>";
       }).join("") + "</select></label>" +
       field("proyecto", "Proyecto", v.proyecto) + field("unidad", "Unidad", v.unidad) +
-      field("promotor", "Promotor", v.promotor) + field("precio", "Precio (€)", v.precio) +
-      field("comision", "Mi comisión (€)", v.comision) +
+      field("promotor", "Promotor", v.promotor) + field("precio", "Precio (AED)", v.precio) +
+      field("comision", "Mi comisión (AED)", v.comision) +
       "</div>" +
       '<h3>Progreso</h3><ol class="hitos">' + hitos + "</ol>" +
       '<label class="f full"><span>Notas de la venta</span><textarea name="notas" rows="3" placeholder="Plan de pagos, contacto en el promotor, número de factura…">' + esc(v.notas || "") + "</textarea></label>" +
