@@ -80,7 +80,7 @@
   AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json image/svg+xml font/woff font/woff2
 </IfModule>
 
-# ----- Dominio único: con tilde, www y http van a https://tuinversionendubai.com (los subdominios, como guia., no se tocan) -----
+# ----- Dominio único: con tilde, www y http van a https://tuinversionendubai.com -----
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteCond %{HTTP_HOST} ^(www\.)?xn--tuinversinendubai-oyb\.com$ [NC,OR]

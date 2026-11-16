@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Guía gratis: Los 10 pasos para realizar tu inversión con éxito en Dubái</title>
   <meta name="description" content="Descarga gratis la guía de Pascual Vidal, consultor inmobiliario en Dubái (RERA #97799): del agente con licencia a la entrega de llaves, en 10 pasos. Te llega al instante a tu correo." />
-  <link rel="canonical" href="https://guia.tuinversionendubai.com/" />
+  <link rel="canonical" href="https://tuinversionendubai.com/guia/" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="es_ES" />
-  <meta property="og:url" content="https://guia.tuinversionendubai.com/" />
+  <meta property="og:url" content="https://tuinversionendubai.com/guia/" />
   <meta property="og:title" content="Guía gratis: Los 10 pasos para invertir con éxito en Dubái" />
   <meta property="og:description" content="Del agente con licencia RERA a la entrega de llaves. Te llega al instante a tu correo." />
   <meta property="og:image" content="https://tuinversionendubai.com/guia/portada-guia.webp" />
@@ -253,8 +253,7 @@
   <script>
   (function () {
     "use strict";
-    // En el subdominio el CRM está en el dominio principal.
-    var API = location.hostname === "tuinversionendubai.com" ? "/crm/api.php?action=lead" : "https://tuinversionendubai.com/crm/api.php?action=lead";
+    var API = "/crm/api.php?action=lead";
     var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     var $ = function (id) { return document.getElementById(id); };
     var form = $("lead"), btn = $("f-btn"), msg = $("f-msg");
@@ -298,7 +297,7 @@
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(function () {
           window.dataLayer = window.dataLayer || [];
-          window.dataLayer.push({ event: "lead_submit", formulario: "guia", pagina: "subdominio-guia" });
+          window.dataLayer.push({ event: "lead_submit", formulario: "guia", pagina: "guia" });
           $("done-title").textContent = "¡Listo, " + nombre + "!";
           $("done-text").textContent = "Te la acabo de enviar a " + email + ". Si no la ves en unos minutos, revisa Promociones o Spam.";
           $("wa").href = "https://wa.me/message/QI3A7Q5BXFTCA1";
