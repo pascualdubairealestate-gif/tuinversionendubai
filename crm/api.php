@@ -67,6 +67,14 @@ if ($action === 'feed') {
 
 /* ---------- Entrada pública: formularios de la web ---------- */
 if ($action === 'lead') {
+  // La página de la guía vive en un subdominio (guia.tuinversionendubai.com) y envía aquí sus datos.
+  $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+  if (preg_match('#^https://([a-z0-9-]+\.)?(tuinversionendubai\.com|xn--tuinversinendubai-oyb\.com)$#i', $origin)) {
+    header("Access-Control-Allow-Origin: $origin");
+    header('Vary: Origin');
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+  }
   if ($method === 'OPTIONS') { http_response_code(204); exit; }
   if ($method !== 'POST') json_out(['error' => 'method'], 405);
   $b = body();
