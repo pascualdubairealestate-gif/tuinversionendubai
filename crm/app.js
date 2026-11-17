@@ -1167,7 +1167,11 @@
   function submitLead(form) {
     var patch = {};
     $$("input[name], select[name], textarea[name]", form).forEach(function (f) {
-      patch[f.name] = f.type === "checkbox" ? f.checked : f.value.trim();
+      if (f.type === "checkbox") { patch[f.name] = f.checked; return; }
+      var v = f.value.trim();
+      // Todo lo escrito se guarda en MAYÚSCULAS, salvo el email, fechas, campos ocultos y desplegables.
+      if (f.tagName === "TEXTAREA" || (f.tagName === "INPUT" && ["text", "tel", "search", ""].indexOf(f.type) > -1)) v = up(v);
+      patch[f.name] = v;
     });
     if (!patch.nombre && !patch.email && !patch.telefono) { toast("Pon al menos nombre, email o teléfono", true); return; }
     var btn = $("button[type=submit]", form);
