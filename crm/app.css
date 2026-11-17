@@ -506,3 +506,8 @@ tbody tr:last-child td { border-bottom: 0; }
 .red-dot { display: inline-grid; place-items: center; min-width: 20px; height: 18px; padding: 0 4px; border-radius: 5px; font-size: 10px; font-weight: 800; color: #fff; vertical-align: 2px; margin-right: 2px; }
 .red-dot.red-linkedin { background: #0a66c2; }
 .red-dot.red-instagram { background: linear-gradient(45deg, #f09433, #dc2743 50%, #bc1888); }
+
+/* Ficha del cliente: todo lo escrito se muestra en MAYÚSCULAS (solo visual; el email se deja tal cual) */
+#lead-form input:not([type=email]):not([type=date]):not([type=checkbox]):not([type=file]),
+#lead-form textarea, #lead-form select, #lead-form .timeline p { text-transform: uppercase; }
+#lead-form input::placeholder, #lead-form textarea::placeholder { text-transform: none; }
