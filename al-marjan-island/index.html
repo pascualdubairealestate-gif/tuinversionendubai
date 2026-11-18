@@ -194,6 +194,17 @@
     .cookie-banner .cookie-no { background: transparent; color: #f4efe6; border: 1px solid rgba(244, 239, 230, .35); }
     .cookie-banner .cookie-yes { background: #f4efe6; color: #0b1424; }
     .cookie-banner .btn { width: auto; min-height: 38px; font-size: 14px; padding: 0 16px; }
+
+    /* Wynn */
+    .wynn { background: radial-gradient(900px 500px at 20% 0%, #1d3157 0%, var(--navy) 60%, #070d18 100%); color: #fff; }
+    .wynn-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; }
+    .wynn-grid figure { margin: 0; border-radius: 18px; overflow: hidden; }
+    .wynn-grid img { width: 100%; height: 100%; object-fit: cover; min-height: 280px; }
+    .wynn-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+    .wynn-facts div { border-top: 1px solid rgba(255, 255, 255, .18); padding-top: 12px; }
+    .wynn-facts b { display: block; font: 600 32px/1.05 var(--f-display); color: var(--amber); }
+    .wynn-facts span { font-size: 14px; color: #c9d1dd; }
+    @media (max-width: 960px) { .wynn-grid { grid-template-columns: minmax(0, 1fr); } .wynn-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   </style>
 </head>
 <body data-no-guide-popup>
@@ -242,6 +253,25 @@
           <p class="src">Fuentes citadas por el promotor: RAK Vision 2030, Fitch Ratings y S&amp;P Global.</p>
         </div>
         <img src="/assets/img/the-views/isla.webp" alt="Vista aérea de Al Marjan Island con Ardee Views y Ardee Downtown" width="1460" height="890" loading="lazy" />
+      </div>
+    </section>
+
+    <section class="wynn">
+      <div class="wrap">
+        <p class="eyebrow" style="color:var(--sand)"><span class="dot"></span>A 5 minutos de tu casa</p>
+        <h2 class="h2" style="color:#fff">El <em>Wynn Resort</em> de Al Marjan Island</h2>
+        <p class="intro" style="color:#c9d1dd">Wynn, el grupo de Wynn Las Vegas y Wynn Macao, abre en 2027 su primer resort en Oriente Medio en Al Marjan Island: hotel de lujo frente al mar, restaurantes de autor, spa, marina y el primer casino con licencia de Emiratos. Es el gran motor de la isla.</p>
+        <div class="wynn-grid">
+          <figure class="wynn-main"><img src="/assets/img/the-views/wynn-resort.webp" alt="Wynn Resort en Al Marjan Island" width="1400" height="788" loading="lazy" /></figure>
+          <figure><img src="/assets/img/the-views/isla-wynn.webp" alt="Vista aérea de Al Marjan Island con la torre del Wynn Resort" width="1500" height="1143" loading="lazy" /></figure>
+        </div>
+        <div class="wynn-facts">
+          <div><b>2027</b><span>apertura prevista del Wynn Resort</span></div>
+          <div><b>16.000+</b><span>empleos previstos en la isla: demanda de alquiler anual</span></div>
+          <div><b>25.000+</b><span>habitaciones de déficit en la zona, según el análisis de Wynn</span></div>
+          <div><b>5 min</b><span>desde Ardee Views</span></div>
+        </div>
+        <p class="note" style="color:#9aa6b8">Imágenes ilustrativas (recreaciones). Datos citados por el promotor del proyecto.</p>
       </div>
     </section>
 
