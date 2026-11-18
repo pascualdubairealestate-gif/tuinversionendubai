@@ -94,16 +94,16 @@
     .gallery .h2r { grid-row: span 2; }
 
     @media (min-width: 961px) {
-      .gallery { grid-template-rows: 257px 257px 300px 220px; }
-      .gallery [data-i="0"] { grid-column: 1 / 3; grid-row: 1; }
-      .gallery [data-i="1"] { grid-column: 3 / 5; grid-row: 1 / 3; }
-      .gallery [data-i="3"] { grid-column: 1; grid-row: 2; }
-      .gallery [data-i="5"] { grid-column: 2; grid-row: 2; }
-      .gallery [data-i="4"] { grid-column: 1 / 3; grid-row: 3; }
-      .gallery [data-i="8"] { grid-column: 3 / 5; grid-row: 3; }
-      .gallery [data-i="7"] { grid-column: 1; grid-row: 4; }
-      .gallery [data-i="9"] { grid-column: 3 / 5; grid-row: 4; }
-      .gallery [data-i="2"] { grid-column: 2; grid-row: 4; }
+      .gallery { grid-template-rows: 380px 220px 220px 300px; }
+      .gallery [data-i="1"] { grid-column: 1 / 5; grid-row: 1; }
+      .gallery [data-i="0"] { grid-column: 1 / 3; grid-row: 2; }
+      .gallery [data-i="2"] { grid-column: 3; grid-row: 2; }
+      .gallery [data-i="3"] { grid-column: 4; grid-row: 2; }
+      .gallery [data-i="5"] { grid-column: 1; grid-row: 3; }
+      .gallery [data-i="7"] { grid-column: 2; grid-row: 3; }
+      .gallery [data-i="9"] { grid-column: 3 / 5; grid-row: 3; }
+      .gallery [data-i="4"] { grid-column: 1 / 3; grid-row: 4; }
+      .gallery [data-i="8"] { grid-column: 3 / 5; grid-row: 4; }
     }
     .lb { position: fixed; inset: 0; z-index: 50; background: rgba(7, 13, 24, .94); display: grid; place-items: center; padding: 16px; }
     .lb[hidden] { display: none; }
@@ -190,7 +190,6 @@
       .top .btn span { display: none; }
       .top .btn { width: 44px; padding: 0; }
     }
-    @media (max-width: 960px) { .gallery [data-i="1"] { grid-row: span 2; aspect-ratio: 1 / 1; height: auto; } }
     @media (max-width: 560px) {
       .price-table th:nth-child(3), .price-table td:nth-child(3) { display: none; }
       .price-table td, .price-table th { padding: 14px 12px; }
@@ -308,7 +307,7 @@
         <h2 class="h2">Así será <em>vivir aquí</em></h2>
         <div class="gallery" id="gallery">
           <button class="w2" data-i="0"><img src="/assets/img/the-views/piscina-townhouses.webp" alt="Piscina y townhouses" loading="lazy" /></button>
-          <button class="w2 h2r" data-i="1"><img src="/assets/img/the-views/torres-mar.webp" alt="Las dos torres de Ardee Views frente al mar" loading="lazy" /></button>
+          <button class="w2 h2r" data-i="1"><img style="object-position:center 30%" src="/assets/img/the-views/torres-mar.webp" alt="Las dos torres de Ardee Views frente al mar" loading="lazy" /></button>
           <button data-i="2"><img src="/assets/img/the-views/lobby.webp" alt="Lobby" loading="lazy" /></button>
           <button data-i="3"><img src="/assets/img/the-views/salon.webp" alt="Salón de un apartamento" loading="lazy" /></button>
           <button class="w2" data-i="4"><img src="/assets/img/the-views/torres.webp" alt="Torres con vistas a la isla" loading="lazy" /></button>
