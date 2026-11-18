@@ -1111,9 +1111,9 @@ for key, (path, doc) in pages.items():
     open(d + "index.html", "w").write(doc)
     print("ok", path)
 
-LASTMOD = {"/": TODAY, "/blog/": max(a["date"] for a in ARTICLES), "/sobre-pascual-vidal/": TODAY, "/guia/": TODAY}
+LASTMOD = {"/": TODAY, "/blog/": max(a["date"] for a in ARTICLES), "/sobre-pascual-vidal/": TODAY, "/guia/": TODAY, "/al-marjan-island/": TODAY}
 LASTMOD.update({f'/blog/{a["slug"]}/': a["date"] for a in ARTICLES})
-urls = ["/", "/guia/", "/sobre-pascual-vidal/", "/blog/"] + [f'/blog/{a["slug"]}/' for a in ARTICLES]
+urls = ["/", "/guia/", "/al-marjan-island/", "/sobre-pascual-vidal/", "/blog/"] + [f'/blog/{a["slug"]}/' for a in ARTICLES]
 sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
     f"  <url><loc>{SITE}{u}</loc><lastmod>{LASTMOD[u]}</lastmod></url>\n" for u in urls) + "</urlset>\n"
 open(ROOT + "/sitemap.xml", "w").write(sm)

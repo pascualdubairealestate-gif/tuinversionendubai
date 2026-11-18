@@ -122,9 +122,18 @@
       .hide-m { display: none; }
     }
     @media (max-width: 420px) { .row { grid-template-columns: minmax(0, 1fr); gap: 0; } .phone { grid-template-columns: 104px 1fr; } }
+    /* ===== Aviso de cookies ===== */
+    .cookie-banner { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 90; max-width: 560px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; padding: 16px 18px; border-radius: 16px; background: #0b1424; color: #f4efe6; box-shadow: 0 20px 50px -20px rgba(7, 13, 24, .6); font-size: 14px; line-height: 1.5; }
+    .cookie-banner p { margin: 0; flex: 1 1 260px; }
+    .cookie-banner a { color: #f7931e; }
+    .cookie-actions { display: flex; gap: 8px; }
+    .cookie-banner .cookie-no, .cookie-banner .cookie-yes { min-width: 104px; justify-content: center; }
+    .cookie-banner .cookie-no { background: transparent; color: #f4efe6; border: 1px solid rgba(244, 239, 230, .35); }
+    .cookie-banner .cookie-yes { background: #f4efe6; color: #0b1424; }
+    .cookie-banner .btn { width: auto; min-height: 38px; font-size: 14px; padding: 0 16px; }
   </style>
 </head>
-<body>
+<body data-no-guide-popup>
 
   <header class="top">
     <div class="wrap">
@@ -250,6 +259,7 @@
     </div>
   </footer>
 
+  <script defer src="/main.js?v=20261118a"></script>
   <script>
   (function () {
     "use strict";
@@ -298,6 +308,8 @@
         .then(function () {
           window.dataLayer = window.dataLayer || [];
           window.dataLayer.push({ event: "lead_submit", formulario: "guia", pagina: "guia" });
+          var C = window.__PV__ || {};
+          if (window.gtag && C.googleAdsId && C.googleAdsLabels && C.googleAdsLabels.guia) window.gtag("event", "conversion", { send_to: C.googleAdsId + "/" + C.googleAdsLabels.guia });
           $("done-title").textContent = "¡Listo, " + nombre + "!";
           $("done-text").textContent = "Te la acabo de enviar a " + email + ". Si no la ves en unos minutos, revisa Promociones o Spam.";
           $("wa").href = "https://wa.me/message/QI3A7Q5BXFTCA1";

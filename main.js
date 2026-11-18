@@ -150,6 +150,7 @@ window.__PV__ = {
   /* ---------- Navegación ---------- */
   function initNav() {
     var nav = $("[data-nav]"), burger = $("[data-burger]"), wa = $(".wa-float");
+    if (!nav || !burger) return; // páginas sin menú (landings)
     var onScroll = function () {
       var y = window.scrollY;
       nav.classList.toggle("is-scrolled", y > 40);
