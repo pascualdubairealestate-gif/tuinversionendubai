@@ -169,6 +169,9 @@
 
     /* Zona */
     .area-img { border-radius: 20px; width: 100%; margin-bottom: 26px; }
+    .area-fig { position: relative; margin: 0 0 26px; }
+    .area-fig img { border-radius: 20px; width: 100%; }
+    .area-fig .fig-tag { position: absolute; left: 14px; top: 14px; z-index: 1; background: var(--amber); color: var(--navy); font-size: 13px; font-weight: 800; padding: 7px 13px; border-radius: 99px; box-shadow: 0 8px 20px -8px rgba(0, 0, 0, .5); }
     .near { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
     .near div { background: var(--paper); border-radius: 18px; padding: 22px; }
     .near h3 { font: 600 24px/1.1 var(--f-display); margin: 0 0 10px; }
@@ -550,7 +553,7 @@
         <p class="eyebrow"><span class="dot"></span>La zona</p>
         <h2 class="h2">Sobre <em>Al Marjan Island</em></h2>
         <p class="lead-txt">Al Marjan Island es un archipiélago artificial de cuatro islas que se adentra 4,5 km en el golfo frente a Ras Al Khaimah, a algo más de una hora de Dubái. Tiene playas, hoteles de cadenas internacionales y, desde 2027, el Wynn Resort. Al lado está el barrio de Al Hamra, con centro comercial, campo de golf y el antiguo pueblo perlero de Jazirat Al Hamra.</p>
-        <img class="area-img" src="/assets/img/the-views/isla-general.webp" alt="Vista aérea de las cuatro islas de Al Marjan Island" width="1600" height="1020" loading="lazy" />
+        <figure class="area-fig"><span class="fig-tag">Ardee masterplan</span><img src="/assets/img/the-views/isla-general.webp" alt="Vista aérea de las cuatro islas de Al Marjan Island" width="1600" height="1020" loading="lazy" /></figure>
         <div class="stats">
           <div class="stat"><b>7,8 km</b><span>de playa de arena</span></div>
           <div class="stat"><b>+5 M</b><span>visitantes al año objetivo para 2030 (1,35 M en 2025)</span></div>
