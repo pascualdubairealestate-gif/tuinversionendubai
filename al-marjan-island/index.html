@@ -4,13 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Ardee Views, Al Marjan Island: estudios, 1 y 2 dormitorios desde 888.000 AED</title>
-  <meta name="description" content="Ardee Views en Al Marjan Island, Ras Al Khaimah: estudios, 1 y 2 dormitorios desde 888.000 AED con plan 50/50 y 3 años para pagar tras la entrega. Pide el dossier y los precios con Pascual Vidal, consultor RERA #97799." />
+  <meta name="description" content="Ardee Views en Al Marjan Island, Ras Al Khaimah: estudios, 1 y 2 dormitorios desde 888.000 AED, plan 50/50 con 3 años para pagar tras la entrega (Q4 2029). Planos, precios y disponibilidad con Pascual Vidal, consultor RERA #97799." />
   <link rel="canonical" href="https://tuinversionendubai.com/al-marjan-island/" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="es_ES" />
   <meta property="og:url" content="https://tuinversionendubai.com/al-marjan-island/" />
   <meta property="og:title" content="Ardee Views, Al Marjan Island · desde 888.000 AED" />
-  <meta property="og:description" content="Plan 50/50 con 3 años para pagar tras la entrega. Pide el dossier y los precios." />
+  <meta property="og:description" content="Plan 50/50 con 3 años para pagar tras la entrega. Planos, precios y disponibilidad." />
   <meta property="og:image" content="https://tuinversionendubai.com/assets/img/the-views/fachada.webp" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="theme-color" content="#0b1424" />
@@ -20,7 +20,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --navy: #0b1424; --ink: #0b1424; --ivory: #f4efe6; --sand: #d9c7a7; --sea: #e8f1f2;
+      --navy: #0b1424; --ink: #0b1424; --ivory: #f4efe6; --sand: #d9c7a7; --paper: #f6f1e8; --sea: #e8f1f2;
       --mute: #5a6474; --line: rgba(11, 20, 36, .12); --amber: #f7931e; --amber-ink: #c76a00; --wa: #25d366; --red: #d64545;
       --f-display: "Cormorant Garamond", Georgia, serif; --f-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
       --pad: max(16px, 5vw);
@@ -28,26 +28,33 @@
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body { margin: 0; background: #fff; color: var(--ink); font: 16px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; }
+    body.lock { overflow: hidden; }
     a { color: inherit; }
     img { display: block; max-width: 100%; }
-    .wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 var(--pad); }
-    .eyebrow { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin: 0 0 16px; color: var(--amber-ink); }
+    .wrap { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 var(--pad); }
+    section { padding: clamp(56px, 7vw, 96px) 0; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin: 0 0 14px; color: var(--amber-ink); }
     .eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 4px rgba(247, 147, 30, .2); }
-    .h2 { font: 600 clamp(32px, 3.8vw, 50px)/1.06 var(--f-display); margin: 0 0 14px; max-width: 22ch; }
+    .h2 { font: 600 clamp(32px, 3.8vw, 48px)/1.06 var(--f-display); margin: 0 0 14px; max-width: 24ch; }
     .h2 em, h1 em { font-style: italic; color: var(--amber); }
-    .intro { color: var(--mute); font-size: 17px; max-width: 62ch; margin: 0 0 36px; }
-    section { padding: clamp(64px, 8vw, 104px) 0; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 54px; padding: 0 26px; border: 0; border-radius: 999px; background: var(--amber); color: var(--navy); font: 800 15.5px var(--f-body); cursor: pointer; text-decoration: none; transition: background .2s, box-shadow .2s, transform .15s; }
+    .h3 { font: 600 clamp(24px, 2.4vw, 30px)/1.15 var(--f-display); margin: 0 0 12px; }
+    .lead-txt { color: var(--mute); font-size: 17px; max-width: 70ch; margin: 0 0 28px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 24px; border: 0; border-radius: 999px; background: var(--amber); color: var(--navy); font: 800 15px var(--f-body); cursor: pointer; text-decoration: none; transition: background .2s, box-shadow .2s, transform .15s; }
     .btn:hover { background: #ffa326; box-shadow: 0 16px 40px -14px rgba(247, 147, 30, .7); }
     .btn:active { transform: scale(.98); }
     .btn-wa { background: var(--wa); color: #fff; }
     .btn-wa:hover { background: #1da851; box-shadow: 0 16px 40px -14px rgba(37, 211, 102, .6); }
-    .btn-line { background: rgba(255, 255, 255, .1); color: #fff; border: 1px solid rgba(255, 255, 255, .35); }
-    .btn svg { width: 20px; height: 20px; }
+    .btn-out { background: transparent; color: var(--ink); border: 1.5px solid rgba(11, 20, 36, .2); }
+    .btn-out:hover { background: rgba(11, 20, 36, .04); box-shadow: none; }
+    .btn-glass { background: rgba(255, 255, 255, .1); color: #fff; border: 1px solid rgba(255, 255, 255, .35); }
+    .btn-glass:hover { background: rgba(255, 255, 255, .18); box-shadow: none; }
+    .btn svg { width: 19px; height: 19px; flex: none; }
+    .btn-block { width: 100%; }
+    .note { font-size: 12.5px; color: var(--mute); margin: 12px 0 0; }
 
     /* Cabecera */
     .top { position: absolute; inset: 0 0 auto; z-index: 5; padding: 18px 0; }
-    .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; max-width: 1240px; }
     .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; }
     .brand-mark { width: 40px; height: 46px; border: 1px solid rgba(255, 255, 255, .6); border-radius: 20px 20px 8px 8px; display: grid; place-items: center; font: 600 17px var(--f-display); }
     .brand b { display: block; font: 600 20px/1 var(--f-display); }
@@ -55,169 +62,221 @@
     .top .btn { min-height: 44px; padding: 0 18px; font-size: 14px; }
 
     /* Portada */
-    .hero { position: relative; min-height: min(92vh, 820px); display: flex; align-items: flex-end; color: #fff; padding: 120px 0 56px; }
+    .hero { position: relative; color: #fff; padding: 128px 0 56px; }
     .hero-bg { position: absolute; inset: 0; background: #0b1424 url("/assets/img/the-views/fachada.webp") 70% 40% / cover no-repeat; }
-    .hero-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7, 13, 24, .88) 0%, rgba(7, 13, 24, .7) 40%, rgba(7, 13, 24, .15) 72%, rgba(7, 13, 24, 0) 100%), linear-gradient(180deg, rgba(7, 13, 24, .5) 0%, rgba(7, 13, 24, 0) 30%, rgba(7, 13, 24, .55) 75%, rgba(7, 13, 24, .92) 100%); }
-    @media (max-width: 960px) { .hero-bg::after { background: linear-gradient(180deg, rgba(7, 13, 24, .7) 0%, rgba(7, 13, 24, .78) 45%, rgba(7, 13, 24, .92) 100%); } }
-    .hero .wrap { position: relative; }
-    .hero .eyebrow { color: var(--sand); }
-    h1 { font: 600 clamp(40px, 5.6vw, 76px)/1.02 var(--f-display); text-shadow: 0 2px 30px rgba(0, 0, 0, .35); margin: 0; letter-spacing: -.01em; max-width: 15ch; }
-    .hero p.lead { font-size: clamp(17px, 1.6vw, 20px); color: #dfe4ec; max-width: 56ch; margin: 18px 0 26px; }
-    .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; }
-    .facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: rgba(255, 255, 255, .18); border: 1px solid rgba(255, 255, 255, .18); border-radius: 18px; overflow: hidden; margin-top: 40px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-    .facts div { background: rgba(7, 13, 24, .55); padding: 18px 20px; }
-    .facts b { display: block; font: 600 clamp(24px, 2.4vw, 32px)/1.1 var(--f-display); color: #fff; }
-    .facts span { font-size: 13px; color: #c9d1dd; }
+    .hero-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7, 13, 24, .9) 0%, rgba(7, 13, 24, .72) 45%, rgba(7, 13, 24, .2) 78%, rgba(7, 13, 24, .05) 100%), linear-gradient(180deg, rgba(7, 13, 24, .5) 0%, rgba(7, 13, 24, 0) 30%, rgba(7, 13, 24, .6) 80%, rgba(7, 13, 24, .92) 100%); }
+    .hero .wrap { position: relative; max-width: 1240px; }
+    .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(247, 147, 30, .16); border: 1px solid rgba(247, 147, 30, .5); color: #ffd3a1; font-size: 12.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 7px 12px; border-radius: 99px; margin-bottom: 18px; }
+    .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); }
+    h1 { font: 600 clamp(40px, 5.4vw, 72px)/1.02 var(--f-display); margin: 0; letter-spacing: -.01em; max-width: 16ch; text-shadow: 0 2px 30px rgba(0, 0, 0, .35); }
+    .hero .sub { font-size: clamp(17px, 1.6vw, 20px); color: #dfe4ec; max-width: 54ch; margin: 18px 0 30px; }
+    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 860px; border-top: 1px solid rgba(255, 255, 255, .25); }
+    .kpis div { padding: 16px 16px 0 0; }
+    .kpis span { display: block; font-size: 11.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #b8c2d2; }
+    .kpis b { display: block; font: 600 clamp(24px, 2.4vw, 32px)/1.15 var(--f-display); margin-top: 4px; }
+    .hero-ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+    .hero-ctas .btn-main { min-width: 260px; }
 
-    /* Zona */
-    .zone-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
-    .zone-grid img { border-radius: 20px; width: 100%; height: 100%; max-height: 560px; object-fit: cover; }
-    .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 8px; }
-    .stat { background: var(--sea); border-radius: 16px; padding: 18px; }
-    .stat b { display: block; font: 600 32px/1.05 var(--f-display); }
-    .stat span { font-size: 14px; color: var(--mute); }
-    .src { font-size: 12px; color: var(--mute); margin: 14px 0 0; }
+    /* Resumen y ficha */
+    .overview-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: clamp(28px, 5vw, 64px); align-items: start; }
+    .dist { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; }
+    .dist li { display: flex; gap: 12px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+    .dist b { font: 600 22px/1 var(--f-display); color: var(--amber-ink); min-width: 62px; }
+    .facts-card { background: var(--paper); border-radius: 20px; padding: 26px; position: sticky; top: 20px; }
+    .facts-card table { width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 15px; }
+    .facts-card td { padding: 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .facts-card td:first-child { color: var(--mute); padding-right: 12px; }
+    .facts-card td:last-child { text-align: right; font-weight: 700; }
 
-    /* Proyecto */
-    .project { background: #f6f1e8; }
-    .points { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-    .points li { background: #fff; border-radius: 18px; padding: 22px; }
-    .points b { display: block; font: 600 24px/1.15 var(--f-display); margin-bottom: 6px; }
-    .points span { color: var(--mute); font-size: 15px; }
-
-    /* Galería */
-    .gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 220px; gap: 10px; }
-    .gallery button { padding: 0; border: 0; border-radius: 14px; overflow: hidden; cursor: zoom-in; background: #ddd; }
-    .gallery img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
-    .gallery button:hover img { transform: scale(1.04); }
-    .gallery .w2 { grid-column: span 2; }
-    .gallery .h2r { grid-row: span 2; }
-
-    @media (min-width: 961px) {
-      .gallery { grid-template-rows: 380px 220px 220px 300px; }
-      .gallery [data-i="1"] { grid-column: 1 / 5; grid-row: 1; }
-      .gallery [data-i="0"] { grid-column: 1 / 3; grid-row: 2; }
-      .gallery [data-i="2"] { grid-column: 3; grid-row: 2; }
-      .gallery [data-i="3"] { grid-column: 4; grid-row: 2; }
-      .gallery [data-i="5"] { grid-column: 1; grid-row: 3; }
-      .gallery [data-i="7"] { grid-column: 2; grid-row: 3; }
-      .gallery [data-i="9"] { grid-column: 3 / 5; grid-row: 3; }
-      .gallery [data-i="4"] { grid-column: 1 / 3; grid-row: 4; }
-      .gallery [data-i="8"] { grid-column: 3 / 5; grid-row: 4; }
-    }
-    .lb { position: fixed; inset: 0; z-index: 50; background: rgba(7, 13, 24, .94); display: grid; place-items: center; padding: 16px; }
-    .lb[hidden] { display: none; }
-    .lb img { max-width: 100%; max-height: 86vh; border-radius: 10px; }
-    .lb button { position: absolute; background: rgba(255, 255, 255, .12); color: #fff; border: 0; width: 48px; height: 48px; border-radius: 50%; font-size: 22px; cursor: pointer; }
-    .lb .x { top: 16px; right: 16px; } .lb .prev { left: 16px; top: 50%; } .lb .next { right: 16px; top: 50%; }
-    .note { font-size: 12.5px; color: var(--mute); margin: 12px 0 0; }
-
-    /* Precios y plan */
-    .price-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 1px 0 var(--line); }
-    .price-table th { text-align: left; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); padding: 14px 18px; border-bottom: 1px solid var(--line); }
-    .price-table td { padding: 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
-    .price-table tr:last-child td { border-bottom: 0; }
-    .price-table b { font: 600 24px/1.1 var(--f-display); }
-    .price-table small { display: block; color: var(--mute); font-size: 13px; }
-    .tag { display: inline-block; font-size: 11.5px; font-weight: 800; letter-spacing: .04em; color: var(--amber-ink); background: rgba(247, 147, 30, .14); border-radius: 99px; padding: 3px 9px; margin-top: 6px; }
-    .plan { margin-top: 56px; background: var(--navy); color: #fff; border-radius: 24px; padding: clamp(24px, 4vw, 44px); }
-    .plan .h2 { color: #fff; }
-    .plan p { color: #c9d1dd; margin: 0 0 26px; max-width: 64ch; }
-    .bar { display: grid; grid-template-columns: repeat(5, 1fr) 5fr; gap: 4px; }
-    .bar div { background: rgba(255, 255, 255, .08); border-radius: 10px; padding: 14px 12px; min-height: 108px; display: flex; flex-direction: column; justify-content: space-between; }
-    .bar div.post { background: rgba(247, 147, 30, .16); border: 1px solid rgba(247, 147, 30, .45); }
-    .bar b { font: 600 30px/1 var(--f-display); color: var(--amber); }
-    .bar span { font-size: 12.5px; color: #dfe4ec; line-height: 1.35; }
-    .bar-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 8px; font-size: 13px; font-weight: 700; color: #9aa6b8; text-align: center; }
-    .example { margin-top: 26px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-    .example div { border-top: 1px solid rgba(255, 255, 255, .15); padding-top: 12px; }
-    .example b { display: block; font: 600 26px/1.15 var(--f-display); color: #fff; }
-    .example span { font-size: 13.5px; color: #c9d1dd; }
-
-    /* Servicios y ubicación */
-    .amen { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; list-style: none; padding: 0; margin: 0; }
-    .amen li { display: flex; align-items: center; gap: 10px; background: #f6f1e8; border-radius: 12px; padding: 14px 16px; font-weight: 600; font-size: 15px; }
+    /* Servicios */
+    .amen-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
+    .amen-grid img { border-radius: 20px; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+    .amen { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+    .amen li { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--line); font-weight: 600; font-size: 15px; }
     .amen li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex: none; }
-    .dist { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 36px; }
-    .dist div { border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
-    .dist b { display: block; font: 600 30px/1 var(--f-display); color: var(--amber-ink); }
-    .dist span { font-size: 14px; color: var(--mute); }
 
-    /* Formulario */
-    .lead-sec { background: radial-gradient(900px 600px at 80% 0%, #1d3157 0%, var(--navy) 60%, #070d18 100%); color: var(--ivory); }
-    .lead-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
-    .lead-sec .h2 { color: #fff; }
-    .lead-sec .intro { color: #c9d1dd; }
-    .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
-    .checks li { display: flex; gap: 12px; color: #e6e9ef; }
-    .checks li::before { content: "✓"; color: var(--amber); font-weight: 800; }
-    .card { background: #fff; color: var(--ink); border-radius: 22px; padding: clamp(22px, 3vw, 34px); box-shadow: 0 40px 90px -40px rgba(0, 0, 0, .7); }
-    .card h3 { font: 600 clamp(26px, 2.4vw, 32px)/1.1 var(--f-display); margin: 0 0 6px; }
-    .card .sub { color: var(--mute); margin: 0 0 18px; font-size: 15px; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .field { display: grid; gap: 6px; margin-bottom: 14px; }
-    label { font-size: 13px; font-weight: 700; }
-    input, select { width: 100%; font: inherit; font-size: 16px; color: var(--ink); padding: 13px 14px; border: 1px solid rgba(11, 20, 36, .18); border-radius: 12px; background: #fff; outline: none; }
-    input:focus, select:focus { border-color: var(--amber); box-shadow: 0 0 0 4px rgba(247, 147, 30, .15); }
-    .phone { display: grid; grid-template-columns: 118px 1fr; gap: 8px; }
-    input.bad, select.bad { border-color: var(--red); }
-    .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--mute); margin: 4px 0 18px; cursor: pointer; }
-    .consent input { width: 18px; height: 18px; padding: 0; margin: 2px 0 0; flex: none; accent-color: var(--amber); }
-    .consent.bad { color: var(--red); }
-    .card .btn { width: 100%; }
-    .msg { font-size: 14px; color: var(--red); margin: 10px 0 0; min-height: 1em; }
-    .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-    .done { text-align: center; }
-    .done .ok { width: 64px; height: 64px; border-radius: 50%; background: rgba(37, 211, 102, .12); color: #1a9a4e; display: grid; place-items: center; margin: 4px auto 16px; font-size: 30px; font-weight: 800; }
-    .done p { color: var(--mute); margin: 0 0 18px; }
-    .legal-note { font-size: 12px; color: var(--mute); }
-    footer { background: #070d18; color: #8b95a7; font-size: 13px; padding: 26px 0 calc(26px + env(safe-area-inset-bottom)); }
-    footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
-    footer a { color: #b9c2d0; text-decoration: none; }
-    .wa-float { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom)); width: 58px; height: 58px; border-radius: 50%; background: var(--wa); display: grid; place-items: center; box-shadow: 0 12px 30px -8px rgba(37, 211, 102, .6); z-index: 20; }
-    .wa-float svg { width: 30px; height: 30px; fill: #fff; }
+    /* Tipologías */
+    .types { border-top: 1px solid var(--line); margin-top: 8px; }
+    .type { border-bottom: 1px solid var(--line); }
+    .type > button { width: 100%; display: grid; grid-template-columns: 1.2fr 1fr 1fr 28px; gap: 12px; align-items: center; padding: 20px 4px; background: none; border: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+    .type > button b { font: 600 24px/1.1 var(--f-display); }
+    .type > button span { color: var(--mute); font-size: 15px; }
+    .type > button span strong { color: var(--ink); }
+    .type > button i { font-style: normal; font-size: 22px; color: var(--amber-ink); transition: transform .3s; text-align: center; }
+    .type.open > button i { transform: rotate(45deg); }
+    .type-body { display: none; padding: 4px 4px 26px; }
+    .type.open .type-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: center; }
+    .plan-img { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 18px; cursor: zoom-in; }
+    .plan-img img { width: 100%; max-height: 420px; object-fit: contain; }
+    .type-data div { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+    .type-data div span { color: var(--mute); }
+    .type-data .btn { margin-top: 18px; }
+    .types-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
 
-    @media (max-width: 960px) {
-      .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .zone-grid, .lead-grid { grid-template-columns: minmax(0, 1fr); }
-      .points { grid-template-columns: minmax(0, 1fr); }
-      .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 160px; }
-      .amen, .dist { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .example { grid-template-columns: minmax(0, 1fr); }
-      .bar { grid-template-columns: repeat(5, 1fr); }
-      .bar div.post { grid-column: 1 / -1; min-height: 80px; }
-      .bar-legend { display: none; }
-      .top .btn span { display: none; }
-      .top .btn { width: 44px; padding: 0; }
-    }
-    @media (max-width: 560px) {
-      .price-table th:nth-child(3), .price-table td:nth-child(3) { display: none; }
-      .price-table td, .price-table th { padding: 14px 12px; }
-      .bar { grid-template-columns: repeat(2, 1fr); }
-      .bar div { min-height: 84px; }
-      .row { grid-template-columns: minmax(0, 1fr); gap: 0; }
-      .phone { grid-template-columns: 104px 1fr; }
-    }
-    /* ===== Aviso de cookies ===== */
-    .cookie-banner { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 90; max-width: 560px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; padding: 16px 18px; border-radius: 16px; background: #0b1424; color: #f4efe6; box-shadow: 0 20px 50px -20px rgba(7, 13, 24, .6); font-size: 14px; line-height: 1.5; }
-    .cookie-banner p { margin: 0; flex: 1 1 260px; }
-    .cookie-banner a { color: #f7931e; }
-    .cookie-actions { display: flex; gap: 8px; }
-    .cookie-banner .cookie-no, .cookie-banner .cookie-yes { min-width: 104px; justify-content: center; }
-    .cookie-banner .cookie-no { background: transparent; color: #f4efe6; border: 1px solid rgba(244, 239, 230, .35); }
-    .cookie-banner .cookie-yes { background: #f4efe6; color: #0b1424; }
-    .cookie-banner .btn { width: auto; min-height: 38px; font-size: 14px; padding: 0 16px; }
+    /* Plan de pagos */
+    .pay-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: end; margin-bottom: 28px; }
+    .pay-head p { color: var(--mute); margin: 0; }
+    .pay { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .pay div { background: var(--paper); border-radius: 18px; padding: 22px 20px; min-height: 150px; display: flex; flex-direction: column; justify-content: space-between; }
+    .pay div.hl { background: var(--navy); color: #fff; }
+    .pay b { font: 600 46px/1 var(--f-display); color: var(--amber); }
+    .pay strong { display: block; font-size: 16px; margin-top: 10px; }
+    .pay span { font-size: 13.5px; color: var(--mute); }
+    .pay div.hl span { color: #c9d1dd; }
+    .example { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+    .example div { border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+    .example b { display: block; font: 600 24px/1.15 var(--f-display); }
+    .example span { font-size: 13.5px; color: var(--mute); }
+
+    /* Inversión */
+    .invest { background: var(--paper); }
+    .invest-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(28px, 5vw, 64px); align-items: start; }
+    .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; background: #fff; border-radius: 18px; padding: 8px 22px; }
+    .checks li { display: flex; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); font-weight: 600; font-size: 15px; }
+    .checks li:last-child { border-bottom: 0; }
+    .checks li::before { content: "✓"; color: var(--amber-ink); font-weight: 800; }
+    .invest-ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 
     /* Wynn */
     .wynn { background: radial-gradient(900px 500px at 20% 0%, #1d3157 0%, var(--navy) 60%, #070d18 100%); color: #fff; }
+    .wynn .h2 { color: #fff; }
+    .wynn .lead-txt { color: #c9d1dd; }
     .wynn-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; }
     .wynn-grid figure { margin: 0; border-radius: 18px; overflow: hidden; }
-    .wynn-grid img { width: 100%; height: 100%; object-fit: cover; min-height: 280px; }
+    .wynn-grid img { width: 100%; height: 100%; object-fit: cover; min-height: 260px; }
     .wynn-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
     .wynn-facts div { border-top: 1px solid rgba(255, 255, 255, .18); padding-top: 12px; }
     .wynn-facts b { display: block; font: 600 32px/1.05 var(--f-display); color: var(--amber); }
     .wynn-facts span { font-size: 14px; color: #c9d1dd; }
-    @media (max-width: 960px) { .wynn-grid { grid-template-columns: minmax(0, 1fr); } .wynn-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+    /* Galería */
+    .tabs { display: inline-flex; background: var(--paper); border-radius: 99px; padding: 5px; margin-bottom: 20px; }
+    .tabs button { border: 0; background: none; font: 700 15px var(--f-body); color: var(--mute); padding: 11px 26px; border-radius: 99px; cursor: pointer; }
+    .tabs button.on { background: #fff; color: var(--ink); box-shadow: 0 4px 14px -6px rgba(11, 20, 36, .25); }
+    .slider { position: relative; }
+    .slides { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 4px; }
+    .slides::-webkit-scrollbar { display: none; }
+    .slides button { flex: 0 0 min(78%, 720px); aspect-ratio: 16 / 10; padding: 0; border: 0; border-radius: 18px; overflow: hidden; scroll-snap-align: start; cursor: zoom-in; background: #ddd; }
+    .slides img { width: 100%; height: 100%; object-fit: cover; }
+    .slides[hidden] { display: none; }
+    .field[hidden] { display: none; }
+    .arrows { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+    .arrows button { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: #fff; font-size: 20px; cursor: pointer; }
+
+    /* Zona */
+    .area-img { border-radius: 20px; width: 100%; margin-bottom: 26px; }
+    .near { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+    .near div { background: var(--paper); border-radius: 18px; padding: 22px; }
+    .near h3 { font: 600 24px/1.1 var(--f-display); margin: 0 0 10px; }
+    .near ul { margin: 0; padding-left: 18px; color: #2d3646; font-size: 15px; }
+    .near li { margin: 5px 0; }
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 0 26px; }
+    .stat { background: var(--sea); border-radius: 16px; padding: 18px; }
+    .stat b { display: block; font: 600 30px/1.05 var(--f-display); }
+    .stat span { font-size: 13.5px; color: var(--mute); }
+
+    /* Promotor */
+    .dev { background: var(--paper); }
+    .dev-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
+    .dev-grid img { border-radius: 20px; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
+    .dev-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 22px; }
+    .dev-facts div { background: #fff; border-radius: 16px; padding: 16px; }
+    .dev-facts b { display: block; font: 600 26px/1.1 var(--f-display); }
+    .dev-facts span { font-size: 13px; color: var(--mute); }
+
+    /* FAQ */
+    .faq { max-width: 860px; }
+    .faq details { border-bottom: 1px solid var(--line); }
+    .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 16px; padding: 20px 0; font: 600 21px/1.3 var(--f-display); }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after { content: "+"; font: 400 24px/1 var(--f-body); color: var(--amber-ink); }
+    .faq details[open] summary::after { content: "−"; }
+    .faq p { margin: 0 0 20px; color: var(--mute); max-width: 70ch; }
+
+    /* Formulario final */
+    .lead-sec { background: radial-gradient(900px 600px at 80% 0%, #1d3157 0%, var(--navy) 60%, #070d18 100%); color: var(--ivory); }
+    .lead-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
+    .lead-sec .h2 { color: #fff; }
+    .lead-sec .lead-txt { color: #c9d1dd; }
+    .card { background: #fff; color: var(--ink); border-radius: 22px; padding: clamp(22px, 3vw, 32px); box-shadow: 0 40px 90px -40px rgba(0, 0, 0, .7); }
+    .card h3 { font: 600 clamp(26px, 2.4vw, 30px)/1.1 var(--f-display); margin: 0 0 6px; }
+    .card .sub { color: var(--mute); margin: 0 0 18px; font-size: 15px; }
+
+    /* Campos */
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: grid; gap: 6px; margin-bottom: 12px; }
+    label { font-size: 13px; font-weight: 700; }
+    input, select { width: 100%; font: inherit; font-size: 16px; color: var(--ink); padding: 13px 14px; border: 1px solid rgba(11, 20, 36, .18); border-radius: 12px; background: #fff; outline: none; }
+    input:focus, select:focus { border-color: var(--amber); box-shadow: 0 0 0 4px rgba(247, 147, 30, .15); }
+    .phone { display: grid; grid-template-columns: 112px 1fr; gap: 8px; }
+    input.bad, select.bad { border-color: var(--red); }
+    .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; color: var(--mute); margin: 4px 0 16px; cursor: pointer; }
+    .consent input { width: 18px; height: 18px; padding: 0; margin: 2px 0 0; flex: none; accent-color: var(--amber); }
+    .consent.bad { color: var(--red); }
+    .msg { font-size: 14px; color: var(--red); margin: 10px 0 0; min-height: 1em; }
+    .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+    .done { text-align: center; }
+    .done .ok { width: 60px; height: 60px; border-radius: 50%; background: rgba(37, 211, 102, .12); color: #1a9a4e; display: grid; place-items: center; margin: 4px auto 14px; font-size: 28px; font-weight: 800; }
+    .done p { color: var(--mute); margin: 0 0 16px; }
+    .done .btn + .btn { margin-top: 10px; }
+
+    /* Ventana de formulario */
+    .modal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgba(7, 13, 24, .72); }
+    .modal[hidden] { display: none; }
+    .modal-card { position: relative; width: min(520px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; background: #fff; border-radius: 22px; padding: 28px; box-shadow: 0 40px 90px -30px rgba(0, 0, 0, .7); }
+    .modal-x { position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--paper); font-size: 22px; cursor: pointer; }
+    .modal-tag { display: inline-flex; gap: 8px; align-items: center; font-size: 12.5px; font-weight: 700; color: var(--amber-ink); background: rgba(247, 147, 30, .12); border-radius: 8px; padding: 6px 10px; margin-bottom: 12px; }
+    .modal-card h3 { font: 600 30px/1.1 var(--f-display); margin: 0 0 6px; padding-right: 40px; }
+    .modal-card .sub { color: var(--mute); margin: 0 0 18px; font-size: 15px; }
+
+    /* Visor */
+    .lb { position: fixed; inset: 0; z-index: 70; background: rgba(7, 13, 24, .94); display: grid; place-items: center; padding: 16px; }
+    .lb[hidden] { display: none; }
+    .lb img { max-width: 100%; max-height: 86vh; border-radius: 10px; background: #fff; }
+    .lb button { position: absolute; background: rgba(255, 255, 255, .12); color: #fff; border: 0; width: 48px; height: 48px; border-radius: 50%; font-size: 22px; cursor: pointer; }
+    .lb .x { top: 16px; right: 16px; } .lb .prev { left: 16px; top: 50%; } .lb .next { right: 16px; top: 50%; }
+
+    /* Barra fija en móvil */
+    .sticky { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: none; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: rgba(255, 255, 255, .96); border-top: 1px solid var(--line); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    .sticky .btn { flex: 1; min-height: 48px; padding: 0 12px; font-size: 14px; }
+    .wa-float { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom)); width: 58px; height: 58px; border-radius: 50%; background: var(--wa); display: grid; place-items: center; box-shadow: 0 12px 30px -8px rgba(37, 211, 102, .6); z-index: 20; }
+    .wa-float svg { width: 30px; height: 30px; fill: #fff; }
+    .legal-note { font-size: 12px; color: var(--mute); }
+    footer { background: #070d18; color: #8b95a7; font-size: 13px; padding: 26px 0 calc(26px + env(safe-area-inset-bottom)); }
+    footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+    footer a { color: #b9c2d0; text-decoration: none; }
+
+    /* Aviso de cookies (lo crea main.js si hay Google Ads configurado) */
+    .cookie-banner { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 90; max-width: 560px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; padding: 16px 18px; border-radius: 16px; background: #0b1424; color: #f4efe6; box-shadow: 0 20px 50px -20px rgba(7, 13, 24, .6); font-size: 14px; line-height: 1.5; }
+    .cookie-banner p { margin: 0; flex: 1 1 260px; }
+    .cookie-banner a { color: #f7931e; }
+    .cookie-actions { display: flex; gap: 8px; }
+    .cookie-banner .btn { min-height: 38px; font-size: 14px; padding: 0 16px; min-width: 104px; }
+    .cookie-banner .cookie-no { background: transparent; color: #f4efe6; border: 1px solid rgba(244, 239, 230, .35); }
+    .cookie-banner .cookie-yes { background: #f4efe6; color: #0b1424; }
+
+    @media (max-width: 960px) {
+      .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .overview-grid, .amen-grid, .invest-grid, .dev-grid, .lead-grid, .pay-head, .wynn-grid { grid-template-columns: minmax(0, 1fr); }
+      .facts-card { position: static; }
+      .type.open .type-body { grid-template-columns: minmax(0, 1fr); }
+      .pay, .stats, .wynn-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .near, .example { grid-template-columns: minmax(0, 1fr); }
+      .top .btn span { display: none; }
+      .top .btn { width: 44px; padding: 0; }
+      .sticky { display: flex; }
+      .wa-float { bottom: calc(84px + env(safe-area-inset-bottom)); }
+      footer { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+    }
+    @media (max-width: 560px) {
+      .dist, .amen { grid-template-columns: minmax(0, 1fr); }
+      .type > button { grid-template-columns: 1fr auto 24px; }
+      .type > button .hide-s { display: none; }
+      .row { grid-template-columns: minmax(0, 1fr); gap: 0; }
+      .phone { grid-template-columns: 100px 1fr; }
+      .dev-facts { grid-template-columns: minmax(0, 1fr); }
+      .hero-ctas .btn { flex: 1 1 100%; }
+    }
   </style>
 </head>
 <body data-no-guide-popup>
@@ -232,50 +291,199 @@
   </header>
 
   <main>
+    <!-- 1 · Portada -->
     <section class="hero">
       <div class="hero-bg" role="img" aria-label="Las dos torres de Ardee Views en Al Marjan Island"></div>
       <div class="wrap">
-        <p class="eyebrow"><span class="dot"></span>Al Marjan Island · Ras Al Khaimah · Lanzamiento</p>
-        <h1>Ardee Views: tu casa junto al mar en <em>Al Marjan Island</em></h1>
-        <p class="lead">Estudios, 1 y 2 dormitorios en el nuevo downtown de la isla, a 5 minutos del Wynn Resort, que abre en 2027. Pagas la mitad durante la obra y la otra mitad en 3 años después de recibir las llaves.</p>
+        <span class="badge">Disponibilidad limitada</span>
+        <h1>Ardee Views, <em>Al Marjan Island</em></h1>
+        <p class="sub">Estudios, 1 y 2 dormitorios entre Ardee Downtown y Ardee Waterfront, a 5 minutos del Wynn Resort. Pagas el 50 % durante la obra y el otro 50 % en 3 años después de la entrega.</p>
+        <div class="kpis">
+          <div><span>Precio desde</span><b>888.000 AED</b></div>
+          <div><span>Plan de pagos</span><b>50 / 50</b></div>
+          <div><span>Entrega</span><b>Q4 2029</b></div>
+          <div><span>Golden Visa</span><b>Desde 2 M AED</b></div>
+        </div>
         <div class="hero-ctas">
-          <a class="btn" href="#dossier">Recibe el dossier y los precios</a>
-          <a class="btn btn-line" data-wa data-wa-msg="Hola Pascual, me interesa Ardee Views en Al Marjan Island." href="https://wa.me/message/QI3A7Q5BXFTCA1" target="_blank" rel="noopener">Pregúntame por WhatsApp</a>
-        </div>
-        <div class="facts">
-          <div><b>888.000 AED</b><span>precio desde (≈ 211.000 €)</span></div>
-          <div><b>50 / 50</b><span>con 3 años para pagar tras la entrega</span></div>
-          <div><b>Q4 2029</b><span>entrega prevista</span></div>
-          <div><b>616</b><span>residencias en dos torres</span></div>
+          <button class="btn btn-main" data-open="disponibilidad">Consultar disponibilidad</button>
+          <button class="btn btn-glass" data-open="planos">Planos</button>
+          <button class="btn btn-glass" data-open="brochure">Brochure</button>
+          <a class="btn btn-glass" data-wa data-wa-msg="Hola Pascual, me interesa Ardee Views en Al Marjan Island." href="https://wa.me/message/QI3A7Q5BXFTCA1" target="_blank" rel="noopener">Contactar</a>
         </div>
       </div>
     </section>
 
+    <!-- 2 · Resumen y ficha -->
     <section>
-      <div class="wrap zone-grid">
+      <div class="wrap overview-grid">
         <div>
-          <p class="eyebrow"><span class="dot"></span>La zona</p>
-          <h2 class="h2">Por qué <em>Al Marjan Island</em></h2>
-          <p class="intro">Una isla artificial de Ras Al Khaimah, a algo más de una hora de Dubái, que se está convirtiendo en el nuevo gran destino de playa de Emiratos: hoteles de lujo, el Wynn Resort y miles de viviendas nuevas.</p>
-          <div class="stats">
-            <div class="stat"><b>7,8 km</b><span>de playa de arena</span></div>
-            <div class="stat"><b>+5 M</b><span>visitantes al año objetivo para 2030 (1,35 M en 2025)</span></div>
-            <div class="stat"><b>8.500</b><span>habitaciones de hotel previstas en la isla</span></div>
-            <div class="stat"><b>A+</b><span>calificación de Ras Al Khaimah (Fitch, estable)</span></div>
-          </div>
-          <p class="src">Fuentes citadas por el promotor: RAK Vision 2030, Fitch Ratings y S&amp;P Global.</p>
+          <p class="eyebrow"><span class="dot"></span>El proyecto</p>
+          <h2 class="h2">Resumen de <em>Ardee Views</em></h2>
+          <p class="lead-txt">Ardee Views son dos torres, Oeste y Este, con residencias en 18 plantas sobre un podio ajardinado con townhouses alrededor de la piscina. Están entre Ardee Downtown, el primer downtown familiar de Ras Al Khaimah, y el paseo marítimo de Ardee Waterfront. Los estudios empiezan en 888.000 AED, con el 50 % pagadero en 3 años tras la entrega en Q4 2029.</p>
+          <h3 class="h3">A cuánto queda todo</h3>
+          <ul class="dist">
+            <li><b>5 min</b>Wynn Resort de Al Marjan Island</li>
+            <li><b>25 min</b>Centro de Ras Al Khaimah</li>
+            <li><b>30 min</b>Hospital RAK</li>
+            <li><b>35 min</b>Aeropuerto de Ras Al Khaimah</li>
+            <li><b>50 min</b>Aeropuerto de Sharjah</li>
+            <li><b>75 min</b>Aeropuerto de Dubái (DXB)</li>
+          </ul>
         </div>
-        <img src="/assets/img/the-views/isla.webp" alt="Vista aérea de Al Marjan Island con Ardee Views, Ardee Downtown y el Wynn Resort" width="1600" height="1052" loading="lazy" />
+        <aside class="facts-card">
+          <h3 class="h3">Ficha del proyecto</h3>
+          <table>
+            <tr><td>Precio desde</td><td>888.000 AED (≈ 211.000 €)</td></tr>
+            <tr><td>Entrega</td><td>Q4 2029</td></tr>
+            <tr><td>Plan de pagos</td><td>50/50, 3 años tras la entrega</td></tr>
+            <tr><td>Superficie</td><td>Desde 34 m² (368 pies²)</td></tr>
+            <tr><td>Tipo</td><td>Apartamentos y townhouses</td></tr>
+            <tr><td>Dormitorios</td><td>Estudios, 1 y 2</td></tr>
+            <tr><td>Residencias</td><td>616 en dos torres</td></tr>
+            <tr><td>Promotor</td><td>Ardee Developments</td></tr>
+            <tr><td>Ubicación</td><td>Al Marjan Island, Ras Al Khaimah</td></tr>
+          </table>
+          <button class="btn btn-block" data-open="brochure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Descargar el brochure</button>
+        </aside>
       </div>
     </section>
 
+    <!-- 3 · Servicios -->
+    <section style="padding-top:0">
+      <div class="wrap amen-grid">
+        <div>
+          <p class="eyebrow"><span class="dot"></span>Servicios</p>
+          <h2 class="h2">Piscinas, wellness y <em>jardines</em></h2>
+          <p class="lead-txt">Piscina tipo resort y piscina familiar, jardines para residentes, gimnasio completo y zona wellness. Además, restaurante y bar, sala social, sala de eventos y comercios, con conserjería, aparcacoches y seguridad 24/7.</p>
+          <ul class="amen">
+            <li>Piscina tipo resort</li><li>Sala de eventos</li>
+            <li>Piscina familiar</li><li>Conserjería</li>
+            <li>Jardines para residentes</li><li>Aparcacoches</li>
+            <li>Gimnasio</li><li>Seguridad 24/7</li>
+            <li>Zona wellness</li><li>Carga de coches eléctricos</li>
+            <li>Restaurante y bar</li><li>Comercios y cafeterías</li>
+          </ul>
+        </div>
+        <img src="/assets/img/the-views/piscina-townhouses.webp" alt="Piscina y townhouses de Ardee Views" width="1600" height="821" loading="lazy" />
+      </div>
+    </section>
+
+    <!-- 4 · Tipologías -->
+    <section style="background:var(--paper)">
+      <div class="wrap">
+        <p class="eyebrow"><span class="dot"></span>Tipologías</p>
+        <h2 class="h2">Estudios, 1 y 2 <em>dormitorios</em></h2>
+        <p class="lead-txt">Estudios en las plantas 1 a 17, 1 dormitorio en las plantas 1 a 18 y 2 dormitorios en las plantas 1 a 16. Superficies totales con terraza. Pulsa cada tipología para ver su plano.</p>
+        <div class="types">
+          <div class="type open">
+            <button aria-expanded="true"><b>Estudio</b><span class="hide-s">34–36 m² · 368–386 pies²</span><span>Desde <strong>888.000 AED</strong></span><i>+</i></button>
+            <div class="type-body">
+              <div class="plan-img" data-plan="0"><img src="/assets/img/the-views/plano-estudio.webp" alt="Plano de un estudio de Ardee Views" width="672" height="900" loading="lazy" /></div>
+              <div class="type-data">
+                <div><span>Superficie total</span><b>34–36 m²</b></div>
+                <div><span>Terraza</span><b>≈ 6,6 m²</b></div>
+                <div><span>Plantas</span><b>1 a 17</b></div>
+                <div><span>Unidades</span><b>272</b></div>
+                <div><span>Precio desde</span><b>888.000 AED (≈ 211.000 €)</b></div>
+                <button class="btn btn-block" data-open="disponibilidad" data-tipo="Estudio">Consultar disponibilidad</button>
+              </div>
+            </div>
+          </div>
+          <div class="type">
+            <button aria-expanded="false"><b>1 dormitorio</b><span class="hide-s">62–78 m² · 666–837 pies²</span><span>Desde <strong>1,30 M AED</strong></span><i>+</i></button>
+            <div class="type-body">
+              <div class="plan-img" data-plan="1"><img src="/assets/img/the-views/plano-1-dormitorio.webp" alt="Plano de un apartamento de 1 dormitorio de Ardee Views" width="805" height="900" loading="lazy" /></div>
+              <div class="type-data">
+                <div><span>Superficie total</span><b>62–78 m²</b></div>
+                <div><span>Terraza</span><b>11–13 m²</b></div>
+                <div><span>Plantas</span><b>1 a 18</b></div>
+                <div><span>Unidades</span><b>288</b></div>
+                <div><span>Precio desde</span><b>1,30 M AED (≈ 310.000 €)</b></div>
+                <button class="btn btn-block" data-open="disponibilidad" data-tipo="1 dormitorio">Consultar disponibilidad</button>
+              </div>
+            </div>
+          </div>
+          <div class="type">
+            <button aria-expanded="false"><b>2 dormitorios</b><span class="hide-s">95–100 m² · 1.028–1.082 pies²</span><span>Desde <strong>2,085 M AED</strong></span><i>+</i></button>
+            <div class="type-body">
+              <div class="plan-img" data-plan="2"><img src="/assets/img/the-views/plano-2-dormitorios.webp" alt="Plano de un apartamento de 2 dormitorios de Ardee Views" width="716" height="900" loading="lazy" /></div>
+              <div class="type-data">
+                <div><span>Superficie total</span><b>95–100 m²</b></div>
+                <div><span>Terraza</span><b>≈ 12,6 m²</b></div>
+                <div><span>Plantas</span><b>1 a 16</b></div>
+                <div><span>Unidades</span><b>56</b></div>
+                <div><span>Precio desde</span><b>2,085 M AED (≈ 496.000 €)</b></div>
+                <div><span>Golden Visa</span><b>Supera el mínimo de 2 M AED</b></div>
+                <button class="btn btn-block" data-open="disponibilidad" data-tipo="2 dormitorios">Consultar disponibilidad</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="types-ctas">
+          <button class="btn" data-open="disponibilidad">Consultar disponibilidad</button>
+          <button class="btn btn-out" data-open="planos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Descargar todos los planos</button>
+        </div>
+        <p class="note">También hay una colección Sky de 3 dormitorios y townhouses: pregúntame por ellas. Precios y superficies orientativos según el promotor; euros aproximados (1 € ≈ 4,2 AED).</p>
+      </div>
+    </section>
+
+    <!-- 5 · Plan de pagos -->
+    <section>
+      <div class="wrap">
+        <div class="pay-head">
+          <div>
+            <p class="eyebrow"><span class="dot"></span>Plan de pagos</p>
+            <h2 class="h2" style="margin:0">50/50 con el 50 % <em>después de la entrega</em></h2>
+          </div>
+          <p>Pagas un 10 % al reservar, un 10 % a los 45 días, un 10 % en el mes 12, un 10 % en el mes 24 y un 10 % a la entrega en Q4 2029. El 50 % restante se paga en cuotas trimestrales durante los 3 años siguientes, cuando ya puedes alquilarlo.</p>
+        </div>
+        <div class="pay">
+          <div><b>10 %</b><strong>Al reservar</strong><span>Entrada</span></div>
+          <div><b>30 %</b><strong>Durante la obra</strong><span>A los 45 días y en los meses 12 y 24</span></div>
+          <div><b>10 %</b><strong>A la entrega</strong><span>Q4 2029</span></div>
+          <div class="hl"><b>50 %</b><strong>Después de la entrega</strong><span>12 cuotas trimestrales de 4,17 % en 3 años</span></div>
+        </div>
+        <div class="example">
+          <div><b>88.800 AED</b><span>reserva de un estudio de 888.000 AED (≈ 21.100 €)</span></div>
+          <div><b>444.000 AED</b><span>en total hasta la entrega, prevista en Q4 2029</span></div>
+          <div><b>≈ 37.000 AED</b><span>por trimestre tras la entrega (≈ 8.800 €)</span></div>
+        </div>
+        <p class="note">A estos importes se suman las tasas de registro y gestión. Los hitos exactos los fija el contrato de compraventa (SPA).</p>
+      </div>
+    </section>
+
+    <!-- 6 · Potencial de inversión -->
+    <section class="invest">
+      <div class="wrap invest-grid">
+        <div>
+          <p class="eyebrow"><span class="dot"></span>Inversión</p>
+          <h2 class="h2">Potencial de <em>inversión</em></h2>
+          <p class="lead-txt">Según la consultora Cavendish Maxwell, a mediados de 2026 los precios de los apartamentos en Ras Al Khaimah habían subido un 6,5 % en un año y los alquileres más de un 7 %, con la apertura del Wynn como principal motor de demanda. Ardee Views permite entrar en la zona desde 888.000 AED. Los estudios y apartamentos de 1 dormitorio encajan con profesionales y parejas que alquilan, y el plan 50/50 hace que el alquiler ayude a pagar la segunda mitad.</p>
+          <div class="invest-ctas">
+            <button class="btn" data-open="contacto">Hablar con un consultor</button>
+            <a class="btn btn-out" href="/blog/cuanto-cuesta-comprar-piso-dubai/">Ver los gastos de compra</a>
+          </div>
+        </div>
+        <ul class="checks">
+          <li>Estudios desde 888.000 AED</li>
+          <li>50 % pagadero antes de la entrega</li>
+          <li>50 % después de la entrega, en cuotas trimestrales durante 3 años</li>
+          <li>Dos torres con residencias en 18 plantas</li>
+          <li>Propiedad plena (freehold) para compradores de cualquier nacionalidad</li>
+          <li>Golden Visa de 10 años desde 2 M AED, en una o varias unidades</li>
+          <li>Sin impuesto sobre la renta personal en Emiratos</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 7 · Wynn -->
     <section class="wynn">
       <div class="wrap">
         <p class="eyebrow" style="color:var(--sand)"><span class="dot"></span>A 5 minutos de tu casa</p>
-        <h2 class="h2" style="color:#fff">El <em>Wynn Resort</em> de Al Marjan Island</h2>
-        <p class="intro" style="color:#c9d1dd">Wynn, el grupo de Wynn Las Vegas y Wynn Macao, abre en 2027 su primer resort en Oriente Medio en Al Marjan Island: hotel de lujo frente al mar, restaurantes de autor, spa, marina y el primer casino con licencia de Emiratos. Es el gran motor de la isla.</p>
+        <h2 class="h2">El <em>Wynn Resort</em> de Al Marjan Island</h2>
+        <p class="lead-txt">Wynn, el grupo de Wynn Las Vegas y Wynn Macao, abre en 2027 su primer resort en Oriente Medio en Al Marjan Island: hotel de lujo frente al mar, restaurantes de autor, spa, marina y el primer casino con licencia de Emiratos. Es el gran motor de la isla.</p>
         <div class="wynn-grid">
-          <figure class="wynn-main"><img src="/assets/img/the-views/wynn-resort.webp" alt="Wynn Resort en Al Marjan Island" width="1400" height="788" loading="lazy" /></figure>
+          <figure><img src="/assets/img/the-views/wynn-resort.webp" alt="Wynn Resort en Al Marjan Island" width="1400" height="788" loading="lazy" /></figure>
           <figure><img src="/assets/img/the-views/isla-wynn.webp" alt="Vista aérea de Al Marjan Island con la torre del Wynn Resort" width="1500" height="1143" loading="lazy" /></figure>
         </div>
         <div class="wynn-facts">
@@ -288,149 +496,112 @@
       </div>
     </section>
 
-    <section class="project">
-      <div class="wrap">
-        <p class="eyebrow"><span class="dot"></span>El proyecto</p>
-        <h2 class="h2">Dos torres frente a una <em>piscina resort</em></h2>
-        <p class="intro">Ardee Views son dos torres unidas por un podio ajardinado, con terrazas amplias y townhouses que dan a la piscina. Forma parte de Ardee Downtown, el primer downtown familiar de Ras Al Khaimah, junto al paseo marítimo de Ardee Waterfront.</p>
-        <ul class="points">
-          <li><b>Ardee Downtown</b><span>5,2 millones de pies² con más de 4.000 viviendas, centro comercial, 350 habitaciones de hotel de lujo, más de 50 restaurantes y un paseo de 1 km con fuente central.</span></li>
-          <li><b>Acabados cálidos</b><span>Suelos efecto piedra caliza, cocina con encimera efecto travertino, baños con encimera de mármol y carpintería en roble.</span></li>
-          <li><b>Promotor: Ardee</b><span>Promotor de destinos integrados en Al Marjan Island, con una cartera de más de 15.000 millones de AED y socios como Accor, Pelli Clarke &amp; Partners y DP Architects.</span></li>
-        </ul>
-      </div>
-    </section>
-
+    <!-- 8 · Galería -->
     <section>
       <div class="wrap">
         <p class="eyebrow"><span class="dot"></span>Galería</p>
         <h2 class="h2">Así será <em>vivir aquí</em></h2>
-        <div class="gallery" id="gallery">
-          <button class="w2" data-i="0"><img src="/assets/img/the-views/piscina-townhouses.webp" alt="Piscina y townhouses" loading="lazy" /></button>
-          <button class="w2 h2r" data-i="1"><img style="object-position:center 30%" src="/assets/img/the-views/torres-mar.webp" alt="Las dos torres de Ardee Views frente al mar" loading="lazy" /></button>
-          <button data-i="2"><img src="/assets/img/the-views/lobby.webp" alt="Lobby" loading="lazy" /></button>
-          <button data-i="3"><img src="/assets/img/the-views/salon.webp" alt="Salón de un apartamento" loading="lazy" /></button>
-          <button class="w2" data-i="4"><img src="/assets/img/the-views/torres.webp" alt="Torres con vistas a la isla" loading="lazy" /></button>
-          <button data-i="5"><img src="/assets/img/the-views/dormitorio-estudio.webp" alt="Dormitorio con vistas al mar" loading="lazy" /></button>
-          <button data-i="7"><img src="/assets/img/the-views/gimnasio.webp" alt="Gimnasio" loading="lazy" /></button>
-          <button class="w2" data-i="8"><img src="/assets/img/the-views/salon-2.webp" alt="Salón con terraza" loading="lazy" /></button>
-          <button class="w2" data-i="9"><img src="/assets/img/the-views/downtown.webp" alt="Ardee Downtown" loading="lazy" /></button>
+        <div class="tabs" role="tablist">
+          <button class="on" data-tab="ext" role="tab" aria-selected="true">Exteriores</button>
+          <button data-tab="int" role="tab" aria-selected="false">Interiores</button>
+        </div>
+        <div class="slider">
+          <div class="slides" id="g-ext">
+            <button><img src="/assets/img/the-views/torres-mar.webp" alt="Las dos torres de Ardee Views frente al mar" loading="lazy" /></button>
+            <button><img src="/assets/img/the-views/fachada.webp" alt="Fachada de Ardee Views" loading="lazy" /></button>
+            <button><img src="/assets/img/the-views/piscina-townhouses.webp" alt="Piscina y townhouses" loading="lazy" /></button>
+            <button><img src="/assets/img/the-views/piscina.webp" alt="Piscina tipo resort" loading="lazy" /></button>
+            <button><img src="/assets/img/the-views/torres.webp" alt="Vistas desde las torres" loading="lazy" /></button>
+            <button><img src="/assets/img/the-views/downtown.webp" alt="Ardee Downtown" loading="lazy" /></button>
+          </div>
+          <div class="slides" id="g-int" hidden>
+            <button><img src="/assets/img/the-views/salon-2.webp" alt="Salón con terraza" loading="lazy" /></button>
+            <button><img src="/assets/img/the-views/salon.webp" alt="Salón de un apartamento" loading="lazy" /></button>
+            <button><img src="/assets/img/the-views/dormitorio-estudio.webp" alt="Dormitorio con vistas al mar" loading="lazy" /></button>
+            <button><img src="/assets/img/the-views/lobby.webp" alt="Lobby" loading="lazy" /></button>
+            <button><img src="/assets/img/the-views/gimnasio.webp" alt="Gimnasio" loading="lazy" /></button>
+          </div>
+          <div class="arrows"><button data-dir="-1" aria-label="Anterior">‹</button><button data-dir="1" aria-label="Siguiente">›</button></div>
         </div>
         <p class="note">Imágenes ilustrativas del promotor (recreaciones).</p>
       </div>
     </section>
 
-    <section style="background:#f6f1e8">
+    <!-- 9 · La zona -->
+    <section style="background:var(--paper)">
       <div class="wrap">
-        <p class="eyebrow"><span class="dot"></span>Precios</p>
-        <h2 class="h2">Tipologías y <em>precio desde</em></h2>
-        <p class="intro">616 residencias en tres tipologías. Superficies totales con terraza.</p>
-        <table class="price-table">
-          <thead><tr><th>Tipología</th><th>Desde</th><th>Superficie</th></tr></thead>
-          <tbody>
-            <tr><td><b>Estudio</b><small>272 unidades</small></td><td><b>888.000 AED</b><small>≈ 211.000 €</small></td><td>34–36 m²<small>368–386 pies²</small></td></tr>
-            <tr><td><b>1 dormitorio</b><small>288 unidades</small></td><td><b>1,30 M AED</b><small>≈ 310.000 €</small></td><td>62–78 m²<small>666–837 pies²</small></td></tr>
-            <tr><td><b>2 dormitorios</b><small>56 unidades</small><span class="tag">Supera el mínimo de la Golden Visa</span></td><td><b>2,085 M AED</b><small>≈ 496.000 €</small></td><td>95–100 m²<small>1.028–1.082 pies²</small></td></tr>
-          </tbody>
-        </table>
-        <p class="note">También hay una colección Sky de 3 dormitorios y townhouses: pregúntame por ellas. Precios y disponibilidad orientativos según el promotor; euros aproximados (1 € ≈ 4,2 AED). La Golden Visa está sujeta a los requisitos vigentes.</p>
+        <p class="eyebrow"><span class="dot"></span>La zona</p>
+        <h2 class="h2">Sobre <em>Al Marjan Island</em></h2>
+        <p class="lead-txt">Al Marjan Island es un archipiélago artificial de cuatro islas que se adentra 4,5 km en el golfo frente a Ras Al Khaimah, a algo más de una hora de Dubái. Tiene playas, hoteles de cadenas internacionales y, desde 2027, el Wynn Resort. Al lado está el barrio de Al Hamra, con centro comercial, campo de golf y el antiguo pueblo perlero de Jazirat Al Hamra.</p>
+        <img class="area-img" src="/assets/img/the-views/isla.webp" alt="Vista aérea de Al Marjan Island con Ardee Views, Ardee Downtown y el Wynn Resort" width="1600" height="1052" loading="lazy" />
+        <div class="stats">
+          <div class="stat"><b>7,8 km</b><span>de playa de arena</span></div>
+          <div class="stat"><b>+5 M</b><span>visitantes al año objetivo para 2030 (1,35 M en 2025)</span></div>
+          <div class="stat"><b>8.500</b><span>habitaciones de hotel previstas en la isla</span></div>
+          <div class="stat"><b>A+</b><span>calificación de Ras Al Khaimah (Fitch, estable)</span></div>
+        </div>
+        <div class="near">
+          <div><h3>Ocio y lugares</h3><ul><li>Wynn Resort de Al Marjan Island</li><li>Al Hamra Mall</li><li>Al Hamra Golf Club</li><li>Pueblo histórico de Jazirat Al Hamra</li><li>Playas de la isla y paseo de Ardee Waterfront</li></ul></div>
+          <div><h3>Salud</h3><ul><li>Hospital RAK (30 min)</li><li>Sheikh Khalifa Specialty Hospital</li><li>Clínicas en Al Hamra</li></ul></div>
+          <div><h3>Conexiones</h3><ul><li>Aeropuerto de Ras Al Khaimah (35 min)</li><li>Aeropuerto de Sharjah (50 min)</li><li>Aeropuerto de Dubái DXB (75 min)</li></ul></div>
+        </div>
+        <p class="note">Fuentes citadas por el promotor: RAK Vision 2030, Fitch Ratings y S&amp;P Global.</p>
+      </div>
+    </section>
 
-        <div class="plan">
-          <h2 class="h2">Plan de pagos <em>50 / 50</em></h2>
-          <p>Pagas el 50 % durante la construcción y el otro 50 % en 12 cuotas trimestrales durante los 3 años siguientes a la entrega, cuando ya puedes alquilarlo.</p>
-          <div class="bar">
-            <div><b>10 %</b><span>Al reservar</span></div>
-            <div><b>10 %</b><span>A los 45 días</span></div>
-            <div><b>10 %</b><span>Mes 12</span></div>
-            <div><b>10 %</b><span>Mes 24</span></div>
-            <div><b>10 %</b><span>Entrega (Q4 2029)</span></div>
-            <div class="post"><b>50 %</b><span>Después de la entrega: 12 cuotas trimestrales de 4,17 % durante 3 años</span></div>
+    <!-- 10 · Promotor -->
+    <section class="dev">
+      <div class="wrap dev-grid">
+        <img src="/assets/img/the-views/downtown.webp" alt="Ardee Downtown, el proyecto principal de Ardee en Al Marjan Island" width="1115" height="1190" loading="lazy" />
+        <div>
+          <p class="eyebrow"><span class="dot"></span>El promotor</p>
+          <h2 class="h2">Sobre <em>Ardee Developments</em></h2>
+          <p class="lead-txt">Ardee es un promotor de destinos integrados en Al Marjan Island. Su proyecto principal es Ardee Downtown: 5,2 millones de pies² con más de 4.000 viviendas, centro comercial, hotel de lujo de 350 habitaciones, más de 50 restaurantes y un paseo de 1 km con fuente central. Trabaja con socios como Accor, Pelli Clarke &amp; Partners y DP Architects, y su equipo viene de Emaar, Meraas, Nakheel u Omniyat.</p>
+          <div class="dev-facts">
+            <div><b>15.000 M+</b><span>AED de cartera</span></div>
+            <div><b>4.000+</b><span>viviendas en Ardee Downtown</span></div>
+            <div><b>350</b><span>habitaciones de hotel de lujo</span></div>
           </div>
-          <div class="bar-legend"><span>Durante la obra · 50 %</span><span>Después de la entrega · 50 %</span></div>
-          <div class="example">
-            <div><b>88.800 AED</b><span>reserva de un estudio de 888.000 AED (≈ 21.100 €)</span></div>
-            <div><b>444.000 AED</b><span>en total hasta la entrega, prevista en Q4 2029</span></div>
-            <div><b>≈ 37.000 AED</b><span>por trimestre tras la entrega (≈ 8.800 €)</span></div>
-          </div>
-          <p class="note" style="color:#9aa6b8; margin-top:20px">A estos importes se suman las tasas de registro y gestión. Los hitos exactos los fija el contrato de compraventa (SPA).</p>
         </div>
       </div>
     </section>
 
+    <!-- 11 · Preguntas frecuentes -->
     <section>
       <div class="wrap">
-        <p class="eyebrow"><span class="dot"></span>Servicios y ubicación</p>
-        <h2 class="h2">Todo lo que necesitas, <em>sin salir de casa</em></h2>
-        <ul class="amen">
-          <li>Piscina resort</li><li>Piscina familiar</li><li>Gimnasio</li><li>Zona wellness</li>
-          <li>Restaurante y bar</li><li>Sala de eventos</li><li>Espacios sociales</li><li>Comercios</li>
-          <li>Conserjería</li><li>Aparcacoches</li><li>Seguridad 24/7</li><li>Carga de coches eléctricos</li>
-        </ul>
-        <div class="dist">
-          <div><b>5 min</b><span>al Wynn Resort</span></div>
-          <div><b>25 min</b><span>a la ciudad de Ras Al Khaimah</span></div>
-          <div><b>35 min</b><span>al aeropuerto de Ras Al Khaimah</span></div>
-          <div><b>75 min</b><span>al aeropuerto de Dubái (DXB)</span></div>
+        <p class="eyebrow"><span class="dot"></span>Preguntas frecuentes</p>
+        <h2 class="h2">Lo que más me <em>preguntan</em></h2>
+        <div class="faq">
+          <details open><summary>¿Dónde está Ardee Views?</summary><p>En Al Marjan Island (Ras Al Khaimah, Emiratos Árabes Unidos), entre Ardee Downtown y el paseo marítimo de Ardee Waterfront, a 5 minutos del Wynn Resort y a unos 75 minutos del aeropuerto de Dubái.</p></details>
+          <details><summary>¿Cuánto cuesta?</summary><p>Los estudios empiezan en 888.000 AED (≈ 211.000 €), los apartamentos de 1 dormitorio en 1,30 M AED y los de 2 dormitorios en 2,085 M AED. A eso se suman las tasas de registro y gestión.</p></details>
+          <details><summary>¿Cómo es el plan de pagos?</summary><p>50/50: un 10 % al reservar, un 10 % a los 45 días, un 10 % en el mes 12, un 10 % en el mes 24 y un 10 % a la entrega. El 50 % restante, en 12 cuotas trimestrales durante 3 años después de la entrega.</p></details>
+          <details><summary>¿Cuándo se entrega?</summary><p>La entrega está prevista para el cuarto trimestre de 2029, según el promotor.</p></details>
+          <details><summary>¿Puede comprar un extranjero?</summary><p>Sí. Al Marjan Island es zona de propiedad plena (freehold) para compradores de cualquier nacionalidad, sin necesidad de residir en Emiratos.</p></details>
+          <details><summary>¿Da acceso a la Golden Visa?</summary><p>La Golden Visa de 10 años se puede solicitar con una inversión inmobiliaria desde 2 millones de AED, en una o varias unidades. Los apartamentos de 2 dormitorios superan ese mínimo. Está sujeta a los requisitos vigentes.</p></details>
+          <details><summary>¿Cómo reservo si la primera torre está vendida?</summary><p>La primera torre se vendió al completo en el lanzamiento, pero estamos consiguiendo asignar unidades que quedan libres por cancelación. Para la segunda torre puedes registrar tu prioridad con una expresión de interés (EOI) de 30.000 AED para estudios, 1 y 2 dormitorios.</p></details>
+          <details><summary>¿Puedo comprar sin viajar a Emiratos?</summary><p>Sí. La reserva, el contrato y los pagos se hacen a distancia. Yo vivo en Dubái todo el año y me ocupo de todo lo presencial, incluida la entrega de llaves.</p></details>
         </div>
+        <div class="invest-ctas"><button class="btn" data-open="contacto">Hablar con un experto</button></div>
       </div>
     </section>
 
+    <!-- 12 · Formulario final -->
     <section class="lead-sec" id="dossier">
       <div class="wrap lead-grid">
         <div>
           <p class="eyebrow" style="color:var(--sand)"><span class="dot"></span>Lanzamiento</p>
-          <h2 class="h2">Recibe el dossier <em>y los precios</em></h2>
-          <p class="intro">Estamos en fase de lanzamiento. La primera torre ya se ha lanzado y está vendida al completo, pero estamos consiguiendo asignar las unidades que quedan libres por cancelación. Para la segunda torre puedes reservar tu prioridad con una expresión de interés (EOI) de 30.000 AED para estudios, 1 y 2 dormitorios. Te envío:</p>
-          <ul class="checks">
-            <li>Disponibilidad y precios actualizados por planta</li>
-            <li>Planos de cada tipología</li>
-            <li>Plan de pagos detallado y simulación con tu presupuesto</li>
-            <li>Mi opinión sincera: si encaja contigo o no</li>
-          </ul>
+          <h2 class="h2">Recibe la disponibilidad <em>y los precios</em></h2>
+          <p class="lead-txt">Estamos en fase de lanzamiento. La primera torre ya se ha lanzado y está vendida al completo, pero estamos consiguiendo asignar las unidades que quedan libres por cancelación. Para la segunda torre puedes reservar tu prioridad con una expresión de interés (EOI) de 30.000 AED para estudios, 1 y 2 dormitorios.</p>
         </div>
         <div class="card">
-          <form id="lead" novalidate>
-            <h3>Pide la información</h3>
-            <p class="sub">Te respondo en menos de 24 horas, por email y WhatsApp.</p>
-            <div class="row">
-              <div class="field"><label for="f-nombre">Nombre</label><input id="f-nombre" autocomplete="given-name" required /></div>
-              <div class="field"><label for="f-apellidos">Apellidos</label><input id="f-apellidos" autocomplete="family-name" required /></div>
-            </div>
-            <div class="field"><label for="f-email">Correo electrónico</label><input id="f-email" type="email" autocomplete="email" inputmode="email" required /></div>
-            <div class="field">
-              <label for="f-tel">Teléfono / WhatsApp</label>
-              <div class="phone">
-                <select id="f-prefijo" aria-label="Prefijo del país">
-                  <option value="+34">🇪🇸 +34</option><option value="+52">🇲🇽 +52</option><option value="+57">🇨🇴 +57</option><option value="+1">🇺🇸 +1</option>
-                  <option value="+54">🇦🇷 +54</option><option value="+56">🇨🇱 +56</option><option value="+51">🇵🇪 +51</option><option value="+58">🇻🇪 +58</option>
-                  <option value="+593">🇪🇨 +593</option><option value="+507">🇵🇦 +507</option><option value="+598">🇺🇾 +598</option><option value="+971">🇦🇪 +971</option>
-                  <option value="+44">🇬🇧 +44</option><option value="">Otro</option>
-                </select>
-                <input id="f-tel" type="tel" autocomplete="tel-national" inputmode="tel" placeholder="600 000 000" required />
-              </div>
-            </div>
-            <div class="field">
-              <label for="f-tipo">¿Qué te interesa?</label>
-              <select id="f-tipo">
-                <option>Estudio</option><option>1 dormitorio</option><option>2 dormitorios</option><option>Sky 3 dormitorios / townhouse</option><option selected>Aún no lo sé</option>
-              </select>
-            </div>
-            <div class="hp" aria-hidden="true"><label for="f-web">Web</label><input id="f-web" tabindex="-1" autocomplete="off" /></div>
-            <label class="consent" id="c-consent"><input type="checkbox" id="f-consent" required /> <span>Acepto la <a href="/privacidad/" target="_blank" rel="noopener">política de privacidad</a> y recibir información sobre este proyecto.</span></label>
-            <button class="btn" type="submit" id="f-btn">Quiero el dossier</button>
-            <p class="msg" id="f-msg" role="status" aria-live="polite"></p>
-          </form>
-          <div class="done" id="done" hidden>
-            <div class="ok">✓</div>
-            <h3 id="done-title">¡Gracias!</h3>
-            <p id="done-text">Te escribo en menos de 24 horas con el dossier y los precios.</p>
-            <a class="btn btn-wa" data-wa data-wa-msg="Hola Pascual, acabo de pedir el dossier de Ardee Views." href="https://wa.me/message/QI3A7Q5BXFTCA1" target="_blank" rel="noopener">Escríbeme ya por WhatsApp</a>
-          </div>
+          <h3>Consultar disponibilidad</h3>
+          <p class="sub">Te respondo en menos de 24 horas, por email y WhatsApp.</p>
+          <form data-lead="disponibilidad" novalidate></form>
         </div>
       </div>
     </section>
 
-    <section style="padding:40px 0">
+    <section style="padding:36px 0">
       <div class="wrap">
         <p class="legal-note">Información orientativa basada en el material del promotor (Ardee). Precios, disponibilidad, superficies, plan de pagos y fecha de entrega pueden cambiar y quedan sujetos al contrato de compraventa. Las imágenes son recreaciones. Pascual Vidal, consultor inmobiliario registrado en RERA (#97799).</p>
       </div>
@@ -444,12 +615,56 @@
     </div>
   </footer>
 
+  <div class="sticky">
+    <button class="btn" data-open="disponibilidad">Disponibilidad</button>
+    <button class="btn btn-out" data-open="planos">Planos</button>
+  </div>
+
   <a class="wa-float" data-wa data-wa-msg="Hola Pascual, me interesa Ardee Views en Al Marjan Island." href="https://wa.me/message/QI3A7Q5BXFTCA1" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg></a>
 
-  <div class="lb" id="lb" hidden role="dialog" aria-label="Galería">
+  <!-- Ventana con formulario (planos, brochure, disponibilidad, contacto) -->
+  <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <div class="modal-card">
+      <button class="modal-x" data-close aria-label="Cerrar">×</button>
+      <span class="modal-tag" id="m-tag"></span>
+      <h3 id="m-title"></h3>
+      <p class="sub" id="m-sub"></p>
+      <form data-lead="modal" novalidate></form>
+    </div>
+  </div>
+
+  <div class="lb" id="lb" hidden role="dialog" aria-label="Imagen ampliada">
     <button class="x" aria-label="Cerrar">×</button><button class="prev" aria-label="Anterior">‹</button><img alt="" /><button class="next" aria-label="Siguiente">›</button>
   </div>
   <div class="toast" data-toast hidden></div>
+
+  <template id="tpl-form">
+    <div class="row">
+      <div class="field"><label>Nombre</label><input data-f="nombre" autocomplete="given-name" required /></div>
+      <div class="field"><label>Apellidos</label><input data-f="apellidos" autocomplete="family-name" required /></div>
+    </div>
+    <div class="field"><label>Correo electrónico</label><input data-f="email" type="email" autocomplete="email" inputmode="email" required /></div>
+    <div class="field">
+      <label>Teléfono / WhatsApp</label>
+      <div class="phone">
+        <select data-f="prefijo" aria-label="Prefijo del país">
+          <option value="+34">🇪🇸 +34</option><option value="+52">🇲🇽 +52</option><option value="+57">🇨🇴 +57</option><option value="+1">🇺🇸 +1</option>
+          <option value="+54">🇦🇷 +54</option><option value="+56">🇨🇱 +56</option><option value="+51">🇵🇪 +51</option><option value="+58">🇻🇪 +58</option>
+          <option value="+593">🇪🇨 +593</option><option value="+507">🇵🇦 +507</option><option value="+598">🇺🇾 +598</option><option value="+971">🇦🇪 +971</option>
+          <option value="+44">🇬🇧 +44</option><option value="">Otro</option>
+        </select>
+        <input data-f="telefono" type="tel" autocomplete="tel-national" inputmode="tel" placeholder="600 000 000" required />
+      </div>
+    </div>
+    <div class="field" data-only="tipo">
+      <label>¿Qué te interesa?</label>
+      <select data-f="tipo"><option>Estudio</option><option>1 dormitorio</option><option>2 dormitorios</option><option>Sky 3 dormitorios / townhouse</option><option selected>Aún no lo sé</option></select>
+    </div>
+    <div class="hp" aria-hidden="true"><input data-f="web" tabindex="-1" autocomplete="off" /></div>
+    <label class="consent"><input type="checkbox" data-f="consent" required /> <span>Acepto la <a href="/privacidad/" target="_blank" rel="noopener">política de privacidad</a> y recibir información sobre este proyecto.</span></label>
+    <button class="btn btn-block" type="submit" data-f="btn"></button>
+    <p class="msg" role="status" aria-live="polite"></p>
+  </template>
 
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-wa" viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91A9.85 9.85 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.23 8.23 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24a8.24 8.24 0 0 1 8.24 8.25c0 4.54-3.7 8.23-8.24 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.15.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.44.12-.14.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48a.92.92 0 0 0-.66.31c-.23.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.1-.22-.16-.47-.28Z"/></symbol>
@@ -459,60 +674,146 @@
   <script>
   (function () {
     "use strict";
-    var $ = function (id) { return document.getElementById(id); };
+    var $ = function (s, c) { return (c || document).querySelector(s); };
+    var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
     var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     var PROYECTO = "Ardee Views · Al Marjan Island";
-
-    // Galería con visor
-    var imgs = Array.prototype.slice.call(document.querySelectorAll("#gallery img")), lb = $("lb"), big = lb.querySelector("img"), cur = 0;
-    function show(i) { cur = (i + imgs.length) % imgs.length; big.src = imgs[cur].src; big.alt = imgs[cur].alt; lb.hidden = false; document.body.style.overflow = "hidden"; }
-    function hide() { lb.hidden = true; document.body.style.overflow = ""; }
-    document.querySelectorAll("#gallery button").forEach(function (b, i) { b.addEventListener("click", function () { show(i); }); });
-    lb.querySelector(".x").addEventListener("click", hide);
-    lb.querySelector(".prev").addEventListener("click", function () { show(cur - 1); });
-    lb.querySelector(".next").addEventListener("click", function () { show(cur + 1); });
-    lb.addEventListener("click", function (e) { if (e.target === lb) hide(); });
-    document.addEventListener("keydown", function (e) { if (lb.hidden) return; if (e.key === "Escape") hide(); if (e.key === "ArrowRight") show(cur + 1); if (e.key === "ArrowLeft") show(cur - 1); });
+    var DOCS = { planos: "/assets/docs/ardee-views-planos.pdf", brochure: "/assets/docs/ardee-views-catalogo.pdf" };
+    var MODES = {
+      disponibilidad: { tag: "Lanzamiento · plazas limitadas", title: "Consultar disponibilidad", sub: "Te envío las unidades libres, precios por planta y el plan de pagos detallado.", btn: "Consultar disponibilidad", tipo: true },
+      planos: { tag: "PDF · 27 planos · 4,5 MB", title: "Todos los planos del proyecto", sub: "Recibe el PDF con todas las distribuciones de estudios, 1 y 2 dormitorios.", btn: "Recibir los planos", tipo: false },
+      brochure: { tag: "PDF · catálogo · 23 MB", title: "Descarga el brochure", sub: "El catálogo completo de Ardee Views: arquitectura, servicios, interiores y ubicación.", btn: "Descargar el brochure", tipo: false },
+      contacto: { tag: "Consultoría gratuita", title: "Habla con un consultor", sub: "Cuéntame tu presupuesto y tu objetivo y te digo con sinceridad si encaja contigo.", btn: "Quiero que me contactes", tipo: true }
+    };
 
     // Prefijo según la zona horaria
+    var guess = "+34";
     try {
       var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-      $("f-prefijo").value = /Mexico|Monterrey|Cancun|Tijuana|Merida|Chihuahua/.test(tz) ? "+52" : /Bogota/.test(tz) ? "+57" : /Buenos_Aires|Argentina/.test(tz) ? "+54" :
+      guess = /Mexico|Monterrey|Cancun|Tijuana|Merida|Chihuahua/.test(tz) ? "+52" : /Bogota/.test(tz) ? "+57" : /Buenos_Aires|Argentina/.test(tz) ? "+54" :
         /Santiago/.test(tz) ? "+56" : /Lima/.test(tz) ? "+51" : /Caracas/.test(tz) ? "+58" : /Guayaquil/.test(tz) ? "+593" : /Panama/.test(tz) ? "+507" :
         /Montevideo/.test(tz) ? "+598" : /Dubai/.test(tz) ? "+971" : /^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Detroit)/.test(tz) ? "+1" : /London/.test(tz) ? "+44" : "+34";
     } catch (e) {}
 
-    var form = $("lead"), btn = $("f-btn"), msg = $("f-msg");
-    form.addEventListener("input", function (e) { e.target.classList.remove("bad"); $("c-consent").classList.remove("bad"); msg.textContent = ""; });
-    form.addEventListener("submit", function (e) {
+    function buildForm(form, mode, tipo) {
+      var m = MODES[mode];
+      form.innerHTML = $("#tpl-form").innerHTML;
+      form.setAttribute("data-mode", mode);
+      $("[data-f=prefijo]", form).value = guess;
+      $("[data-only=tipo]", form).hidden = !m.tipo;
+      if (tipo) $("[data-f=tipo]", form).value = tipo;
+      $("[data-f=btn]", form).textContent = m.btn;
+      $$("input,select", form).forEach(function (el, i) { if (!el.id) el.id = "f-" + mode + "-" + i + "-" + Math.random().toString(36).slice(2, 6); });
+      $$(".field", form).forEach(function (f) { var l = $("label", f), el = $("input,select", f); if (l && el) l.htmlFor = el.id; });
+    }
+
+    function done(form, mode, nombre, email) {
+      var doc = DOCS[mode];
+      var html = '<div class="done"><div class="ok">✓</div><h3>¡Gracias, ' + nombre.replace(/[<>&"]/g, "") + '!</h3>';
+      if (doc) {
+        html += '<p>Aquí lo tienes. También te escribo a ' + email.replace(/[<>&"]/g, "") + ' para resolver tus dudas.</p>' +
+          '<a class="btn btn-block" href="' + doc + '" target="_blank" rel="noopener" download>' + (mode === "planos" ? "Descargar los planos (PDF)" : "Descargar el brochure (PDF)") + '</a>';
+      } else {
+        html += '<p>Te escribo en menos de 24 horas a ' + email.replace(/[<>&"]/g, "") + ' y por WhatsApp con la disponibilidad y los precios.</p>';
+      }
+      html += '<a class="btn btn-wa btn-block" data-wa href="https://wa.me/message/QI3A7Q5BXFTCA1" target="_blank" rel="noopener">Escríbeme ya por WhatsApp</a></div>';
+      form.outerHTML = html;
+    }
+
+    document.addEventListener("submit", function (e) {
+      var form = e.target;
+      if (!form.hasAttribute("data-lead")) return;
       e.preventDefault();
-      var nombre = $("f-nombre").value.trim(), apellidos = $("f-apellidos").value.trim(), email = $("f-email").value.trim(), tel = $("f-tel").value.trim();
+      var mode = form.getAttribute("data-mode"), m = MODES[mode];
+      var f = function (k) { return $("[data-f=" + k + "]", form); };
+      var nombre = f("nombre").value.trim(), apellidos = f("apellidos").value.trim(), email = f("email").value.trim(), tel = f("telefono").value.trim();
       var ok = true;
-      [[$("f-nombre"), !nombre], [$("f-apellidos"), !apellidos], [$("f-email"), !EMAIL.test(email)], [$("f-tel"), tel.replace(/\D/g, "").length < 6]].forEach(function (c) { c[0].classList.toggle("bad", c[1]); if (c[1]) ok = false; });
-      if (!$("f-consent").checked) { $("c-consent").classList.add("bad"); ok = false; }
+      [[f("nombre"), !nombre], [f("apellidos"), !apellidos], [f("email"), !EMAIL.test(email)], [f("telefono"), tel.replace(/\D/g, "").length < 6]].forEach(function (c) { c[0].classList.toggle("bad", c[1]); if (c[1]) ok = false; });
+      if (!f("consent").checked) { $(".consent", form).classList.add("bad"); ok = false; }
+      var msg = $(".msg", form);
       if (!ok) { msg.textContent = "Revisa los campos marcados."; return; }
+      var tipo = m.tipo ? f("tipo").value : "";
+      var que = { disponibilidad: "Disponibilidad", planos: "Planos", brochure: "Brochure", contacto: "Contacto" }[mode];
       var q = new URLSearchParams(location.search);
-      var payload = { formulario: "dossier", proyecto: PROYECTO + " · " + $("f-tipo").value, nombre: nombre + " " + apellidos, email: email,
-        telefono: (tel.charAt(0) === "+" ? "" : $("f-prefijo").value + " ") + tel, mensaje: "Interés: " + $("f-tipo").value + " (landing Al Marjan Island)",
-        consentimiento: true, web: $("f-web").value, pagina: location.href, fecha: new Date().toISOString() };
+      var payload = { formulario: "dossier", proyecto: PROYECTO + " · " + que + (tipo ? " · " + tipo : ""), nombre: nombre + " " + apellidos, email: email,
+        telefono: (tel.charAt(0) === "+" ? "" : f("prefijo").value + " ") + tel, mensaje: "Pide: " + que + (tipo ? " · Interés: " + tipo : "") + " (landing Al Marjan Island)",
+        consentimiento: true, web: f("web").value, pagina: location.href, fecha: new Date().toISOString() };
       ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "fbclid"].forEach(function (k) { if (q.get(k)) payload[k] = q.get(k); });
-      btn.disabled = true; btn.textContent = "Enviando…";
+      var btn = f("btn"); btn.disabled = true; btn.textContent = "Enviando…";
+      var tab = null;
+      if (DOCS[mode]) { try { tab = window.open("", "_blank"); } catch (err) {} }
       fetch("/crm/api.php?action=lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(function () {
           window.dataLayer = window.dataLayer || [];
-          window.dataLayer.push({ event: "lead_submit", formulario: "dossier", proyecto: PROYECTO });
-          // Conversión de Google Ads (solo si está configurada en main.js y el visitante aceptó cookies)
+          window.dataLayer.push({ event: "lead_submit", formulario: "dossier", proyecto: PROYECTO, pide: que });
           var C = window.__PV__ || {};
           if (window.gtag && C.googleAdsId && C.googleAdsLabels && C.googleAdsLabels.consultoria) window.gtag("event", "conversion", { send_to: C.googleAdsId + "/" + C.googleAdsLabels.consultoria });
-          $("done-title").textContent = "¡Gracias, " + nombre + "!";
-          $("done-text").textContent = "Te escribo en menos de 24 horas a " + email + " y por WhatsApp con el dossier y los precios de Ardee Views.";
-          form.hidden = true; $("done").hidden = false;
+          if (tab) { try { tab.location.href = DOCS[mode]; } catch (err) {} }
+          done(form, mode, nombre, email);
         })
         .catch(function () {
-          btn.disabled = false; btn.textContent = "Quiero el dossier";
+          if (tab) { try { tab.close(); } catch (err) {} }
+          btn.disabled = false; btn.textContent = m.btn;
           msg.innerHTML = 'No se pudo enviar. Escríbeme por <a href="https://wa.me/message/QI3A7Q5BXFTCA1" target="_blank" rel="noopener">WhatsApp</a>, por favor.';
         });
+    });
+    document.addEventListener("input", function (e) { if (e.target.classList) e.target.classList.remove("bad"); var c = e.target.closest && e.target.closest(".consent"); if (c) c.classList.remove("bad"); });
+
+    // Formulario de la sección final
+    buildForm($("form[data-lead=disponibilidad]"), "disponibilidad");
+
+    // Ventana
+    var modal = $("#modal");
+    function openModal(mode, tipo) {
+      var m = MODES[mode];
+      $("#m-tag").textContent = m.tag; $("#m-title").textContent = m.title; $("#m-sub").textContent = m.sub;
+      var holder = $(".modal-card"), old = $("form, .done", holder);
+      var form = document.createElement("form"); form.setAttribute("data-lead", "modal"); form.noValidate = true;
+      if (old) old.replaceWith(form); else holder.appendChild(form);
+      buildForm(form, mode, tipo);
+      modal.hidden = false; document.body.classList.add("lock");
+      setTimeout(function () { var i = $("input", form); if (i) i.focus(); }, 50);
+    }
+    function closeModal() { modal.hidden = true; document.body.classList.remove("lock"); }
+    $$("[data-open]").forEach(function (b) { b.addEventListener("click", function () { openModal(b.getAttribute("data-open"), b.getAttribute("data-tipo")); }); });
+    modal.addEventListener("click", function (e) { if (e.target === modal || e.target.hasAttribute("data-close")) closeModal(); });
+    if (/^#modal-(floor|planos)/.test(location.hash)) openModal("planos");
+
+    // Tipologías (acordeón)
+    $$(".type > button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var t = b.parentNode, open = !t.classList.contains("open");
+        $$(".type").forEach(function (x) { x.classList.remove("open"); $("button", x).setAttribute("aria-expanded", "false"); });
+        if (open) { t.classList.add("open"); b.setAttribute("aria-expanded", "true"); }
+      });
+    });
+
+    // Galería con pestañas y flechas
+    var cur = $("#g-ext");
+    $$(".tabs button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        $$(".tabs button").forEach(function (x) { x.classList.toggle("on", x === b); x.setAttribute("aria-selected", x === b ? "true" : "false"); });
+        $("#g-ext").hidden = b.getAttribute("data-tab") !== "ext"; $("#g-int").hidden = b.getAttribute("data-tab") !== "int";
+        cur = b.getAttribute("data-tab") === "ext" ? $("#g-ext") : $("#g-int");
+      });
+    });
+    $$(".arrows button").forEach(function (b) { b.addEventListener("click", function () { cur.scrollBy({ left: +b.getAttribute("data-dir") * cur.clientWidth * .8, behavior: "smooth" }); }); });
+
+    // Visor de imágenes (galería y planos)
+    var lb = $("#lb"), big = $("img", lb), list = [], idx = 0;
+    function show(arr, i) { list = arr; idx = (i + arr.length) % arr.length; big.src = arr[idx].src; big.alt = arr[idx].alt; lb.hidden = false; document.body.classList.add("lock"); }
+    function hide() { lb.hidden = true; if (modal.hidden) document.body.classList.remove("lock"); }
+    $$(".slides").forEach(function (s) { var imgs = $$("img", s); $$("button", s).forEach(function (b, i) { b.addEventListener("click", function () { show(imgs, i); }); }); });
+    var plans = $$(".plan-img img"); $$(".plan-img").forEach(function (p, i) { p.addEventListener("click", function () { show(plans, i); }); });
+    $(".x", lb).addEventListener("click", hide);
+    $(".prev", lb).addEventListener("click", function () { show(list, idx - 1); });
+    $(".next", lb).addEventListener("click", function () { show(list, idx + 1); });
+    lb.addEventListener("click", function (e) { if (e.target === lb) hide(); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { if (!lb.hidden) hide(); else if (!modal.hidden) closeModal(); }
+      if (!lb.hidden && e.key === "ArrowRight") show(list, idx + 1);
+      if (!lb.hidden && e.key === "ArrowLeft") show(list, idx - 1);
     });
   })();
   </script>
