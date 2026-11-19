@@ -126,9 +126,9 @@ ErrorDocument 404 /404.html
   </FilesMatch>
   # RFC 8288: anunciar llms.txt y la versión Markdown de cada página (ruta relativa a la carpeta)
   <FilesMatch "^index\.html$">
-    Header add Link "</llms.txt>; rel=\"describedby\"; type=\"text/plain\""
-    Header add Link "<index.md>; rel=\"alternate\"; type=\"text/markdown\""
-    Header add Link "</.well-known/mcp/server-card.json>; rel=\"describedby\"; type=\"application/json\""
+    Header add Link '</llms.txt>; rel="describedby"; type="text/plain"'
+    Header add Link '<index.md>; rel="alternate"; type="text/markdown"'
+    Header add Link '</.well-known/mcp/server-card.json>; rel="describedby"; type="application/json"'
   </FilesMatch>
   <FilesMatch "^(index\.md|llms\.txt|server-card\.json)$">
     Header set Access-Control-Allow-Origin "*"
