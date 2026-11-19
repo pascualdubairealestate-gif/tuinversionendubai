@@ -143,6 +143,8 @@
     .wynn .lead-txt { color: #c9d1dd; }
     .wynn-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; }
     .wynn-grid figure { margin: 0; border-radius: 18px; overflow: hidden; }
+    .wynn-grid figure.tagged { position: relative; }
+    .fig-tag { position: absolute; left: 14px; top: 14px; z-index: 1; background: var(--amber); color: var(--navy); font-size: 13px; font-weight: 800; padding: 7px 13px; border-radius: 99px; box-shadow: 0 8px 20px -8px rgba(0, 0, 0, .5); }
     .wynn-grid img { width: 100%; height: 100%; object-fit: cover; min-height: 260px; }
     .wynn-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
     .wynn-facts div { border-top: 1px solid rgba(255, 255, 255, .18); padding-top: 12px; }
@@ -485,7 +487,7 @@
         <p class="lead-txt">Wynn, el grupo de Wynn Las Vegas y Wynn Macao, abre en 2027 su primer resort en Oriente Medio en Al Marjan Island: hotel de lujo frente al mar, restaurantes de autor, spa, marina y el primer casino con licencia de Emiratos. Es el gran motor de la isla.</p>
         <div class="wynn-grid">
           <figure><img src="/assets/img/the-views/wynn-resort.webp" alt="Wynn Resort en Al Marjan Island" width="1400" height="788" loading="lazy" /></figure>
-          <figure><img src="/assets/img/the-views/wynn-obra.webp" alt="Obras del Wynn Resort en Al Marjan Island, con la torre ya levantada" width="1600" height="1200" loading="lazy" /></figure>
+          <figure class="tagged"><span class="fig-tag">Estado de las obras · Q1 2026</span><img src="/assets/img/the-views/wynn-obra.webp" alt="Obras del Wynn Resort en Al Marjan Island, con la torre ya levantada" width="1600" height="1200" loading="lazy" /></figure>
         </div>
         <div class="wynn-facts">
           <div><b>2027</b><span>apertura prevista del Wynn Resort</span></div>
