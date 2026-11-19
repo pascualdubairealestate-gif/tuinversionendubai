@@ -150,13 +150,15 @@
     .wynn-facts span { font-size: 14px; color: #c9d1dd; }
 
     /* Galería */
-    .tabs { display: inline-flex; background: var(--paper); border-radius: 99px; padding: 5px; margin-bottom: 20px; }
-    .tabs button { border: 0; background: none; font: 700 15px var(--f-body); color: var(--mute); padding: 11px 26px; border-radius: 99px; cursor: pointer; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 4px; width: fit-content; max-width: 100%; background: var(--paper); border-radius: 22px; padding: 5px; margin-bottom: 20px; }
+    .tabs button { border: 0; background: none; font: 700 15px var(--f-body); color: var(--mute); padding: 10px 20px; border-radius: 99px; cursor: pointer; }
+    .tabs small { font-size: 12px; opacity: .6; margin-left: 2px; }
     .tabs button.on { background: #fff; color: var(--ink); box-shadow: 0 4px 14px -6px rgba(11, 20, 36, .25); }
     .slider { position: relative; }
     .slides { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 4px; }
     .slides::-webkit-scrollbar { display: none; }
-    .slides button { flex: 0 0 min(78%, 720px); aspect-ratio: 16 / 10; padding: 0; border: 0; border-radius: 18px; overflow: hidden; scroll-snap-align: start; cursor: zoom-in; background: #ddd; }
+    .slides button { position: relative; flex: 0 0 min(80%, 760px); aspect-ratio: 16 / 10; padding: 0; border: 0; border-radius: 18px; overflow: hidden; scroll-snap-align: start; cursor: zoom-in; background: #e9e4da; }
+    .slides button span { position: absolute; left: 12px; bottom: 12px; background: rgba(7, 13, 24, .62); color: #fff; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 99px; }
     .slides img { width: 100%; height: 100%; object-fit: cover; }
     .slides[hidden] { display: none; }
     .field[hidden] { display: none; }
@@ -498,31 +500,45 @@
     <!-- 8 · Galería -->
     <section>
       <div class="wrap">
-        <p class="eyebrow"><span class="dot"></span>Galería</p>
+        <p class="eyebrow"><span class="dot"></span>Galería · 24 imágenes</p>
         <h2 class="h2">Así será <em>vivir aquí</em></h2>
-        <div class="tabs" role="tablist">
-          <button class="on" data-tab="ext" role="tab" aria-selected="true">Exteriores</button>
-          <button data-tab="int" role="tab" aria-selected="false">Interiores</button>
-        </div>
+        <div class="tabs" role="tablist"><button class="on" data-tab="ext" role="tab" aria-selected="true">Exteriores <small>6</small></button><button data-tab="amen" role="tab" aria-selected="false">Servicios <small>5</small></button><button data-tab="int" role="tab" aria-selected="false">Interiores <small>8</small></button><button data-tab="life" role="tab" aria-selected="false">Estilo de vida <small>5</small></button></div>
         <div class="slider">
           <div class="slides" id="g-ext">
-            <button><img src="/assets/img/the-views/torres-mar.webp" alt="Las dos torres de Ardee Views frente al mar" loading="lazy" /></button>
-            <button><img src="/assets/img/the-views/fachada.webp" alt="Fachada de Ardee Views" loading="lazy" /></button>
-            <button><img src="/assets/img/the-views/piscina-townhouses.webp" alt="Piscina y townhouses" loading="lazy" /></button>
-            <button><img src="/assets/img/the-views/piscina.webp" alt="Piscina tipo resort" loading="lazy" /></button>
-            <button><img src="/assets/img/the-views/torres.webp" alt="Vistas desde las torres" loading="lazy" /></button>
-            <button><img src="/assets/img/the-views/downtown.webp" alt="Ardee Downtown" loading="lazy" /></button>
+            <button><img src="/assets/img/the-views/renders/00facade-02-fac.webp" alt="Vista aérea de las dos torres frente al mar" loading="lazy" /><span>Vista aérea de las dos torres frente al mar</span></button>
+            <button><img src="/assets/img/the-views/renders/00facade-01-fac.webp" alt="Fachada de día" loading="lazy" /><span>Fachada de día</span></button>
+            <button><img src="/assets/img/the-views/renders/00facade-03-fac.webp" alt="Jardines y torres" loading="lazy" /><span>Jardines y torres</span></button>
+            <button><img src="/assets/img/the-views/renders/00facade-04-fac.webp" alt="Vistas desde una terraza" loading="lazy" /><span>Vistas desde una terraza</span></button>
+            <button><img src="/assets/img/the-views/renders/01arrival-arrival01.webp" alt="Llegada al edificio" loading="lazy" /><span>Llegada al edificio</span></button>
+            <button><img src="/assets/img/the-views/renders/01arrival-arrival02.webp" alt="Podio con comercios" loading="lazy" /><span>Podio con comercios</span></button>
+          </div>
+          <div class="slides" id="g-amen" hidden>
+            <button><img src="/assets/img/the-views/renders/03amenities-am01.webp" alt="Piscina y townhouses" loading="lazy" /><span>Piscina y townhouses</span></button>
+            <button><img src="/assets/img/the-views/renders/03amenities-am02.webp" alt="Piscina vista desde arriba" loading="lazy" /><span>Piscina vista desde arriba</span></button>
+            <button><img src="/assets/img/the-views/renders/03amenities-am03.webp" alt="Vista de la piscina desde un balcón" loading="lazy" /><span>Vista de la piscina desde un balcón</span></button>
+            <button><img src="/assets/img/the-views/renders/03amenities-am04.webp" alt="Gimnasio" loading="lazy" /><span>Gimnasio</span></button>
+            <button><img src="/assets/img/the-views/renders/02lobby-02lobby-reception.webp" alt="Recepción del lobby" loading="lazy" /><span>Recepción del lobby</span></button>
           </div>
           <div class="slides" id="g-int" hidden>
-            <button><img src="/assets/img/the-views/salon-2.webp" alt="Salón con terraza" loading="lazy" /></button>
-            <button><img src="/assets/img/the-views/salon.webp" alt="Salón de un apartamento" loading="lazy" /></button>
-            <button><img src="/assets/img/the-views/dormitorio-estudio.webp" alt="Dormitorio con vistas al mar" loading="lazy" /></button>
-            <button><img src="/assets/img/the-views/lobby.webp" alt="Lobby" loading="lazy" /></button>
-            <button><img src="/assets/img/the-views/gimnasio.webp" alt="Gimnasio" loading="lazy" /></button>
+            <button><img src="/assets/img/the-views/renders/06corner-unit-02livingroom.webp" alt="Salón de un apartamento de esquina" loading="lazy" /><span>Salón de un apartamento de esquina</span></button>
+            <button><img src="/assets/img/the-views/renders/05standard-unit-02living.webp" alt="Salón de 1 dormitorio" loading="lazy" /><span>Salón de 1 dormitorio</span></button>
+            <button><img src="/assets/img/the-views/renders/06corner-unit-01kitchen-dining.webp" alt="Cocina y comedor" loading="lazy" /><span>Cocina y comedor</span></button>
+            <button><img src="/assets/img/the-views/renders/06corner-unit-03bedroom.webp" alt="Dormitorio principal" loading="lazy" /><span>Dormitorio principal</span></button>
+            <button><img src="/assets/img/the-views/renders/04studio-unit-02bedroom.webp" alt="Estudio con vistas al mar" loading="lazy" /><span>Estudio con vistas al mar</span></button>
+            <button><img src="/assets/img/the-views/renders/05standard-unit-03bedroom.webp" alt="Dormitorio" loading="lazy" /><span>Dormitorio</span></button>
+            <button><img src="/assets/img/the-views/renders/04studio-unit-03bathroom.webp" alt="Baño" loading="lazy" /><span>Baño</span></button>
+            <button><img src="/assets/img/the-views/renders/06corner-unit-04balcony.webp" alt="Dormitorio con terraza" loading="lazy" /><span>Dormitorio con terraza</span></button>
+          </div>
+          <div class="slides" id="g-life" hidden>
+            <button><img src="/assets/img/the-views/renders/07lifestyle-LS01.webp" alt="Terraza al atardecer" loading="lazy" /><span>Terraza al atardecer</span></button>
+            <button><img src="/assets/img/the-views/renders/07lifestyle-LS04.webp" alt="Casa al atardecer" loading="lazy" /><span>Casa al atardecer</span></button>
+            <button><img src="/assets/img/the-views/renders/07lifestyle-LS08.webp" alt="Junto a la piscina" loading="lazy" /><span>Junto a la piscina</span></button>
+            <button><img src="/assets/img/the-views/renders/07lifestyle-LS13.webp" alt="Café frente a la playa" loading="lazy" /><span>Café frente a la playa</span></button>
+            <button><img src="/assets/img/the-views/renders/07lifestyle-LS16.webp" alt="Café en el paseo" loading="lazy" /><span>Café en el paseo</span></button>
           </div>
           <div class="arrows"><button data-dir="-1" aria-label="Anterior">‹</button><button data-dir="1" aria-label="Siguiente">›</button></div>
         </div>
-        <p class="note">Imágenes ilustrativas del promotor (recreaciones).</p>
+        <p class="note">Imágenes ilustrativas del promotor (recreaciones). Pulsa una imagen para verla en grande.</p>
       </div>
     </section>
 
@@ -789,12 +805,12 @@
     });
 
     // Galería con pestañas y flechas
-    var cur = $("#g-ext");
+    var cur = $(".slides:not([hidden])");
     $$(".tabs button").forEach(function (b) {
       b.addEventListener("click", function () {
         $$(".tabs button").forEach(function (x) { x.classList.toggle("on", x === b); x.setAttribute("aria-selected", x === b ? "true" : "false"); });
-        $("#g-ext").hidden = b.getAttribute("data-tab") !== "ext"; $("#g-int").hidden = b.getAttribute("data-tab") !== "int";
-        cur = b.getAttribute("data-tab") === "ext" ? $("#g-ext") : $("#g-int");
+        $$(".slides").forEach(function (sl) { sl.hidden = sl.id !== "g-" + b.getAttribute("data-tab"); });
+        cur = $("#g-" + b.getAttribute("data-tab")); cur.scrollLeft = 0;
       });
     });
     $$(".arrows button").forEach(function (b) { b.addEventListener("click", function () { cur.scrollBy({ left: +b.getAttribute("data-dir") * cur.clientWidth * .8, behavior: "smooth" }); }); });
