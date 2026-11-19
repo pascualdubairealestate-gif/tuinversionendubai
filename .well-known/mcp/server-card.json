@@ -1,0 +1,35 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/mcp-server-card/v1.json",
+  "version": "1.0",
+  "protocolVersion": "2025-06-18",
+  "name": "tuinversionendubai",
+  "title": "Tu inversión en Dubái · Pascual Vidal",
+  "description": "Servidor MCP de solo lectura con la información pública de Pascual Vidal, consultor inmobiliario español en Dubái (RERA #97799, Dubana Real Estate): servicios, contacto, preguntas frecuentes y guías sobre invertir en Dubái.",
+  "serverInfo": {
+    "name": "tuinversionendubai",
+    "title": "Tu inversión en Dubái · Pascual Vidal",
+    "version": "1.0.0"
+  },
+  "websiteUrl": "https://tuinversionendubai.com/",
+  "iconUrl": "https://tuinversionendubai.com/assets/img/logo-pv-512.png",
+  "endpoint": "https://tuinversionendubai.com/mcp/",
+  "transport": {
+    "type": "streamable-http",
+    "endpoint": "https://tuinversionendubai.com/mcp/"
+  },
+  "remotes": [
+    { "type": "streamable-http", "url": "https://tuinversionendubai.com/mcp/" }
+  ],
+  "capabilities": {
+    "tools": { "listChanged": false }
+  },
+  "authentication": { "required": false, "schemes": [] },
+  "tools": [
+    { "name": "info_negocio", "description": "Datos de contacto, licencia, agencia y servicios." },
+    { "name": "preguntas_frecuentes", "description": "Preguntas frecuentes sobre invertir en Dubái." },
+    { "name": "listar_paginas", "description": "Páginas y guías del blog con URL y título." },
+    { "name": "leer_pagina", "description": "Contenido en Markdown de una página de la web." },
+    { "name": "buscar", "description": "Búsqueda de texto en todas las páginas y guías." }
+  ],
+  "contact": { "url": "https://tuinversionendubai.com/contacto/" }
+}

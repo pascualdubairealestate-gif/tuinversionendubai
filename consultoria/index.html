@@ -8,6 +8,7 @@
   <link rel="canonical" href="https://tuinversionendubai.com/consultoria/" />
   <link rel="alternate" hreflang="es" href="https://tuinversionendubai.com/consultoria/" />
   <link rel="alternate" hreflang="x-default" href="https://tuinversionendubai.com/consultoria/" />
+  <link rel="alternate" type="text/markdown" href="https://tuinversionendubai.com/consultoria/index.md" title="Versión Markdown" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="es_ES" />
   <meta property="og:site_name" content="Tu inversión en Dubái" />
@@ -88,16 +89,16 @@
             <button class="link-arrow" data-open-guide>Descargar la guía gratuita <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
           </div>
         </div>
-        <form class="lead-card reveal" data-lead-form="consultoria" novalidate>
+        <form class="lead-card reveal" data-lead-form="consultoria" novalidate toolname="reservar_consultoria" tooldescription="Reserva una llamada gratuita de 20 minutos con Pascual Vidal, consultor inmobiliario español en Dubái. Requiere nombre, email, teléfono, presupuesto, objetivo y aceptar la política de privacidad.">
           <h3>Reserva tu llamada</h3>
-          <div class="field"><label for="c-name">Nombre</label><input id="c-name" name="nombre" required autocomplete="name" /></div>
+          <div class="field"><label for="c-name">Nombre</label><input id="c-name" toolparamdescription="Nombre completo" name="nombre" required autocomplete="name" /></div>
           <div class="field-row">
-            <div class="field"><label for="c-email">Email</label><input id="c-email" type="email" name="email" required autocomplete="email" /></div>
-            <div class="field"><label for="c-phone">Teléfono</label><input id="c-phone" type="tel" name="telefono" placeholder="+34" required autocomplete="tel" /></div>
+            <div class="field"><label for="c-email">Email</label><input id="c-email" toolparamdescription="Email de contacto" type="email" name="email" required autocomplete="email" /></div>
+            <div class="field"><label for="c-phone">Teléfono</label><input id="c-phone" toolparamdescription="Teléfono con prefijo internacional" type="tel" name="telefono" placeholder="+34" required autocomplete="tel" /></div>
           </div>
           <div class="field-row">
             <div class="field"><label for="c-budget">Presupuesto</label>
-              <select id="c-budget" name="presupuesto" required>
+              <select id="c-budget" toolparamdescription="Presupuesto aproximado de inversión" name="presupuesto" required>
                 <option value="">Selecciona</option>
                 <option>Menos de 250.000 €</option>
                 <option>250.000 – 500.000 €</option>
@@ -105,7 +106,7 @@
                 <option>Más de 1.000.000 €</option>
               </select></div>
             <div class="field"><label for="c-goal">Objetivo</label>
-              <select id="c-goal" name="objetivo" required>
+              <select id="c-goal" toolparamdescription="Objetivo principal de la inversión" name="objetivo" required>
                 <option value="">Selecciona</option>
                 <option>Rentabilidad por alquiler</option>
                 <option>Revalorización / reventa</option>
@@ -114,7 +115,7 @@
                 <option>Crear empresa en Dubái</option>
               </select></div>
           </div>
-          <div class="field"><label for="c-msg">Mensaje (opcional)</label><textarea id="c-msg" name="mensaje" rows="3"></textarea></div>
+          <div class="field"><label for="c-msg">Mensaje (opcional)</label><textarea id="c-msg" toolparamdescription="Comentario opcional" name="mensaje" rows="3"></textarea></div>
           <label class="consent"><input type="checkbox" name="consentimiento" required /> <span>Acepto la <a href="/privacidad/" target="_blank">política de privacidad</a> y recibir comunicaciones.</span></label>
           <button class="btn btn-primary btn-block" type="submit">Quiero mi consultoría gratuita</button>
           <p class="form-msg" role="status" aria-live="polite"></p>
@@ -137,7 +138,7 @@
         </div>
       </div>
       <nav class="footer-links">
-        <a href="/#sobre-mi">Sobre mí</a><a href="/sobre-pascual-vidal/">Quién es Pascual Vidal</a><a href="/#servicios">Servicios</a><a href="/#proyectos">Proyectos</a><a href="/#emiratos">Otros emiratos</a><a href="/#videos">Vídeos</a><a href="/#preguntas">Preguntas frecuentes</a><a href="/#boletin">Noticias</a><a href="/blog/">Blog</a><a href="/#contacto">Contacto</a>
+        <a href="/sobre-pascual-vidal/">Sobre mí</a><a href="/#servicios">Servicios</a><a href="/#proyectos">Proyectos</a><a href="/#emiratos">Otros emiratos</a><a href="/#videos">Vídeos</a><a href="/#preguntas">Preguntas frecuentes</a><a href="/#boletin">Noticias</a><a href="/blog/">Blog</a><a href="/contacto/">Contacto</a>
       </nav>
       <div class="footer-social">
         <a href="https://www.instagram.com/pascual.dubairealestate/" target="_blank" rel="noopener">Instagram</a>

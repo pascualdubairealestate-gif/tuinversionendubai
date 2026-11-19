@@ -68,6 +68,7 @@ def page(path, title, desc, body, ld, og_image="/assets/img/og/pascual-vidal.jpg
   <link rel="canonical" href="{url}" />
   <link rel="alternate" hreflang="es" href="{url}" />
   <link rel="alternate" hreflang="x-default" href="{url}" />
+  <link rel="alternate" type="text/markdown" href="{url}index.md" title="Versión Markdown" />
   <meta property="og:type" content="{og_type}" />
   <meta property="og:locale" content="es_ES" />
   <meta property="og:site_name" content="Tu inversión en Dubái" />
@@ -1056,6 +1057,35 @@ pages["_autor"] = ("/sobre-pascual-vidal/", page("/sobre-pascual-vidal/", "Pascu
     "Quién es Pascual Vidal: consultor inmobiliario español en Dubái registrado en RERA (n.º 97799), con más de 90 operaciones. Inversión, postventa, alquiler y Golden Visa.",
     about_body, about_ld, og_type="profile"))
 
+# ---------------------------------------------------------------- Contacto
+contacto_body = """    <article class="article legal">
+      <header class="article-head container">
+        <nav class="crumbs" aria-label="Migas de pan"><a href="/">Inicio</a><span>/</span><span>Contacto</span></nav>
+        <h1>Contacto</h1>
+        <p class="article-lead">Hablemos de tu inversión en Dubái. Respondo personalmente, en español, en menos de 24 horas.</p>
+      </header>
+      <div class="article-layout container legal-layout">
+        <div class="prose">
+          <h2>Datos de contacto</h2>
+          <ul>
+            <li><strong>Teléfono y WhatsApp:</strong> <a href="tel:+971507963006">+971 50 796 3006</a> · <a href="""" + WA_LINK + """" target="_blank" rel="noopener">Escribir por WhatsApp</a></li>
+            <li><strong>Agencia:</strong> Dubana Real Estate, Dubái (Emiratos Árabes Unidos)</li>
+            <li><strong>Licencia:</strong> consultor registrado en el Dubai Land Department, RERA n.º 97799</li>
+            <li><strong>Instagram:</strong> <a href="https://www.instagram.com/pascual.dubairealestate/" target="_blank" rel="noopener">@pascual.dubairealestate</a></li>
+            <li><strong>YouTube:</strong> <a href="https://www.youtube.com/@pascual.dubairealestate" target="_blank" rel="noopener">@pascual.dubairealestate</a></li>
+            <li><strong>Idiomas:</strong> español e inglés</li>
+          </ul>
+          <p>¿Quieres saber más sobre mí antes de escribir? Lee <a href="/sobre-pascual-vidal/">quién es Pascual Vidal</a>.</p>
+        </div>
+      </div>
+    </article>
+""" + contact
+contacto_ld = {"@context": "https://schema.org", "@type": "ContactPage", "name": "Contacto · Tu inversión en Dubái", "url": SITE + "/contacto/",
+               "inLanguage": "es", "about": {"@id": ORG_ID}, "mainEntity": {"@id": ORG_ID}}
+pages["_contacto"] = ("/contacto/", page("/contacto/", "Contacto · Pascual Vidal, consultor inmobiliario en Dubái",
+    "Contacta con Pascual Vidal, consultor inmobiliario español en Dubái (RERA #97799): teléfono y WhatsApp +971 50 796 3006, formulario y redes.",
+    contacto_body, contacto_ld, og_type="website", body_attrs=" data-no-guide-popup"))
+
 # ---------------------------------------------------------------- 404
 nf_body = """    <section class="notfound container">
       <p class="eyebrow"><span class="dot"></span>Error 404</p>
@@ -1068,7 +1098,7 @@ nf = page("/404/", "Página no encontrada · Tu inversión en Dubái", "La pági
           {"@context": "https://schema.org", "@type": "WebPage", "name": "Página no encontrada"}, og_type="website")
 nf = nf.replace('<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />', '<meta name="robots" content="noindex, follow" />')
 nf = re.sub(r'\s*<link rel="(canonical|alternate)"[^>]*>', "", nf)
-open(ROOT + "/404.html", "w").write(nf)
+open(ROOT + "/404.html", "w").write(re.sub(r"\n  <link rel=\"alternate\" type=\"text/markdown\"[^\n]*", "", nf))
 
 # ---------------------------------------------------------------- llms.txt (resumen para buscadores con IA: ChatGPT, Perplexity, Gemini, Claude…)
 def _txt(x):
@@ -1082,11 +1112,13 @@ llms = ["# Tu inversión en Dubái · Pascual Vidal", "",
         "- Idiomas: español e inglés. Clientes de España, México, Colombia, Argentina, Chile, Perú y Estados Unidos.",
         "- La compra se puede hacer entera en remoto; primera consultoría gratuita de 20 minutos.",
         "- Agencia: opera con Dubana Real Estate (Dubái).",
-        "- Contacto: teléfono y WhatsApp +971 50 796 3006 · WhatsApp " + WA_LINK + " · formulario en " + SITE + "/#contacto",
-        "- YouTube: https://www.youtube.com/@pascual.dubairealestate · Instagram: https://www.instagram.com/pascual.dubairealestate/", "",
+        "- Contacto: teléfono y WhatsApp +971 50 796 3006 · WhatsApp " + WA_LINK + " · página de contacto " + SITE + "/contacto/",
+        "- YouTube: https://www.youtube.com/@pascual.dubairealestate · Instagram: https://www.instagram.com/pascual.dubairealestate/",
+        "- Para agentes: cada página tiene versión Markdown (añade index.md a la URL o pide Accept: text/markdown) y hay un servidor MCP de solo lectura en " + SITE + "/mcp/ (ficha en " + SITE + "/.well-known/mcp/server-card.json).", "",
         "## Páginas principales", "",
         f"- [Inicio]({SITE}/): servicios, proyectos destacados y preguntas frecuentes sobre invertir en Dubái.",
         f"- [Quién es Pascual Vidal]({SITE}/sobre-pascual-vidal/): trayectoria, licencia RERA y forma de trabajar.",
+        f"- [Contacto]({SITE}/contacto/): teléfono, WhatsApp, formulario y redes.",
         f"- [Consultoría gratuita]({SITE}/consultoria/): reserva de llamada.", "",
         "## Guías (blog)", ""]
 for a in ARTICLES:
@@ -1111,9 +1143,13 @@ for key, (path, doc) in pages.items():
     open(d + "index.html", "w").write(doc)
     print("ok", path)
 
-LASTMOD = {"/": TODAY, "/blog/": max(a["date"] for a in ARTICLES), "/sobre-pascual-vidal/": TODAY, "/guia/": TODAY, "/al-marjan-island/": TODAY}
+LASTMOD = {"/contacto/": TODAY, "/": TODAY, "/blog/": max(a["date"] for a in ARTICLES), "/sobre-pascual-vidal/": TODAY, "/guia/": TODAY, "/al-marjan-island/": TODAY}
 LASTMOD.update({f'/blog/{a["slug"]}/': a["date"] for a in ARTICLES})
-urls = ["/", "/guia/", "/al-marjan-island/", "/sobre-pascual-vidal/", "/blog/"] + [f'/blog/{a["slug"]}/' for a in ARTICLES]
+urls = ["/", "/guia/", "/al-marjan-island/", "/sobre-pascual-vidal/", "/contacto/", "/blog/"] + [f'/blog/{a["slug"]}/' for a in ARTICLES]
 sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
     f"  <url><loc>{SITE}{u}</loc><lastmod>{LASTMOD[u]}</lastmod></url>\n" for u in urls) + "</urlset>\n"
 open(ROOT + "/sitemap.xml", "w").write(sm)
+
+# Versiones Markdown (index.md) de cada página, para agentes de IA
+import runpy
+runpy.run_path(os.path.join(os.path.dirname(os.path.abspath(__file__)), "markdown.py"), run_name="__main__")

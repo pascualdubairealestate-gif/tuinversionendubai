@@ -99,9 +99,40 @@ ErrorDocument 404 /404.html
   # /index.html y /carpeta/index.html -> URL limpia (evita contenido duplicado)
   RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]
   RewriteRule ^(.*/)?index\.html$ /$1 [R=301,L]
+  # Servidor MCP: /mcp sin barra no se redirige (un 301 rompería los POST de los agentes)
+  RewriteRule ^mcp$ /mcp/index.php [L]
   # /blog -> /blog/ (barra final, como en el sitemap y las canónicas)
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^(.+[^/])$ /$1/ [R=301,L]
+</IfModule>
+
+# ----- Agentes de IA: Markdown bajo demanda (Accept: text/markdown) -----
+# Cada carpeta tiene index.md generado por tools/markdown.py. Si el agente pide
+# Markdown, se sirve ese archivo en la misma URL; los navegadores siguen recibiendo HTML.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_ACCEPT} text/markdown [NC]
+  RewriteCond %{DOCUMENT_ROOT}/$1index.md -f
+  RewriteRule ^(.*/)?$ /$1index.md [L]
+</IfModule>
+<IfModule mod_mime.c>
+  AddType text/markdown .md
+  AddCharset utf-8 .md
+</IfModule>
+<IfModule mod_headers.c>
+  # La misma URL devuelve HTML o Markdown según Accept: avisar a cachés y CDN
+  <FilesMatch "^index\.(html|md)$">
+    Header append Vary "Accept"
+  </FilesMatch>
+  # RFC 8288: anunciar llms.txt y la versión Markdown de cada página (ruta relativa a la carpeta)
+  <FilesMatch "^index\.html$">
+    Header add Link "</llms.txt>; rel=\"describedby\"; type=\"text/plain\""
+    Header add Link "<index.md>; rel=\"alternate\"; type=\"text/markdown\""
+    Header add Link "</.well-known/mcp/server-card.json>; rel=\"describedby\"; type=\"application/json\""
+  </FilesMatch>
+  <FilesMatch "^(index\.md|llms\.txt|server-card\.json)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
 </IfModule>
 
 # llms.txt y robots.txt en texto plano UTF-8 (tildes correctas)

@@ -608,6 +608,104 @@ window.__PV__ = {
     $$("[data-year]").forEach(function (y) { y.textContent = new Date().getFullYear(); });
   }
 
+  /* ---------- WebMCP: herramientas para agentes de IA en el navegador ----------
+     https://webmachinelearning.github.io/webmcp/ — solo se activa si el navegador expone navigator.modelContext. */
+  function initWebMCP() {
+    var mc = navigator.modelContext;
+    if (!mc || (typeof mc.registerTool !== "function" && typeof mc.provideContext !== "function")) return;
+    var ORIGIN = "https://tuinversionendubai.com";
+    var text = function (obj) { return { content: [{ type: "text", text: typeof obj === "string" ? obj : JSON.stringify(obj, null, 2) }] }; };
+    var BUDGETS = ["Menos de 250.000 €", "250.000 – 500.000 €", "500.000 – 1.000.000 €", "Más de 1.000.000 €"];
+    var GOALS = ["Rentabilidad por alquiler", "Revalorización / reventa", "Golden Visa / residencia", "Segunda vivienda", "Crear empresa en Dubái"];
+    var base = function (form) {
+      var p = { formulario: form, pagina: location.href, fecha: new Date().toISOString(), origen_agente: "webmcp" };
+      var u = getUTM(); for (var k in u) p[k] = u[k];
+      return p;
+    };
+    var checkEmail = function (e) { if (!EMAIL_RE.test(String(e || "").trim())) throw new Error("Email no válido"); return String(e).trim(); };
+    var needConsent = function (a) { if (!a || a.acepta_privacidad !== true) throw new Error("El usuario debe aceptar la política de privacidad (" + ORIGIN + "/privacidad/)"); };
+
+    var tools = [
+      {
+        name: "info_contacto",
+        description: "Datos de contacto de Pascual Vidal, consultor inmobiliario español en Dubái (RERA #97799, Dubana Real Estate): teléfono, WhatsApp, redes y páginas de contacto.",
+        inputSchema: { type: "object", properties: {} },
+        annotations: { readOnlyHint: true },
+        execute: function () {
+          return text({
+            nombre: "Pascual Vidal · Tu inversión en Dubái", telefono: "+971507963006",
+            whatsapp: CFG.whatsappLink, contacto: ORIGIN + "/contacto/", consultoria_gratuita: ORIGIN + "/consultoria/",
+            instagram: "https://www.instagram.com/pascual.dubairealestate/", youtube: CFG.youtubeChannel, idiomas: ["español", "inglés"]
+          });
+        }
+      },
+      {
+        name: "buscar_preguntas_frecuentes",
+        description: "Busca en las preguntas frecuentes de esta página sobre invertir en Dubái (costes, impuestos, Golden Visa, compra en remoto, alquiler). Sin texto devuelve todas.",
+        inputSchema: { type: "object", properties: { buscar: { type: "string", description: "Texto a buscar (opcional)" } } },
+        annotations: { readOnlyHint: true },
+        execute: function (args) {
+          var q = String((args && args.buscar) || "").toLowerCase();
+          var items = $$("details.faq-item").map(function (d) {
+            var s = d.querySelector("summary"), p = d.querySelector("p");
+            return { pregunta: s ? s.textContent.trim() : "", respuesta: p ? p.textContent.trim() : "" };
+          }).filter(function (i) { return !q || (i.pregunta + " " + i.respuesta).toLowerCase().indexOf(q) !== -1; });
+          return text(items.length ? items : "No hay preguntas que coincidan en esta página. Más información: " + ORIGIN + "/llms.txt");
+        }
+      },
+      {
+        name: "solicitar_consultoria",
+        description: "Envía a Pascual Vidal una solicitud de consultoría gratuita (llamada de 20 min) en nombre del usuario. Úsala solo con datos que el usuario haya dado y si acepta la política de privacidad.",
+        inputSchema: {
+          type: "object",
+          required: ["nombre", "email", "telefono", "presupuesto", "objetivo", "acepta_privacidad"],
+          properties: {
+            nombre: { type: "string", description: "Nombre completo" },
+            email: { type: "string", format: "email" },
+            telefono: { type: "string", description: "Teléfono con prefijo internacional, p. ej. +34 600 000 000" },
+            presupuesto: { type: "string", enum: BUDGETS },
+            objetivo: { type: "string", enum: GOALS },
+            mensaje: { type: "string", description: "Comentario opcional" },
+            acepta_privacidad: { type: "boolean", description: "El usuario acepta la política de privacidad y recibir comunicaciones" }
+          }
+        },
+        execute: function (a) {
+          needConsent(a);
+          if (!String(a.nombre || "").trim()) throw new Error("Falta el nombre");
+          if (String(a.telefono || "").replace(/\D/g, "").length < 7) throw new Error("Teléfono no válido");
+          var p = base("consultoria");
+          p.nombre = String(a.nombre).trim(); p.email = checkEmail(a.email); p.telefono = String(a.telefono).trim();
+          p.presupuesto = BUDGETS.indexOf(a.presupuesto) !== -1 ? a.presupuesto : "";
+          p.objetivo = GOALS.indexOf(a.objetivo) !== -1 ? a.objetivo : "";
+          p.mensaje = String(a.mensaje || "").trim(); p.consentimiento = true;
+          return sendLead(p).then(function () { return text("Solicitud enviada. Pascual responderá en menos de 24 h por email o WhatsApp."); });
+        }
+      },
+      {
+        name: "descargar_guia",
+        description: "Envía al email del usuario la guía gratuita «Invertir en Dubái paso a paso» (10 pasos, PDF) y devuelve el enlace de descarga.",
+        inputSchema: {
+          type: "object", required: ["email", "acepta_privacidad"],
+          properties: {
+            email: { type: "string", format: "email" },
+            nombre: { type: "string" },
+            acepta_privacidad: { type: "boolean", description: "El usuario acepta la política de privacidad y recibir comunicaciones" }
+          }
+        },
+        execute: function (a) {
+          needConsent(a);
+          var p = base("guia"); p.email = checkEmail(a.email); p.nombre = String(a.nombre || "").trim(); p.consentimiento = true;
+          return sendLead(p).then(function () {
+            try { localStorage.setItem("pv_guide_done", "1"); } catch (e) {}
+            return text({ estado: "Guía enviada por email", pdf: ORIGIN + (CFG.guideUrl || "/guia/") });
+          });
+        }
+      }
+    ];
+    if (typeof mc.registerTool === "function") tools.forEach(function (t) { try { mc.registerTool(t); } catch (e) {} });
+    else mc.provideContext({ tools: tools });
+  }
+
   function boot() {
     safe(initSplash, "splash");
     safe(initNav, "nav");
@@ -625,6 +723,7 @@ window.__PV__ = {
     safe(initGuidePopup, "guide");
     safe(initYear, "year");
     safe(initConsent, "consent");
+    safe(initWebMCP, "webmcp");
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();

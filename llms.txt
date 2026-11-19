@@ -6,13 +6,15 @@ Datos clave:
 - Idiomas: español e inglés. Clientes de España, México, Colombia, Argentina, Chile, Perú y Estados Unidos.
 - La compra se puede hacer entera en remoto; primera consultoría gratuita de 20 minutos.
 - Agencia: opera con Dubana Real Estate (Dubái).
-- Contacto: teléfono y WhatsApp +971 50 796 3006 · WhatsApp https://wa.me/message/QI3A7Q5BXFTCA1 · formulario en https://tuinversionendubai.com/#contacto
+- Contacto: teléfono y WhatsApp +971 50 796 3006 · WhatsApp https://wa.me/message/QI3A7Q5BXFTCA1 · página de contacto https://tuinversionendubai.com/contacto/
 - YouTube: https://www.youtube.com/@pascual.dubairealestate · Instagram: https://www.instagram.com/pascual.dubairealestate/
+- Para agentes: cada página tiene versión Markdown (añade index.md a la URL o pide Accept: text/markdown) y hay un servidor MCP de solo lectura en https://tuinversionendubai.com/mcp/ (ficha en https://tuinversionendubai.com/.well-known/mcp/server-card.json).
 
 ## Páginas principales
 
 - [Inicio](https://tuinversionendubai.com/): servicios, proyectos destacados y preguntas frecuentes sobre invertir en Dubái.
 - [Quién es Pascual Vidal](https://tuinversionendubai.com/sobre-pascual-vidal/): trayectoria, licencia RERA y forma de trabajar.
+- [Contacto](https://tuinversionendubai.com/contacto/): teléfono, WhatsApp, formulario y redes.
 - [Consultoría gratuita](https://tuinversionendubai.com/consultoria/): reserva de llamada.
 
 ## Guías (blog)

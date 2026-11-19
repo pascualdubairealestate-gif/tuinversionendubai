@@ -1,5 +1,10 @@
 # Buscadores y asistentes de IA: bienvenidos a todo el contenido público.
+# Content Signals (https://contentsignals.org): cómo se puede usar el contenido.
+#   search   = indexar y mostrar en resultados de búsqueda
+#   ai-input = usarlo en respuestas de IA en tiempo real (citas, resúmenes)
+#   ai-train = entrenar modelos de IA
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 Disallow: /crm/
 Disallow: /tools/
@@ -19,6 +24,7 @@ User-agent: Applebot-Extended
 User-agent: Bingbot
 User-agent: meta-externalagent
 User-agent: CCBot
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 Disallow: /crm/
 Disallow: /tools/
