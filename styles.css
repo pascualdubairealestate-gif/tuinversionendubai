@@ -855,3 +855,24 @@ body, .splash { background: var(--sand-bg); }
 /* Página 404 */
 .notfound { min-height: 60vh; display: grid; place-content: center; text-align: center; gap: 14px; padding: 140px 20px 80px; }
 .notfound .post-links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+
+/* ===== Proyecto estrella ===== */
+.featured { background: #f6f1e8; color: #0b1424; --ivory: #0b1424; --mute: #4a5262; --line: rgba(11, 20, 36, .14); }
+.featured .h2 em { color: var(--amber); }
+.featured-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
+.featured-media { position: relative; display: block; border-radius: 24px; overflow: hidden; box-shadow: 0 40px 80px -40px rgba(11, 20, 36, .45); }
+.featured-media img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; transition: transform .8s var(--ease-out); }
+.featured-media:hover img { transform: scale(1.03); }
+.featured-badge { position: absolute; left: 16px; top: 16px; background: var(--amber); color: #0b1424; font-weight: 800; font-size: 13px; letter-spacing: .04em; padding: 8px 14px; border-radius: 99px; }
+.featured-status { position: absolute; left: 16px; bottom: 16px; background: rgba(7, 13, 24, .72); color: #fff; font-weight: 700; font-size: 13px; padding: 8px 14px; border-radius: 99px; }
+.featured-lead { color: #4a5262; font-size: 17px; line-height: 1.65; margin: 0 0 24px; max-width: 52ch; }
+.featured-kpis { list-style: none; padding: 0; margin: 0 0 28px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.featured-kpis li { background: #fff; border-radius: 14px; padding: 14px 16px; }
+.featured-kpis b { display: block; font-family: var(--f-display); font-weight: 600; font-size: 24px; line-height: 1.1; }
+.featured-kpis span { font-size: 13px; color: #4a5262; }
+.featured-ctas { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn-ghost-dark { background: transparent; color: #0b1424; border: 1.5px solid rgba(11, 20, 36, .25); }
+.btn-ghost-dark:hover { background: rgba(11, 20, 36, .05); }
+@media (max-width: 900px) { .featured-grid { grid-template-columns: minmax(0, 1fr); } }
+.featured .eyebrow { color: var(--amber-ink); }
