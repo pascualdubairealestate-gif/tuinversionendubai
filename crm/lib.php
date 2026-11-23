@@ -504,3 +504,57 @@ function send_guide($to, $nombre) {
   $headers = 'From: ' . smtp_header('Pascual Vidal') . " <$from>\r\nReply-To: " . (($cfg['notify'] ?? '') ?: $from) . "\r\nMIME-Version: 1.0\r\nContent-Type: $ctype";
   return @mail($to, smtp_header($subject), $body, $headers, "-f$from") ? '' : 'El servidor no pudo enviar el correo';
 }
+
+/* ---------- Presentación de proyecto por correo (Ardee Views) ---------- */
+// La presentación pesa ~25 MB: demasiado para adjuntarla (Gmail admite 25 MB y el adjunto crece un 35 %),
+// así que el correo lleva enlaces de descarga a la presentación y a los planos.
+const PROJECT_DOCS = [
+  'ardee-views' => [
+    'nombre' => 'Ardee Views · Al Marjan Island',
+    'pdf' => 'docs/ardee-views-presentacion.pdf',
+    'planos' => 'docs/ardee-views-planos.pdf',
+    'landing' => '/al-marjan-island/',
+  ],
+];
+
+function send_project_doc($key, $to, $nombre) {
+  $d = PROJECT_DOCS[$key] ?? null;
+  if (!$d) return 'Proyecto desconocido';
+  $pdf = dirname(__DIR__) . '/assets/' . $d['pdf'];
+  if (!is_file($pdf)) return 'No se encuentra la presentación';
+  $cfg = config();
+  $host = preg_replace('/^www\./', '', preg_replace('/[^a-z0-9.-]/i', '', preg_replace('/:\d+$/', '', $_SERVER['HTTP_HOST'] ?? 'localhost')));
+  $site = "https://$host";
+  $first = $nombre ? strtok($nombre, ' ') : '';
+  $hola = $first ? 'Hola ' . htmlspecialchars($first, ENT_QUOTES, 'UTF-8') . ',' : 'Hola,';
+  $wa = 'https://wa.me/message/QI3A7Q5BXFTCA1';
+  $f = 'font-family:Helvetica,Arial,sans-serif;';
+  $pres = $site . '/assets/' . $d['pdf'] . '?v=' . filemtime($pdf);
+  $plan = $site . '/assets/' . $d['planos'];
+  $btn = function ($href, $label, $bg, $color) use ($f) {
+    return '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 10px;"><tr><td style="border-radius:999px;background:' . $bg . ';">' .
+      '<a href="' . $href . '" style="display:inline-block;padding:12px 24px;' . $f . 'font-size:15px;font-weight:bold;color:' . $color . ';text-decoration:none;">' . $label . '</a></td></tr></table>';
+  };
+  $html = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f4f0;"><tr><td align="center" style="padding:12px;">' .
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:14px;"><tr><td style="padding:28px;' . $f . 'font-size:16px;line-height:1.6;color:#0b1424;">' .
+    "<p style=\"margin:0 0 14px;\">$hola</p>" .
+    '<p style="margin:0 0 14px;">Gracias por tu interés en <b>' . $d['nombre'] . '</b>. Aquí tienes la presentación completa del proyecto: el destino, Ardee Downtown, las residencias, los planos, los precios y el plan de pagos 50/50.</p>' .
+    $btn($pres, 'Descargar la presentación (PDF)', '#f7931e', '#0b1424') .
+    $btn($plan, 'Ver todos los planos', '#0b1424', '#ffffff') .
+    '<p style="margin:18px 0 14px;">La primera torre está vendida, pero estoy consiguiendo unidades que quedan libres por cancelación, y la segunda torre se puede reservar con una expresión de interés de 30.000 AED. Si me dices tu presupuesto y la tipología que buscas, te paso la disponibilidad real.</p>' .
+    '<p style="margin:0 0 14px;">Responde a este correo o <a href="' . $wa . '" style="color:#c76a00;">escríbeme por WhatsApp</a>.</p>' .
+    '<p style="margin:0;">Un abrazo,<br><b>Pascual Vidal</b><br><span style="color:#5a6474;font-size:13px;">Consultor inmobiliario en Dubái · RERA #97799</span></p>' .
+    '</td></tr></table>' .
+    '<p style="margin:12px 0 0;' . $f . 'font-size:12px;color:#8a919c;">Recibes este correo porque pediste información de ' . $d['nombre'] . ' en ' . $host . '. Si no quieres recibir más correos, responde «baja».</p>' .
+    '</td></tr></table>';
+  $text = ($first ? "Hola $first," : 'Hola,') . "\n\nGracias por tu interés en " . $d['nombre'] . ". Aquí tienes la presentación completa del proyecto:\n$pres\n\nTodos los planos:\n$plan\n\n" .
+    "La primera torre está vendida, pero estoy consiguiendo unidades por cancelación, y la segunda torre se puede reservar con una expresión de interés de 30.000 AED. Dime tu presupuesto y la tipología que buscas y te paso la disponibilidad real.\n\n" .
+    "Responde a este correo o escríbeme por WhatsApp: $wa\n\nUn abrazo,\nPascual Vidal\nConsultor inmobiliario en Dubái · RERA #97799\n\nSi no quieres recibir más correos, responde «baja».";
+  $subject = 'Presentación de ' . $d['nombre'];
+  if (!empty($cfg['smtp_user']) && !empty($cfg['smtp_pass'])) return smtp_send($cfg, $to, $subject, $html, $text);
+  if (!function_exists('mail')) return 'El servidor no permite enviar correos';
+  [$ctype, $body] = mime_body($html, $text);
+  $from = "noreply@$host";
+  $headers = 'From: ' . smtp_header('Pascual Vidal') . " <$from>\r\nReply-To: " . (($cfg['notify'] ?? '') ?: $from) . "\r\nMIME-Version: 1.0\r\nContent-Type: $ctype";
+  return @mail($to, smtp_header($subject), $body, $headers, "-f$from") ? '' : 'El servidor no pudo enviar el correo';
+}

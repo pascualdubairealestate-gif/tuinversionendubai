@@ -700,11 +700,11 @@
     var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
     var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     var PROYECTO = "Ardee Views · Al Marjan Island";
-    var DOCS = { planos: "/assets/docs/ardee-views-planos.pdf", brochure: "/assets/docs/ardee-views-catalogo.pdf" };
+    var DOCS = { planos: "/assets/docs/ardee-views-planos.pdf", brochure: "/assets/docs/ardee-views-presentacion.pdf" };
     var MODES = {
       disponibilidad: { tag: "Lanzamiento · plazas limitadas", title: "Consultar disponibilidad", sub: "Te envío las unidades libres, precios por planta y el plan de pagos detallado.", btn: "Consultar disponibilidad", tipo: true },
       planos: { tag: "PDF · 27 planos · 4,5 MB", title: "Todos los planos del proyecto", sub: "Recibe el PDF con todas las distribuciones de estudios, 1 y 2 dormitorios.", btn: "Recibir los planos", tipo: false },
-      brochure: { tag: "PDF · catálogo · 23 MB", title: "Descarga el brochure", sub: "El catálogo completo de Ardee Views: arquitectura, servicios, interiores y ubicación.", btn: "Descargar el brochure", tipo: false },
+      brochure: { tag: "PDF · presentación · 43 páginas", title: "Descarga la presentación", sub: "La presentación completa de Ardee Views: destino, residencias, planos, precios y plan de pagos. También te la envío por correo.", btn: "Descargar el brochure", tipo: false },
       contacto: { tag: "Consultoría gratuita", title: "Habla con un consultor", sub: "Cuéntame tu presupuesto y tu objetivo y te digo con sinceridad si encaja contigo.", btn: "Quiero que me contactes", tipo: true }
     };
 
@@ -733,10 +733,10 @@
       var doc = DOCS[mode];
       var html = '<div class="done"><div class="ok">✓</div><h3>¡Gracias, ' + nombre.replace(/[<>&"]/g, "") + '!</h3>';
       if (doc) {
-        html += '<p>Aquí lo tienes. También te escribo a ' + email.replace(/[<>&"]/g, "") + ' para resolver tus dudas.</p>' +
-          '<a class="btn btn-block" href="' + doc + '" target="_blank" rel="noopener" download>' + (mode === "planos" ? "Descargar los planos (PDF)" : "Descargar el brochure (PDF)") + '</a>';
+        html += '<p>Aquí lo tienes. Además te he enviado la presentación completa a ' + email.replace(/[<>&"]/g, "") + '.</p>' +
+          '<a class="btn btn-block" href="' + doc + '" target="_blank" rel="noopener" download>' + (mode === "planos" ? "Descargar los planos (PDF)" : "Descargar la presentación (PDF)") + '</a>';
       } else {
-        html += '<p>Te escribo en menos de 24 horas a ' + email.replace(/[<>&"]/g, "") + ' y por WhatsApp con la disponibilidad y los precios.</p>';
+        html += '<p>Te acabo de enviar la presentación completa del proyecto a ' + email.replace(/[<>&"]/g, "") + '. En menos de 24 horas te escribo también por WhatsApp con la disponibilidad.</p>';
       }
       html += '<a class="btn btn-wa btn-block" data-wa href="https://wa.me/message/QI3A7Q5BXFTCA1" target="_blank" rel="noopener">Escríbeme ya por WhatsApp</a></div>';
       form.outerHTML = html;

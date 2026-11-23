@@ -141,7 +141,9 @@ if ($action === 'lead') {
     @mail($notify, $subj, $msg, "From: CRM <noreply@$host>\r\nContent-Type: text/plain; charset=UTF-8");
   }
   // Guía: se responde ya a la web y el correo con el PDF sale justo después, sin hacer esperar al visitante.
-  if ($form === 'guia' && filter_var($email, FILTER_VALIDATE_EMAIL) && rate('guiamail', 5, 3600)) {
+  $docKey = '';
+  if ($form === 'dossier' && stripos((string) ($b['proyecto'] ?? ''), 'Ardee Views') !== false) $docKey = 'ardee-views';
+  if (($form === 'guia' || $docKey) && filter_var($email, FILTER_VALIDATE_EMAIL) && rate('guiamail', 5, 3600)) {
     http_response_code(200);
     header('Content-Type: application/json; charset=utf-8');
     header('Cache-Control: no-store');
@@ -150,12 +152,13 @@ if ($action === 'lead') {
     elseif (function_exists('litespeed_finish_request')) litespeed_finish_request();
     else { @ob_end_flush(); flush(); }
     ignore_user_abort(true);
-    $err = send_guide($email, $res[0]['nombre'] ?? '');
+    $err = $docKey ? send_project_doc($docKey, $email, $res[0]['nombre'] ?? '') : send_guide($email, $res[0]['nombre'] ?? '');
+    $que = $docKey ? 'Presentación de ' . PROJECT_DOCS[$docKey]['nombre'] : 'Guía';
     $id = $res[0]['id'];
-    with_lock('leads', function () use ($id, $err) {
+    with_lock('leads', function () use ($id, $err, $que, $docKey) {
       $leads = store_read('leads', []);
       foreach ($leads as $i => $l) if ($l['id'] === $id) {
-        activity($leads[$i], $err === '' ? '📎 Guía enviada por email (PDF adjunto)' : '⚠ No se pudo enviar la guía por email: ' . $err, 'sistema');
+        activity($leads[$i], $err === '' ? '📎 ' . $que . ' enviada por email' . ($docKey ? ' (enlace de descarga)' : ' (PDF adjunto)') : '⚠ No se pudo enviar por email (' . $que . '): ' . $err, 'sistema');
         store_write('leads', $leads);
       }
     });
