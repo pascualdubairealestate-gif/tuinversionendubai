@@ -124,14 +124,20 @@ function is_setup() { return !empty(config()['hash']); }
 function authed() {
   crm_session();
   $cfg = config();
-  return !empty($_SESSION['ok']) && !empty($cfg['v']) && hash_equals($cfg['v'], (string) ($_SESSION['v'] ?? ''));
+  if (empty($_SESSION['ok'])) return false;
+  // Invitado: su sesión depende de la contraseña de invitado (si la cambias o la quitas, se cierra).
+  $key = !empty($_SESSION['guest']) ? ($cfg['gv'] ?? '') : ($cfg['v'] ?? '');
+  if (!empty($_SESSION['guest']) && empty($cfg['guest_hash'])) return false;
+  return $key !== '' && hash_equals($key, (string) ($_SESSION['v'] ?? ''));
 }
+function is_guest() { crm_session(); return !empty($_SESSION['guest']); }
 
-function login_session() {
+function login_session($guest = false) {
   crm_session();
   session_regenerate_id(true);
   $_SESSION['ok'] = 1;
-  $_SESSION['v'] = config()['v'];
+  $_SESSION['guest'] = $guest ? 1 : 0;
+  $_SESSION['v'] = $guest ? config()['gv'] : config()['v'];
   $_SESSION['csrf'] = bin2hex(random_bytes(16));
 }
 

@@ -17,6 +17,7 @@ function body() {
 
 function require_auth($write = true) {
   if (!authed()) json_out(['error' => 'auth'], 401);
+  if ($write && is_guest()) json_out(['error' => 'Modo invitado: puedes verlo todo, pero no modificar nada.'], 403);
   if ($write) {
     $t = $_SERVER['HTTP_X_CSRF'] ?? '';
     if (!$t || !hash_equals(csrf(), $t)) json_out(['error' => 'csrf'], 403);
@@ -178,7 +179,8 @@ if ($action === 'state') {
   if (in_array('Manual', array_column(store_read('leads', []), 'origen'), true)) {
     with_lock('leads', function () { $ls = store_read('leads', []); foreach ($ls as &$l) if (($l['origen'] ?? '') === 'Manual') $l['origen'] = 'Directo'; unset($l); store_write('leads', $ls); });
   }
-  json_out(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'feed' => $cfg['feed_key'] ?? '', 'colores' => $cfg['colores'] ?? null, 'evcolores' => (object) store_read('evcolores', []), 'smtp' => $cfg['smtp_user'] ?? '', 'smtp_name' => $cfg['smtp_name'] ?? '', 'smtp_host' => $cfg['smtp_host'] ?? 'smtp.gmail.com', 'smtp_port' => (int) ($cfg['smtp_port'] ?? 465), 'csrf' => csrf()]);
+  $g = is_guest();
+  json_out(['invitado' => $g, 'guest_on' => !$g && !empty($cfg['guest_hash'])] + array_merge(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'feed' => $cfg['feed_key'] ?? '', 'colores' => $cfg['colores'] ?? null, 'evcolores' => (object) store_read('evcolores', []), 'smtp' => $cfg['smtp_user'] ?? '', 'smtp_name' => $cfg['smtp_name'] ?? '', 'smtp_host' => $cfg['smtp_host'] ?? 'smtp.gmail.com', 'smtp_port' => (int) ($cfg['smtp_port'] ?? 465), 'csrf' => csrf()], $g ? ['notify' => '', 'ics' => !empty($cfg['ics']) ? 'oculto' : '', 'feed' => '', 'smtp' => '', 'smtp_name' => '', 'smtp_host' => 'smtp.gmail.com', 'smtp_port' => 465] : []));
 }
 
 if ($action === 'save' && $method === 'POST') {
@@ -279,8 +281,18 @@ if ($action === 'settings' && $method === 'POST') {
       }
       $cfg['colores'] = $rules;
     }
+    // Acceso de invitado (solo lectura)
+    if (!empty($b['guest_pass'])) {
+      $g = (string) $b['guest_pass'];
+      if (strlen($g) < 8) return ['error' => 'La contraseña de invitado necesita al menos 8 caracteres'];
+      if (password_verify($g, $cfg['hash'])) return ['error' => 'La contraseña de invitado no puede ser la misma que la tuya'];
+      $cfg['guest_hash'] = password_hash($g, PASSWORD_DEFAULT);
+      $cfg['gv'] = bin2hex(random_bytes(8)); // cierra las sesiones de invitado anteriores
+    }
+    if (!empty($b['guest_off'])) { unset($cfg['guest_hash']); $cfg['gv'] = bin2hex(random_bytes(8)); }
     if (!empty($b['nueva'])) {
       if (!password_verify((string) ($b['actual'] ?? ''), $cfg['hash'])) return ['error' => 'La contraseña actual no es correcta'];
+      if (!empty($cfg['guest_hash']) && password_verify((string) $b['nueva'], $cfg['guest_hash'])) return ['error' => 'Tu contraseña no puede ser la misma que la de invitado'];
       if (strlen((string) $b['nueva']) < 10) return ['error' => 'La nueva contraseña necesita al menos 10 caracteres'];
       $cfg['hash'] = password_hash((string) $b['nueva'], PASSWORD_DEFAULT);
       $cfg['v'] = bin2hex(random_bytes(8)); // cierra las demás sesiones
@@ -289,7 +301,7 @@ if ($action === 'settings' && $method === 'POST') {
     return ['ok' => true];
   });
   if (!empty($res['ok']) && !empty($b['nueva'])) login_session();
-  json_out($res + ['csrf' => csrf(), 'feed' => config()['feed_key'] ?? ''], empty($res['ok']) ? 422 : 200);
+  json_out($res + ['csrf' => csrf(), 'feed' => config()['feed_key'] ?? '', 'guest_on' => !empty(config()['guest_hash'])], empty($res['ok']) ? 422 : 200);
 }
 
 if ($action === 'export') {

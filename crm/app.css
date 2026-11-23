@@ -511,3 +511,9 @@ tbody tr:last-child td { border-bottom: 0; }
 #lead-form input:not([type=email]):not([type=date]):not([type=checkbox]):not([type=file]),
 #lead-form textarea, #lead-form select, #lead-form .timeline p { text-transform: uppercase; }
 #lead-form input::placeholder, #lead-form textarea::placeholder { text-transform: none; }
+
+/* Modo invitado */
+.guest-badge { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px; border-radius: 99px; background: rgba(47, 125, 225, .1); color: #1d5fb8; font-size: 13px; font-weight: 700; white-space: nowrap; }
+.is-guest textarea[readonly], .is-guest input[readonly] { background: #f6f4f0; }
+.guest-out { margin: 0; }
+.is-guest .seg[data-stage]:not(.is-on) { opacity: .45; pointer-events: none; }

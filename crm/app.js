@@ -129,6 +129,10 @@
   }
 
   function api(action, data, isForm) {
+    if (S.invitado && data !== undefined) {
+      if (action === "seen") return Promise.resolve({ ok: true });
+      return Promise.reject(new Error("Modo invitado: puedes verlo todo, pero no modificar nada."));
+    }
     var opts = { credentials: "same-origin" };
     if (data !== undefined) {
       opts.method = "POST";
@@ -154,6 +158,8 @@
       S.stages = j.stages;
       S.csrf = j.csrf;
       S.notify = j.notify || "";
+      S.invitado = !!j.invitado; S.guestOn = !!j.guest_on;
+      if (S.invitado) guestMode();
       S.ics = j.ics || "";
       S.feed = j.feed || "";
       S.colores = j.colores || DEFAULT_COLORES;
@@ -1218,6 +1224,11 @@
       '<button class="btn primary" type="submit">Guardar aviso</button></form>' +
       '<div class="box"><h3>Exportar</h3><p class="muted small">CSV para Excel o para importar en Mailchimp/Brevo. Haz una copia de seguridad de vez en cuando.</p>' +
       '<div class="quick"><a class="btn ghost sm" href="' + API + 'export">Contactos (CSV)</a><a class="btn ghost sm" href="' + API + 'export&solo=boletin">Suscritos al boletín (CSV)</a><a class="btn ghost sm" href="' + API + 'export&fmt=json">Copia de seguridad (JSON)</a></div></div>' +
+      '<form class="box set-form"><h3>Acceso de invitado</h3><p class="muted small">Una segunda contraseña para que otra persona entre en el CRM y lo vea todo, sin poder modificar nada.' +
+      (S.guestOn ? " <b>Ahora está activado.</b> Si pones otra contraseña, la anterior deja de valer." : " <b>Ahora está desactivado.</b>") + "</p>" +
+      '<label class="f"><span>' + (S.guestOn ? "Nueva contraseña de invitado" : "Contraseña de invitado") + ' (mín. 8)</span><input name="guest_pass" type="text" minlength="8" autocomplete="off" spellcheck="false" data-lpignore="true" required /></label>' +
+      '<div class="quick"><button class="btn primary" type="submit">' + (S.guestOn ? "Cambiar contraseña de invitado" : "Activar acceso de invitado") + "</button>" +
+      (S.guestOn ? '<button class="btn danger" type="button" data-act="guest-off">Quitar acceso</button>' : "") + "</div></form>" +
       '<form class="box set-form"><h3>Cambiar contraseña</h3>' +
       '<label class="f"><span>Contraseña actual</span><input name="actual" type="password" autocomplete="current-password" required /></label>' +
       '<label class="f"><span>Nueva contraseña (mín. 10)</span><input name="nueva" type="password" minlength="10" autocomplete="new-password" required /></label>' +
@@ -1262,8 +1273,46 @@
       if ("ics" in data) { S.ics = data.ics; S.cal = {}; S.calErr = ""; render(); }
       toast("ics" in data ? (data.ics ? "Calendario conectado" : "Calendario desconectado") : "Guardado");
       if (data.nueva) form.reset();
+      if (data.guest_pass) { S.guestOn = true; openSettings(); toast("Acceso de invitado activado. Comparte la contraseña solo con quien quieras."); return; }
       S.dirty = false;
     }).catch(function (e) { toast(e.message, true); });
+  }
+
+  /* ---------- Modo invitado (solo lectura) ---------- */
+  // Acciones que cambian datos: en modo invitado se ocultan y no hacen nada.
+  var GUEST_BLOCK = ["new", "settings", "delete", "customer", "opportunity", "qualified", "doc-del", "ev-color", "ev-open", "folder-new", "folder-del",
+    "mail-send", "batch-send", "smtp-test", "tpl-del", "tpl-edit", "tpl-new", "sale-del", "sale-new", "pros-del", "pros-edit", "pros-import", "pros-lead",
+    "pros-new", "pros-wa", "pros-mail", "color-add", "color-del", "feed-reset"];
+  // Campos que sí se pueden usar: buscar, filtrar y ordenar.
+  var GUEST_OK = ".toolbar input, .toolbar select, .search, .sort-by select, #pick-form *, .pick-filters *, [data-guest-ok]";
+  function guestLock(root) {
+    $$("input, select, textarea", root || document).forEach(function (x) {
+      if (x.matches(GUEST_OK) || x.type === "hidden" || x.disabled) return;
+      if (x.tagName === "TEXTAREA" || (x.tagName === "INPUT" && !/^(checkbox|radio|file|date|color)$/.test(x.type))) x.readOnly = true;
+      else x.disabled = true;
+    });
+  }
+  function guestMode() {
+    if (document.body.classList.contains("is-guest")) return;
+    document.body.classList.add("is-guest");
+    var top = $(".top-actions");
+    if (top) top.insertAdjacentHTML("afterbegin", '<span class="guest-badge" title="Puedes verlo todo, pero no modificar nada">👁 Invitado · solo lectura</span><form method="post" class="guest-out"><input type="hidden" name="form" value="logout" /><button class="btn ghost sm" type="submit">Salir</button></form>');
+    var style = document.createElement("style");
+    style.textContent = GUEST_BLOCK.map(function (a) { return '.is-guest [data-act="' + a + '"]'; }).join(",") +
+      ",.is-guest #dropzone,.is-guest .lead-docs label.btn,.is-guest .drawer .d-actions .btn.primary,.is-guest .drawer .d-actions .btn.danger,.is-guest .set-form,.is-guest #pros-import-form{display:none !important}";
+    document.head.appendChild(style);
+    guestLock();
+    new MutationObserver(function () { guestLock(); }).observe(document.body, { childList: true, subtree: true });
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-act]");
+      if (!b && e.target.closest && e.target.closest(".seg[data-stage]")) b = { getAttribute: function () { return "new"; } }; // cambiar etapa
+      if (b && GUEST_BLOCK.indexOf(b.getAttribute("data-act")) > -1) { e.preventDefault(); e.stopPropagation(); toast("Modo invitado: solo lectura", true); }
+    }, true);
+    document.addEventListener("submit", function (e) {
+      if (e.target.getAttribute("method") === "post") return; // cerrar sesión
+      e.preventDefault(); e.stopPropagation(); toast("Modo invitado: solo lectura", true);
+    }, true);
+    ["dragstart", "drop"].forEach(function (ev) { document.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); }, true); });
   }
 
   /* ---------- Búsquedas potenciales ---------- */
@@ -1446,6 +1495,10 @@
     if (act) {
       var a = act.getAttribute("data-act");
       if (a === "new") openLead(null);
+      if (a === "guest-off" && confirm("¿Quitar el acceso de invitado? Quien esté dentro como invitado saldrá del CRM.")) {
+        api("settings", { guest_off: 1 }).then(function (j) { S.csrf = j.csrf || S.csrf; S.guestOn = false; openSettings(); toast("Acceso de invitado quitado"); }, function (err) { toast(err.message, true); });
+        return;
+      }
       if (a === "pros-prompt") { copyText(CLAUDE_PROMPT, "Instrucciones copiadas. Pégaselas a Claude en Chrome estando en LinkedIn."); return; }
       if (a === "pros-prompt-ig") { copyText(CLAUDE_PROMPT_IG, "Instrucciones copiadas. Pégaselas a Claude en Chrome estando en Instagram."); return; }
       if (a === "pros-import") { S.prosImport = !S.prosImport; renderPros(); if (S.prosImport) $("#pros-import-form textarea").focus(); return; }

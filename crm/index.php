@@ -44,10 +44,14 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
       login_session();
       header('Location: ' . crm_base());
       exit;
+    } elseif (!empty(config()['guest_hash']) && password_verify((string) ($_POST['password'] ?? ''), config()['guest_hash'])) {
+      login_session(true); // invitado: solo lectura
+      header('Location: ' . crm_base());
+      exit;
     } else { rate('login', 8, 900); $error = 'Contraseña incorrecta.'; }
   }
 }
-$v = '20261116a';
+$v = '20261123a';
 ?><!doctype html>
 <html lang="es">
 <head>
