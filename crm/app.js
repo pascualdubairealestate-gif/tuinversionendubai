@@ -1278,6 +1278,16 @@
     }).catch(function (e) { toast(e.message, true); });
   }
 
+  /* ---------- Modo claro / oscuro ---------- */
+  function setTheme(t, silent) {
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem("crm_theme", t); } catch (e) {}
+    $$(".theme-label").forEach(function (x) { x.textContent = t === "dark" ? "Modo claro" : "Modo oscuro"; });
+    var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = t === "dark" ? "#0d1420" : "#ffffff";
+    if (!silent) toast(t === "dark" ? "Modo oscuro activado" : "Modo claro activado");
+  }
+  setTheme(document.documentElement.getAttribute("data-theme") || "light", true);
+
   /* ---------- Modo invitado (solo lectura) ---------- */
   // Acciones que cambian datos: en modo invitado se ocultan y no hacen nada.
   var GUEST_BLOCK = ["new", "settings", "delete", "customer", "opportunity", "qualified", "doc-del", "ev-color", "ev-open", "folder-new", "folder-del",
@@ -1494,6 +1504,7 @@
     var act = t.closest("[data-act]");
     if (act) {
       var a = act.getAttribute("data-act");
+      if (a === "theme") { setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark"); return; }
       if (a === "new") openLead(null);
       if (a === "guest-off" && confirm("¿Quitar el acceso de invitado? Quien esté dentro como invitado saldrá del CRM.")) {
         api("settings", { guest_off: 1 }).then(function (j) { S.csrf = j.csrf || S.csrf; S.guestOn = false; openSettings(); toast("Acceso de invitado quitado"); }, function (err) { toast(err.message, true); });
