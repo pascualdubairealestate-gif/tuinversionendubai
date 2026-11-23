@@ -29,6 +29,8 @@ window.__PV__ = {
   // IDs de tus vídeos, en el mismo orden que las tarjetas (lo que va tras "v=" en la URL)
   youtube: ["", "", ""],
 
+  // Etiqueta de Google (Google Ads → «Instalar manualmente», empieza por GTM-). Se carga solo si el visitante acepta las cookies.
+  googleTagId: "GTM-PPLZPBMG",
   // Google Ads: tu ID de cuenta (Herramientas → Conversiones → «Instalar la etiqueta tú mismo», empieza por AW-).
   // Vacío = no se carga nada de Google ni aparece el aviso de cookies.
   googleAdsId: "",
@@ -64,18 +66,20 @@ window.__PV__ = {
   /* ---------- Google Ads / Analytics con consentimiento ---------- */
   var tagsOn = false;
   function gtag() { window.dataLayer = window.dataLayer || []; window.dataLayer.push(arguments); }
-  function tagsConfigured() { return !!(CFG.googleAdsId || CFG.ga4Id); }
+  function tagsConfigured() { return !!(CFG.googleTagId || CFG.googleAdsId || CFG.ga4Id); }
   function getConsent() { try { return localStorage.getItem("pv_consent"); } catch (e) { return null; } }
   function loadTags() {
     if (tagsOn || !tagsConfigured()) return;
     tagsOn = true;
     window.gtag = gtag;
     gtag("consent", "default", { ad_storage: "granted", ad_user_data: "granted", ad_personalization: "granted", analytics_storage: "granted" });
+    gtag("js", new Date());
     var sc = document.createElement("script");
     sc.async = true;
-    sc.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(CFG.googleAdsId || CFG.ga4Id);
+    sc.src = CFG.googleTagId
+      ? "https://www.googletagmanager.com/gtm.js?id=" + encodeURIComponent(CFG.googleTagId)
+      : "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(CFG.googleAdsId || CFG.ga4Id);
     document.head.appendChild(sc);
-    gtag("js", new Date());
     if (CFG.googleAdsId) gtag("config", CFG.googleAdsId);
     if (CFG.ga4Id) gtag("config", CFG.ga4Id);
   }
