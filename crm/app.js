@@ -485,8 +485,59 @@
       '<span class="due' + (done ? " ok" : "") + '">' + esc(nextStep(v)) + (num(v.comision) ? " · comisión " + aed(num(v.comision)) : "") + "</span></article>";
   }
 
+  /* Gráfica: ventas cerradas por mes (cuenta el mes en que se firmó el booking form) */
+  var MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  var MESES_L = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  var SC_METRICS = { n: "Nº de ventas", vol: "Volumen (AED)", com: "Comisión (AED)" };
+  function shortAed(n) {
+    if (n >= 1e6) return (Math.round(n / 1e5) / 10).toLocaleString("es-ES") + " M";
+    if (n >= 1e3) return Math.round(n / 1e3).toLocaleString("es-ES") + " K";
+    return Math.round(n).toLocaleString("es-ES");
+  }
+  function salesChartHtml() {
+    var thisYear = new Date().getFullYear();
+    var closed = S.ventas.filter(function (v) { return /^\d{4}-\d{2}/.test((v.hitos || {}).booking || ""); });
+    var years = [thisYear];
+    closed.forEach(function (v) { var y = +v.hitos.booking.slice(0, 4); if (years.indexOf(y) < 0) years.push(y); });
+    years.sort(function (a, b) { return b - a; });
+    var year = S.scYear && years.indexOf(S.scYear) > -1 ? S.scYear : thisYear, m = S.scMetric || "n";
+    var months = MESES.map(function () { return { n: 0, vol: 0, com: 0 }; });
+    closed.forEach(function (v) {
+      if (+v.hitos.booking.slice(0, 4) !== year) return;
+      var b = months[+v.hitos.booking.slice(5, 7) - 1];
+      if (!b) return;
+      b.n++; b.vol += num(v.precio); b.com += num(v.comision);
+    });
+    var tot = months.reduce(function (t, x) { return { n: t.n + x.n, vol: t.vol + x.vol, com: t.com + x.com }; }, { n: 0, vol: 0, com: 0 });
+    var max = Math.max.apply(null, months.map(function (x) { return x[m]; })) || 1;
+    var label = function (x) { return m === "n" ? String(x.n) : shortAed(x[m]); };
+    var nowM = year === thisYear ? new Date().getMonth() : 11;
+    var bars = months.map(function (x, i) {
+      var h = x[m] ? Math.max(3, Math.round(x[m] / max * 100)) : 0;
+      var tip = MESES_L[i] + " " + year + ": " + x.n + (x.n === 1 ? " venta" : " ventas") + (x.n ? " · " + aed(x.vol) + " · comisión " + aed(x.com) : "");
+      return '<div class="sc-col' + (i > nowM ? " future" : "") + '" tabindex="0" aria-label="' + esc(tip) + '">' +
+        '<span class="sc-tip" aria-hidden="true">' + esc(tip) + "</span>" +
+        '<div class="sc-track">' + (h ? '<b class="sc-val">' + esc(label(x)) + '</b><i class="sc-bar" style="height:' + h + '%"></i>' : "") + "</div>" +
+        '<span class="sc-m">' + MESES[i] + "</span></div>";
+    }).join("");
+    return '<section class="panel sales-chart" aria-labelledby="sc-title">' +
+      '<header class="sc-head"><div><h3 id="sc-title">Ventas cerradas en ' + year + "</h3>" +
+      '<p class="muted small">Cada venta cuenta en el mes en que se firmó el booking form.</p></div>' +
+      '<div class="sc-ctrl"><div class="view-toggle" role="group" aria-label="Qué medir">' + Object.keys(SC_METRICS).map(function (k) {
+        return '<button type="button" data-act="sc-metric" data-m="' + k + '" aria-pressed="' + (k === m) + '">' + SC_METRICS[k] + "</button>";
+      }).join("") + "</div>" +
+      (years.length > 1 ? '<select id="sc-year" aria-label="Año">' + years.map(function (y) { return "<option" + (y === year ? " selected" : "") + ">" + y + "</option>"; }).join("") + "</select>" : "") + "</div></header>" +
+      '<div class="sc-totals"><div><span>Ventas cerradas</span><b>' + tot.n + "</b></div><div><span>Volumen</span><b>" + aed(tot.vol) + "</b></div><div><span>Comisión</span><b>" + aed(tot.com) + "</b></div></div>" +
+      (tot.n ? '<div class="sc-chart" role="img" aria-label="' + esc(SC_METRICS[m] + " por mes en " + year) + '">' + bars + "</div>" +
+        '<details class="sc-table"><summary>Ver tabla</summary><table><thead><tr><th>Mes</th><th>Ventas</th><th>Volumen</th><th>Comisión</th></tr></thead><tbody>' +
+        months.map(function (x, i) { return "<tr><td>" + MESES_L[i] + "</td><td>" + x.n + "</td><td>" + (x.n ? aed(x.vol) : "—") + "</td><td>" + (x.n ? aed(x.com) : "—") + "</td></tr>"; }).join("") +
+        "</tbody></table></details>"
+        : '<p class="empty">Aún no hay ventas con el booking form firmado en ' + year + ". Al marcar «Booking form» en una venta, aparecerá aquí en su mes.</p>") +
+      "</section>";
+  }
+
   function renderSales() {
-    $("#main").innerHTML = saleStatsHtml() +
+    $("#main").innerHTML = saleStatsHtml() + salesChartHtml() +
       '<nav class="toolbar"><input class="search" id="q" type="search" placeholder="Buscar cliente, proyecto, unidad, promotor…" value="' + esc(S.q) + '" />' +
       '<button type="button" class="btn primary" data-act="sale-new">+ Nueva venta</button></nav><div id="results"></div>';
     renderSaleBoard();
@@ -1542,6 +1593,7 @@
         api("settings", { agencia_off: 1 }).then(function (j) { S.csrf = j.csrf || S.csrf; S.agencia = { on: false, cola: 0 }; openSettings(); toast("Desconectado del CRM de la agencia"); }, function (err) { toast(err.message, true); });
         return;
       }
+      if (a === "sc-metric") { S.scMetric = act.getAttribute("data-m"); var scEl = $(".sales-chart"); scEl.outerHTML = salesChartHtml(); return; }
       if (a === "theme") { setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark"); return; }
       if (a === "new") openLead(null);
       if (a === "guest-off" && confirm("¿Quitar el acceso de invitado? Quien esté dentro como invitado saldrá del CRM.")) {
@@ -1881,6 +1933,7 @@
   document.addEventListener("change", function (e) {
     var t = e.target;
     if (t.id === "pros-f") { S.prosEstado = t.value; renderPros(); return; }
+    if (t.id === "sc-year") { S.scYear = +t.value; $(".sales-chart").outerHTML = salesChartHtml(); return; }
     if (t.id === "pros-c") { S.prosCanal = t.value; renderPros(); return; }
     if (t.id === "pros-r") { S.prosRed = t.value; renderPros(); return; }
     if (t.classList.contains("pros-estado")) {

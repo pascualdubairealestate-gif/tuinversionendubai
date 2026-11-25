@@ -564,3 +564,31 @@ tbody tr:last-child td { border-bottom: 0; }
 .theme-toggle .ic-sun { display: none; }
 :root[data-theme="dark"] .theme-toggle .ic-sun { display: block; }
 :root[data-theme="dark"] .theme-toggle .ic-moon { display: none; }
+
+/* Ventas: gráfica de ventas cerradas por mes */
+.sales-chart { margin: 0 0 16px; }
+.sc-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.sc-head h3 { font-size: 16px; font-weight: 800; }
+.sc-head p { margin: 2px 0 0; }
+.sc-ctrl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sc-ctrl select { width: auto; min-height: 36px; padding: 4px 10px; }
+.sc-totals { display: flex; flex-wrap: wrap; gap: 10px 32px; margin-bottom: 18px; }
+.sc-totals span { display: block; font-size: 12px; font-weight: 700; color: var(--mute); text-transform: uppercase; letter-spacing: .04em; }
+.sc-totals b { font-size: 22px; font-weight: 800; }
+.sc-chart { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px; height: 210px; }
+.sc-col { position: relative; display: grid; grid-template-rows: 1fr auto; min-width: 0; outline: none; border-radius: 8px; }
+.sc-col:hover, .sc-col:focus-visible { background: var(--amber-soft); }
+.sc-track { position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 0 18%; border-bottom: 1px solid var(--line); }
+.sc-bar { display: block; width: 100%; max-width: 34px; background: var(--amber); border-radius: 4px 4px 0 0; }
+.sc-val { font-size: 11px; font-weight: 800; color: var(--ink); margin-bottom: 4px; white-space: nowrap; }
+.sc-m { text-align: center; font-size: 11px; font-weight: 700; color: var(--mute); padding: 6px 0 4px; }
+.sc-col.future .sc-m { opacity: .5; }
+.sc-tip { display: none; position: absolute; z-index: 5; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); width: max-content; max-width: 230px; background: var(--ink); color: var(--surface); font-size: 12px; font-weight: 600; line-height: 1.4; padding: 7px 10px; border-radius: 8px; box-shadow: var(--shadow); pointer-events: none; }
+.sc-col:hover .sc-tip, .sc-col:focus-visible .sc-tip { display: block; }
+.sc-col:first-child .sc-tip, .sc-col:nth-child(2) .sc-tip { left: 0; transform: none; }
+.sc-col:last-child .sc-tip, .sc-col:nth-child(11) .sc-tip { left: auto; right: 0; transform: none; }
+.sc-table { margin-top: 14px; font-size: 13px; }
+.sc-table summary { cursor: pointer; font-weight: 700; color: var(--mute); }
+.sc-table table { margin-top: 8px; width: 100%; border-collapse: collapse; }
+.sc-table th, .sc-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+@media (max-width: 640px) { .sc-chart { gap: 2px; height: 160px; } .sc-val { font-size: 9.5px; } .sc-m { font-size: 10px; } }
