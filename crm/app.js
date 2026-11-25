@@ -515,6 +515,7 @@
     var step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * mag;
     if (m === "n") step = Math.max(1, Math.ceil(step));
     var top = Math.max(step, Math.ceil(max / step) * step), ticks = [];
+    if (m === "vol" && top <= 1e7) { top = 1e7; step = 2e6; } // volumen: eje fijo de 0 a 10 M (solo crece si un mes lo supera)
     for (var t = 0; t <= top + 1e-9; t += step) ticks.push(t);
     var fmtTick = function (v) { return m === "n" ? String(v) : shortAed(v); };
     var nowM = year === thisYear ? new Date().getMonth() : 11;
