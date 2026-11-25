@@ -564,3 +564,128 @@ function send_project_doc($key, $to, $nombre) {
   $headers = 'From: ' . smtp_header('Pascual Vidal') . " <$from>\r\nReply-To: " . (($cfg['notify'] ?? '') ?: $from) . "\r\nMIME-Version: 1.0\r\nContent-Type: $ctype";
   return @mail($to, smtp_header($subject), $body, $headers, "-f$from") ? '' : 'El servidor no pudo enviar el correo';
 }
+
+/* ---------- Reenvío de los formularios de la web al CRM de la agencia ---------- */
+// La clave se guarda en Ajustes (fichero de datos fuera de la web), nunca en el JavaScript ni en GitHub.
+const AGENCIA_URL = 'https://hayeintzsvnxifcyxgab.supabase.co/functions/v1/web-agente-entrada';
+const AGENCIA_FORMS = ['newsletter', 'guia', 'consultoria', 'dossier'];
+const AGENCIA_ESPERAS = [0, 2, 10]; // 3 intentos: solo se reintenta con 408, 429, 5xx o sin respuesta
+
+function agencia_url() { return getenv('CRM_AGENCIA_URL') ?: AGENCIA_URL; } // la variable solo sirve para pruebas
+function agencia_on() { return !empty(config()['agencia_clave']); }
+function client_ip() { return (string) ($_SERVER['REMOTE_ADDR'] ?? ''); }
+
+function truthy($v) {
+  if ($v === true || $v === 1) return true;
+  return in_array(strtolower(trim((string) $v)), ['true', 'on', '1', 'si', 'sí', 'yes'], true);
+}
+
+// Prepara el JSON para la agencia con los campos que acepta y sus límites. null = no se reenvía.
+function agencia_payload(array $b) {
+  if (!empty($b['web'])) return null;                       // campo trampa: robot
+  if (!truthy($b['consentimiento'] ?? '')) return null;     // sin consentimiento no guardan nada
+  $form = (string) ($b['formulario'] ?? '');
+  $msgExtra = '';
+  if ($form === 'solicitud') { $form = 'consultoria'; $msgExtra = 'Formulario «Solicitar información» (/solicitud/)'; }
+  if (!in_array($form, AGENCIA_FORMS, true)) return null;
+  $lim = ['nombre' => 120, 'email' => 200, 'telefono' => 40, 'presupuesto' => 80, 'objetivo' => 120, 'proyecto' => 120, 'mensaje' => 2000,
+    'pagina' => 500, 'fecha' => 40, 'utm_source' => 150, 'utm_medium' => 150, 'utm_campaign' => 150, 'utm_term' => 150, 'utm_content' => 150,
+    'gclid' => 300, 'fbclid' => 300, 'consentimiento_texto' => 500, 'consentimiento_version' => 40];
+  $p = ['formulario' => $form, 'consentimiento' => true, 'web' => ''];
+  foreach ($lim as $k => $max) {
+    $v = trim(is_scalar($b[$k] ?? null) ? (string) $b[$k] : '');
+    if ($v !== '') $p[$k] = mb_substr($v, 0, $max);
+  }
+  if ($msgExtra) $p['mensaje'] = mb_substr($msgExtra . (isset($p['mensaje']) ? "\n" . $p['mensaje'] : ''), 0, 2000);
+  if (!isset($p['consentimiento_texto'])) $p['consentimiento_texto'] = 'Acepto la política de privacidad y recibir comunicaciones.';
+  // Correo: sin espacios ni ? & % / : (si no cumple, se manda solo con el teléfono)
+  if (isset($p['email']) && (!filter_var($p['email'], FILTER_VALIDATE_EMAIL) || preg_match('~[\s?&%/:]~', $p['email']))) unset($p['email']);
+  if (empty($p['email']) && strlen(phone_digits($p['telefono'] ?? '')) < 7) return null; // hace falta teléfono o correo
+  $p['ip_visitante'] = mb_substr(client_ip(), 0, 64);       // la pone el servidor, nunca el formulario
+  return $p;
+}
+
+// Un envío. Devuelve el código HTTP (0 = sin respuesta).
+function agencia_post(array $p, $clave) {
+  $json = json_encode($p, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+  $hdr = ['Content-Type: application/json', 'x-web-agente-clave: ' . $clave];
+  if (function_exists('curl_init')) {
+    $ch = curl_init(agencia_url());
+    curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => $json, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10, CURLOPT_CONNECTTIMEOUT => 5, CURLOPT_HTTPHEADER => $hdr]);
+    curl_exec($ch);
+    $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    return $code;
+  }
+  $ctx = stream_context_create(['http' => ['method' => 'POST', 'header' => implode("\r\n", $hdr), 'content' => $json, 'timeout' => 10, 'ignore_errors' => true]]);
+  $r = @file_get_contents(agencia_url(), false, $ctx);
+  return ($r !== false && isset($http_response_header[0]) && preg_match('~\s(\d{3})\s?~', $http_response_header[0], $m)) ? (int) $m[1] : 0;
+}
+function agencia_retry_code($c) { return $c === 0 || $c === 408 || $c === 429 || $c >= 500; }
+
+// Envía con reintentos (2 y 10 s). $esperar = false: un solo intento (para vaciar la cola sin bloquear).
+function agencia_send(array $p, $esperar = true) {
+  $clave = config()['agencia_clave'] ?? '';
+  if ($clave === '') return -1;
+  $code = 0;
+  foreach ($esperar ? AGENCIA_ESPERAS : [0] as $s) {
+    if ($s) sleep($s);
+    $code = agencia_post($p, $clave);
+    if (!agencia_retry_code($code)) break;
+  }
+  return $code;
+}
+
+function agencia_log($form, $code, $leadId) {
+  with_lock('agencia', function () use ($form, $code, $leadId) {
+    $log = store_read('agencia_log', []);
+    array_unshift($log, ['fecha' => now_iso(), 'formulario' => $form, 'codigo' => $code, 'lead' => $leadId]);
+    store_write('agencia_log', array_slice($log, 0, 30));
+  });
+}
+function agencia_note($leadId, $code) {
+  if (!$leadId) return;
+  $txt = $code === 200 ? '↗ Enviado al CRM de la agencia' : (agencia_retry_code($code) ? '⏳ CRM de la agencia sin respuesta (' . $code . '): queda en cola para reenviarlo' : '⚠ El CRM de la agencia no lo aceptó (' . $code . ')');
+  with_lock('leads', function () use ($leadId, $txt) {
+    $leads = store_read('leads', []);
+    foreach ($leads as $i => $l) if ($l['id'] === $leadId) { activity($leads[$i], $txt, 'sistema'); store_write('leads', $leads); }
+  });
+}
+function agencia_queue(array $p, $leadId) {
+  with_lock('agencia', function () use ($p, $leadId) {
+    $q = store_read('agencia_cola', []);
+    $q[] = ['p' => $p, 'lead' => $leadId, 'desde' => now_iso(), 'intentos' => 0];
+    store_write('agencia_cola', array_slice($q, -200));
+  });
+}
+// Reintenta la cola (un intento por formulario). Se llama al abrir el CRM y tras cada formulario nuevo.
+function agencia_flush($max = 10) {
+  if (!agencia_on()) return 0;
+  $q = with_lock('agencia', function () { $q = store_read('agencia_cola', []); store_write('agencia_cola', []); return $q; });
+  if (!$q) return 0;
+  $keep = []; $n = 0;
+  foreach ($q as $item) {
+    if ($n >= $max) { $keep[] = $item; continue; }
+    $n++;
+    $code = agencia_send($item['p'], false);
+    $item['intentos']++;
+    if (agencia_retry_code($code) && $item['intentos'] < 20) { $keep[] = $item; continue; }
+    agencia_log($item['p']['formulario'], $code, $item['lead']);
+    agencia_note($item['lead'], $code);
+  }
+  if ($keep) with_lock('agencia', function () use ($keep) { store_write('agencia_cola', array_merge($keep, store_read('agencia_cola', []))); });
+  return $n;
+}
+// Freno global: como mucho 25 reenvíos por minuto y 400 al día (por debajo del cupo de la agencia).
+function agencia_cupo() {
+  return with_lock('agencia', function () {
+    $r = store_read('agencia_cupo', ['m' => '', 'nm' => 0, 'd' => '', 'nd' => 0]);
+    $m = gmdate('YmdHi'); $d = gmdate('Ymd');
+    if ($r['m'] !== $m) { $r['m'] = $m; $r['nm'] = 0; }
+    if ($r['d'] !== $d) { $r['d'] = $d; $r['nd'] = 0; }
+    if ($r['nm'] >= 25 || $r['nd'] >= 400) return false;
+    $r['nm']++; $r['nd']++;
+    store_write('agencia_cupo', $r);
+    return true;
+  });
+}

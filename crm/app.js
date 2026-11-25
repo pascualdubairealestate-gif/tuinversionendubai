@@ -159,6 +159,12 @@
       S.csrf = j.csrf;
       S.notify = j.notify || "";
       S.invitado = !!j.invitado; S.guestOn = !!j.guest_on;
+      S.agencia = j.agencia || null;
+      // Si quedaron formularios sin llegar al CRM de la agencia, se reintentan al abrir el CRM
+      if (S.agencia && S.agencia.on && S.agencia.cola > 0 && !S.agenciaTried) {
+        S.agenciaTried = true;
+        api("agencia_flush", {}).then(function (k) { S.agencia.cola = k.cola; S.agencia.ultimo = k.ultimo || S.agencia.ultimo; }, function () {});
+      }
       if (S.invitado) guestMode();
       S.ics = j.ics || "";
       S.feed = j.feed || "";
@@ -1224,6 +1230,7 @@
       '<button class="btn primary" type="submit">Guardar aviso</button></form>' +
       '<div class="box"><h3>Exportar</h3><p class="muted small">CSV para Excel o para importar en Mailchimp/Brevo. Haz una copia de seguridad de vez en cuando.</p>' +
       '<div class="quick"><a class="btn ghost sm" href="' + API + 'export">Contactos (CSV)</a><a class="btn ghost sm" href="' + API + 'export&solo=boletin">Suscritos al boletín (CSV)</a><a class="btn ghost sm" href="' + API + 'export&fmt=json">Copia de seguridad (JSON)</a></div></div>' +
+      agenciaBox() +
       '<form class="box set-form"><h3>Acceso de invitado</h3><p class="muted small">Una segunda contraseña para que otra persona entre en el CRM y lo vea todo, sin poder modificar nada.' +
       (S.guestOn ? " <b>Ahora está activado.</b> Si pones otra contraseña, la anterior deja de valer." : " <b>Ahora está desactivado.</b>") + "</p>" +
       '<label class="f"><span>' + (S.guestOn ? "Nueva contraseña de invitado" : "Contraseña de invitado") + ' (mín. 8)</span><input name="guest_pass" type="text" minlength="8" autocomplete="off" spellcheck="false" data-lpignore="true" required /></label>' +
@@ -1235,6 +1242,23 @@
       '<button class="btn primary" type="submit">Cambiar contraseña</button></form>' +
       '<form method="post" class="box"><input type="hidden" name="form" value="logout" /><button class="btn ghost" type="submit">Cerrar sesión</button></form>';
     showDrawer();
+  }
+
+  // Ajustes: conexión con el CRM de la agencia (la clave nunca vuelve a la pantalla)
+  function agenciaBox() {
+    var A = S.agencia || {}, u = A.ultimo;
+    var res = function (c) { return c === 200 ? "recibido ✓" : c === 401 ? "la clave no vale (401): pide otra" : c === 400 ? "faltaban datos (400)" : c === 0 ? "sin respuesta" : "error " + c; };
+    return '<form class="box set-form" id="agencia-form"><h3>CRM de la agencia</h3>' +
+      '<p class="muted small">Cada formulario de tu web se guarda aquí y, después, se reenvía al CRM de la agencia como lead tuyo. Solo se reenvían los que traen la casilla de privacidad marcada y un teléfono o email.</p>' +
+      (A.on ? '<p class="small"><b>Conectado</b> · clave ' + esc(A.clave || "") +
+        (u ? '<br>Último envío: ' + fmtDate(u.fecha, true) + " · " + esc(u.formulario) + " · " + res(u.codigo) : "<br>Aún no se ha enviado ningún formulario.") +
+        (A.cola ? '<br><span style="color:var(--amber-ink)">' + A.cola + (A.cola === 1 ? " formulario pendiente" : " formularios pendientes") + " de enviar</span>" : "") + "</p>"
+        : '<p class="small"><b>Sin conectar.</b> Pega la clave que te ha dado la agencia.</p>') +
+      '<label class="f"><span>' + (A.on ? "Cambiar la clave" : "Clave de la agencia") + '</span><input name="agencia_clave" type="text" autocomplete="off" spellcheck="false" data-lpignore="true" placeholder="' + (A.on ? "Escribe la nueva solo si te dan otra" : "Pégala aquí") + '"' + (A.on ? "" : " required") + " /></label>" +
+      '<p class="muted small">Se guarda en tu servidor, fuera de la web. No se ve en la página ni en GitHub.</p>' +
+      '<div class="quick"><button class="btn primary" type="submit">' + (A.on ? "Guardar clave nueva" : "Conectar") + "</button>" +
+      (A.on ? '<button class="btn ghost" type="button" data-act="agencia-flush">Enviar pendientes</button>' : "") +
+      (A.on ? '<button class="btn danger" type="button" data-act="agencia-off">Desconectar</button>' : "") + "</div></form>";
   }
 
   function smtpProv() {
@@ -1273,6 +1297,11 @@
       if ("ics" in data) { S.ics = data.ics; S.cal = {}; S.calErr = ""; render(); }
       toast("ics" in data ? (data.ics ? "Calendario conectado" : "Calendario desconectado") : "Guardado");
       if (data.nueva) form.reset();
+      if ("agencia_clave" in data) {
+        if (!data.agencia_clave) { toast("Escribe la clave nueva o deja la que tienes", true); return; }
+        S.agencia = S.agencia || {}; S.agencia.on = true; S.agencia.clave = "••••" + data.agencia_clave.slice(-4);
+        openSettings(); toast("Conectado. Manda un formulario de prueba desde tu web."); return;
+      }
       if (data.guest_pass) { S.guestOn = true; openSettings(); toast("Acceso de invitado activado. Comparte la contraseña solo con quien quieras."); return; }
       S.dirty = false;
     }).catch(function (e) { toast(e.message, true); });
@@ -1504,6 +1533,15 @@
     var act = t.closest("[data-act]");
     if (act) {
       var a = act.getAttribute("data-act");
+      if (a === "agencia-flush") {
+        act.disabled = true; act.textContent = "Enviando…";
+        api("agencia_flush", {}).then(function (k) { S.agencia.cola = k.cola; S.agencia.ultimo = k.ultimo || S.agencia.ultimo; openSettings(); toast(k.cola ? "Siguen " + k.cola + " pendientes: el CRM de la agencia no responde" : k.enviados ? "Pendientes enviados" : "No había nada pendiente"); }, function (err) { toast(err.message, true); openSettings(); });
+        return;
+      }
+      if (a === "agencia-off" && confirm("¿Desconectar del CRM de la agencia? Tus formularios seguirán entrando aquí, pero dejarán de reenviarse.")) {
+        api("settings", { agencia_off: 1 }).then(function (j) { S.csrf = j.csrf || S.csrf; S.agencia = { on: false, cola: 0 }; openSettings(); toast("Desconectado del CRM de la agencia"); }, function (err) { toast(err.message, true); });
+        return;
+      }
       if (a === "theme") { setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark"); return; }
       if (a === "new") openLead(null);
       if (a === "guest-off" && confirm("¿Quitar el acceso de invitado? Quien esté dentro como invitado saldrá del CRM.")) {

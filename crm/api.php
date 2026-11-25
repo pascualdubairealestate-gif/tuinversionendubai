@@ -83,7 +83,7 @@ if ($action === 'lead') {
   $email = strtolower(cut($b['email'] ?? '', 160));
   $tel = cut($b['telefono'] ?? '', 40);
   if (!filter_var($email, FILTER_VALIDATE_EMAIL) && strlen(phone_digits($tel)) < 7) json_out(['error' => 'datos'], 422);
-  if (!rate('lead', 20, 3600)) json_out(['error' => 'rate'], 429);
+  if (!rate('lead', 20, 3600) || !rate('lead10', 5, 600)) json_out(['error' => 'rate'], 429);
 
   $forms = ['guia' => 'Web · Guía', 'newsletter' => 'Web · Boletín', 'consultoria' => 'Web · Consultoría', 'dossier' => 'Web · Dossier', 'solicitud' => 'Formulario'];
   $form = cut($b['formulario'] ?? 'web', 30);
@@ -141,31 +141,46 @@ if ($action === 'lead') {
     $subj = '=?UTF-8?B?' . base64_encode('Nuevo lead: ' . ($lead['nombre'] ?: $lead['email'])) . '?=';
     @mail($notify, $subj, $msg, "From: CRM <noreply@$host>\r\nContent-Type: text/plain; charset=UTF-8");
   }
-  // Guía: se responde ya a la web y el correo con el PDF sale justo después, sin hacer esperar al visitante.
+  // Se contesta YA al visitante. El correo de la guía y el reenvío al CRM de la agencia van después, sin hacerle esperar.
   $docKey = '';
   if ($form === 'dossier' && stripos((string) ($b['proyecto'] ?? ''), 'Ardee Views') !== false) $docKey = 'ardee-views';
-  if (($form === 'guia' || $docKey) && filter_var($email, FILTER_VALIDATE_EMAIL) && rate('guiamail', 5, 3600)) {
-    http_response_code(200);
-    header('Content-Type: application/json; charset=utf-8');
-    header('Cache-Control: no-store');
-    echo json_encode(['ok' => true, 'guia' => 'email']);
-    if (function_exists('fastcgi_finish_request')) fastcgi_finish_request();
-    elseif (function_exists('litespeed_finish_request')) litespeed_finish_request();
-    else { @ob_end_flush(); flush(); }
-    ignore_user_abort(true);
-    $err = $docKey ? send_project_doc($docKey, $email, $res[0]['nombre'] ?? '') : send_guide($email, $res[0]['nombre'] ?? '');
-    $que = $docKey ? 'Presentación de ' . PROJECT_DOCS[$docKey]['nombre'] : 'Guía';
-    $id = $res[0]['id'];
-    with_lock('leads', function () use ($id, $err, $que, $docKey) {
-      $leads = store_read('leads', []);
-      foreach ($leads as $i => $l) if ($l['id'] === $id) {
-        activity($leads[$i], $err === '' ? '📎 ' . $que . ' enviada por email' . ($docKey ? ' (enlace de descarga)' : ' (PDF adjunto)') : '⚠ No se pudo enviar por email (' . $que . '): ' . $err, 'sistema');
-        store_write('leads', $leads);
-      }
-    });
-    exit;
+  $sendMail = ($form === 'guia' || $docKey) && filter_var($email, FILTER_VALIDATE_EMAIL) && rate('guiamail', 5, 3600);
+  $fwd = agencia_on() ? agencia_payload($b) : null;
+  $resp = $sendMail ? ['ok' => true, 'guia' => 'email'] : ['ok' => true];
+  if (!$sendMail && !$fwd) json_out($resp);
+  http_response_code(200);
+  header('Content-Type: application/json; charset=utf-8');
+  header('Cache-Control: no-store');
+  echo json_encode($resp);
+  $bg = true;
+  if (function_exists('fastcgi_finish_request')) fastcgi_finish_request();
+  elseif (function_exists('litespeed_finish_request')) litespeed_finish_request();
+  else { @ob_end_flush(); flush(); $bg = false; }
+  ignore_user_abort(true);
+  @set_time_limit(90);
+  if ($sendMail) {
+      $err = $docKey ? send_project_doc($docKey, $email, $res[0]['nombre'] ?? '') : send_guide($email, $res[0]['nombre'] ?? '');
+      $que = $docKey ? 'Presentación de ' . PROJECT_DOCS[$docKey]['nombre'] : 'Guía';
+      $id = $res[0]['id'];
+      with_lock('leads', function () use ($id, $err, $que, $docKey) {
+        $leads = store_read('leads', []);
+        foreach ($leads as $i => $l) if ($l['id'] === $id) {
+          activity($leads[$i], $err === '' ? '📎 ' . $que . ' enviada por email' . ($docKey ? ' (enlace de descarga)' : ' (PDF adjunto)') : '⚠ No se pudo enviar por email (' . $que . '): ' . $err, 'sistema');
+          store_write('leads', $leads);
+        }
+      });
   }
-  json_out(['ok' => true]);
+  if ($fwd) {
+    $leadId = $res[0]['id'];
+    if ($bg) agencia_flush(5); // primero, lo que quedó pendiente de antes
+    if ($bg && agencia_cupo()) {
+      $code = agencia_send($fwd);
+      if (agencia_retry_code($code)) agencia_queue($fwd, $leadId);
+      else agencia_log($fwd['formulario'], $code, $leadId);
+      agencia_note($leadId, $code);
+    } else agencia_queue($fwd, $leadId); // sin forma de no hacer esperar al visitante, o cupo lleno: se manda después
+  }
+  exit;
 }
 
 /* ---------- Panel ---------- */
@@ -180,7 +195,10 @@ if ($action === 'state') {
     with_lock('leads', function () { $ls = store_read('leads', []); foreach ($ls as &$l) if (($l['origen'] ?? '') === 'Manual') $l['origen'] = 'Directo'; unset($l); store_write('leads', $ls); });
   }
   $g = is_guest();
-  json_out(['invitado' => $g, 'guest_on' => !$g && !empty($cfg['guest_hash'])] + array_merge(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'feed' => $cfg['feed_key'] ?? '', 'colores' => $cfg['colores'] ?? null, 'evcolores' => (object) store_read('evcolores', []), 'smtp' => $cfg['smtp_user'] ?? '', 'smtp_name' => $cfg['smtp_name'] ?? '', 'smtp_host' => $cfg['smtp_host'] ?? 'smtp.gmail.com', 'smtp_port' => (int) ($cfg['smtp_port'] ?? 465), 'csrf' => csrf()], $g ? ['notify' => '', 'ics' => !empty($cfg['ics']) ? 'oculto' : '', 'feed' => '', 'smtp' => '', 'smtp_name' => '', 'smtp_host' => 'smtp.gmail.com', 'smtp_port' => 465] : []));
+  $alog = store_read('agencia_log', []);
+  $agencia = $g ? null : ['on' => !empty($cfg['agencia_clave']), 'cola' => count(store_read('agencia_cola', [])), 'ultimo' => $alog[0] ?? null,
+    'clave' => !empty($cfg['agencia_clave']) ? '••••' . substr($cfg['agencia_clave'], -4) : ''];
+  json_out(['agencia' => $agencia, 'invitado' => $g, 'guest_on' => !$g && !empty($cfg['guest_hash'])] + array_merge(['leads' => store_read('leads', []), 'ventas' => store_read('ventas', []), 'hitos' => HITOS, 'stages' => STAGES, 'notify' => $cfg['notify'] ?? '', 'ics' => $cfg['ics'] ?? '', 'feed' => $cfg['feed_key'] ?? '', 'colores' => $cfg['colores'] ?? null, 'evcolores' => (object) store_read('evcolores', []), 'smtp' => $cfg['smtp_user'] ?? '', 'smtp_name' => $cfg['smtp_name'] ?? '', 'smtp_host' => $cfg['smtp_host'] ?? 'smtp.gmail.com', 'smtp_port' => (int) ($cfg['smtp_port'] ?? 465), 'csrf' => csrf()], $g ? ['notify' => '', 'ics' => !empty($cfg['ics']) ? 'oculto' : '', 'feed' => '', 'smtp' => '', 'smtp_name' => '', 'smtp_host' => 'smtp.gmail.com', 'smtp_port' => 465] : []));
 }
 
 if ($action === 'save' && $method === 'POST') {
@@ -281,6 +299,13 @@ if ($action === 'settings' && $method === 'POST') {
       }
       $cfg['colores'] = $rules;
     }
+    // CRM de la agencia: la clave se guarda aquí y nunca se devuelve a la pantalla
+    if (!empty($b['agencia_clave'])) {
+      $k = trim((string) $b['agencia_clave']);
+      if (strlen($k) < 16 || preg_match('~\s~', $k)) return ['error' => 'Esa clave no parece correcta: cópiala entera, sin espacios'];
+      $cfg['agencia_clave'] = $k;
+    }
+    if (!empty($b['agencia_off'])) unset($cfg['agencia_clave']);
     // Acceso de invitado (solo lectura)
     if (!empty($b['guest_pass'])) {
       $g = (string) $b['guest_pass'];
@@ -302,6 +327,14 @@ if ($action === 'settings' && $method === 'POST') {
   });
   if (!empty($res['ok']) && !empty($b['nueva'])) login_session();
   json_out($res + ['csrf' => csrf(), 'feed' => config()['feed_key'] ?? '', 'guest_on' => !empty(config()['guest_hash'])], empty($res['ok']) ? 422 : 200);
+}
+
+if ($action === 'agencia_flush' && $method === 'POST') {
+  require_auth();
+  @set_time_limit(120);
+  $n = agencia_flush(15);
+  $alog = store_read('agencia_log', []);
+  json_out(['enviados' => $n, 'cola' => count(store_read('agencia_cola', [])), 'ultimo' => $alog[0] ?? null]);
 }
 
 if ($action === 'export') {

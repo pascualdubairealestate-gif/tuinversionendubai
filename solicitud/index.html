@@ -372,6 +372,8 @@
       var nombre = $("#nombre").value.trim();
       var payload = {
         formulario: "solicitud",
+        consentimiento: true, // casilla de privacidad marcada (obligatoria para enviar)
+        pagina: location.href, fecha: new Date().toISOString(),
         nombre: nombre,
         telefono: "+" + data.pais.code + " " + $("#tel").value.trim(),
         mensaje: "Mayor preocupación: " + (data.pre.length ? data.pre.join(", ") : "no indicada") + "\nCapital a invertir: " + (data.cap || "no indicado"),

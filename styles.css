@@ -876,3 +876,9 @@ body, .splash { background: var(--sand-bg); }
 .btn-ghost-dark:hover { background: rgba(11, 20, 36, .05); }
 @media (max-width: 900px) { .featured-grid { grid-template-columns: minmax(0, 1fr); } }
 .featured .eyebrow { color: var(--amber-ink); }
+
+/* Casilla de consentimiento dentro de los formularios en línea (guía y boletín) */
+.inline-form .consent { flex: 1 1 100%; order: 3; margin: 2px 0 0 6px; }
+.inline-form .consent input { flex: none; width: 18px; height: 18px; padding: 0; border-radius: 4px; margin: 2px 0 0; }
+.inline-form .form-msg { order: 4; }
+.inline-form .form-note { order: 5; }

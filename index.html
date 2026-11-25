@@ -287,7 +287,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261113a" />
+  <link rel="stylesheet" href="styles.css?v=20261125a" />
 </head>
 <body>
 
@@ -693,6 +693,7 @@
           <form class="inline-form reveal" data-lead-form="newsletter" novalidate>
             <label class="sr-only" for="nl-email">Tu correo</label>
             <input id="nl-email" type="email" name="email" placeholder="Tu correo electrónico" required autocomplete="email" />
+            <label class="consent"><input type="checkbox" name="consentimiento" required /> <span>Acepto la <a href="/privacidad/" target="_blank">política de privacidad</a> y recibir comunicaciones.</span></label>
             <button class="btn btn-primary" type="submit">Suscribirme</button>
             <p class="form-note">Sin spam. Te das de baja con un clic.</p>
             <p class="form-msg" role="status" aria-live="polite"></p>
@@ -822,6 +823,7 @@
         <form class="inline-form" data-lead-form="guia" novalidate>
           <label class="sr-only" for="g-email">Tu correo</label>
           <input id="g-email" type="email" name="email" placeholder="Tu correo electrónico" required autocomplete="email" />
+          <label class="consent"><input type="checkbox" name="consentimiento" required /> <span>Acepto la <a href="/privacidad/" target="_blank">política de privacidad</a> y recibir comunicaciones.</span></label>
           <button class="btn btn-primary" type="submit">Recibir la guía</button>
           <p class="form-msg" role="status" aria-live="polite"></p>
         </form>
@@ -843,6 +845,7 @@
         <div class="field"><label for="d-name">Nombre</label><input id="d-name" name="nombre" required autocomplete="name" /></div>
         <div class="field"><label for="d-email">Email</label><input id="d-email" type="email" name="email" required autocomplete="email" /></div>
         <div class="field"><label for="d-phone">Teléfono / WhatsApp</label><input id="d-phone" type="tel" name="telefono" placeholder="+34" required autocomplete="tel" /></div>
+        <label class="consent"><input type="checkbox" name="consentimiento" required /> <span>Acepto la <a href="/privacidad/" target="_blank">política de privacidad</a> y recibir comunicaciones.</span></label>
         <button class="btn btn-primary btn-block" type="submit">Enviarme el dossier</button>
         <p class="form-msg" role="status" aria-live="polite"></p>
       </form>
