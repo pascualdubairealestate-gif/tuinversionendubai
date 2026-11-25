@@ -500,7 +500,7 @@
     var years = [thisYear];
     closed.forEach(function (v) { var y = +v.hitos.booking.slice(0, 4); if (years.indexOf(y) < 0) years.push(y); });
     years.sort(function (a, b) { return b - a; });
-    var year = S.scYear && years.indexOf(S.scYear) > -1 ? S.scYear : thisYear, m = S.scMetric || "n";
+    var year = S.scYear && years.indexOf(S.scYear) > -1 ? S.scYear : thisYear, m = S.scMetric || "vol";
     var months = MESES.map(function () { return { n: 0, vol: 0, com: 0 }; });
     closed.forEach(function (v) {
       if (+v.hitos.booking.slice(0, 4) !== year) return;
