@@ -884,8 +884,8 @@ body, .splash { background: var(--sand-bg); }
 .inline-form .form-note { order: 5; }
 
 /* ---------- Logo icono (Burj Khalifa) ---------- */
-.brand-mark { width: 44px; height: 44px; border: 0; border-radius: 10px; overflow: hidden; } .brand-mark img { display: block; width: 100%; height: 100%; }
-.np-logo { width: 54px; height: 54px; border-radius: 12px; overflow: hidden; background: none; }
+.brand-mark { width: 56px; height: 56px; border: 0; border-radius: 0; overflow: visible; } .brand-mark img { display: block; width: 100%; height: 100%; }
+.np-logo { width: 60px; height: 60px; border-radius: 0; overflow: visible; background: none; }
 .np-logo img { display: block; width: 100%; height: 100%; }
-.splash-arch { width: 96px; height: 96px; border: 0; border-radius: 22px; overflow: hidden; }
+.splash-arch { width: 110px; height: 110px; border: 0; border-radius: 0; overflow: visible; }
 .splash-arch img { display: block; width: 100%; height: 100%; }
