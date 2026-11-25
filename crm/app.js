@@ -509,17 +509,30 @@
       b.n++; b.vol += num(v.precio); b.com += num(v.comision);
     });
     var tot = months.reduce(function (t, x) { return { n: t.n + x.n, vol: t.vol + x.vol, com: t.com + x.com }; }, { n: 0, vol: 0, com: 0 });
-    var max = Math.max.apply(null, months.map(function (x) { return x[m]; })) || 1;
-    var label = function (x) { return m === "n" ? String(x.n) : shortAed(x[m]); };
+    // Escala del eje: 4 tramos "redondos"
+    var max = Math.max.apply(null, months.map(function (x) { return x[m]; }));
+    var raw = (max || 1) / 4, mag = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / mag;
+    var step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * mag;
+    if (m === "n") step = Math.max(1, Math.ceil(step));
+    var top = Math.max(step, Math.ceil(max / step) * step), ticks = [];
+    for (var t = 0; t <= top + 1e-9; t += step) ticks.push(t);
+    var fmtTick = function (v) { return m === "n" ? String(v) : shortAed(v); };
     var nowM = year === thisYear ? new Date().getMonth() : 11;
-    var bars = months.map(function (x, i) {
-      var h = x[m] ? Math.max(3, Math.round(x[m] / max * 100)) : 0;
-      var tip = MESES_L[i] + " " + year + ": " + x.n + (x.n === 1 ? " venta" : " ventas") + (x.n ? " · " + aed(x.vol) + " · comisión " + aed(x.com) : "");
-      return '<div class="sc-col' + (i > nowM ? " future" : "") + '" tabindex="0" aria-label="' + esc(tip) + '">' +
-        '<span class="sc-tip" aria-hidden="true">' + esc(tip) + "</span>" +
-        '<div class="sc-track">' + (h ? '<b class="sc-val">' + esc(label(x)) + '</b><i class="sc-bar" style="height:' + h + '%"></i>' : "") + "</div>" +
-        '<span class="sc-m">' + MESES[i] + "</span></div>";
+    var X = function (k) { return 3 + k * (94 / 11); };          // % horizontal
+    var Y = function (v) { return v / top * 100; };              // % desde abajo
+    var pts = months.slice(0, nowM + 1).map(function (x, k) { return [X(k), Y(x[m])]; });
+    var grid = ticks.map(function (v) { return '<span class="sc-grid" style="bottom:' + Y(v) + '%"><em>' + esc(fmtTick(v)) + "</em></span>"; }).join("");
+    var line = '<svg class="sc-line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' +
+      pts.map(function (p) { return p[0].toFixed(2) + "," + (100 - p[1]).toFixed(2); }).join(" ") + '" /></svg>';
+    var dots = pts.map(function (p) { return '<i class="sc-dot" style="left:' + p[0] + "%;bottom:" + p[1] + '%"></i>'; }).join("");
+    var hits = months.map(function (x, k) {
+      var tip = MESES_L[k] + " " + year + ": " + x.n + (x.n === 1 ? " venta" : " ventas") + (x.n ? " · " + aed(x.vol) + " · comisión " + aed(x.com) : "");
+      return '<div class="sc-hit' + (k > nowM ? " future" : "") + (k < 2 ? " edge-l" : k > 9 ? " edge-r" : "") + '" style="left:' + (X(k) - 94 / 22) + "%;width:" + (94 / 11) + '%" tabindex="0" aria-label="' + esc(tip) + '">' +
+        '<span class="sc-cross"></span><span class="sc-tip" aria-hidden="true">' + esc(tip) + "</span></div>";
     }).join("");
+    var xlab = MESES.map(function (mm, k) { return '<span class="sc-x' + (k > nowM ? " future" : "") + '" style="left:' + X(k) + '%"><span class="sc-full">' + mm + '</span><span class="sc-ini" aria-hidden="true">' + mm.charAt(0).toUpperCase() + "</span></span>"; }).join("");
+    var chart = '<div class="sc-chart" role="img" aria-label="' + esc(SC_METRICS[m] + " por mes en " + year) + '"><div class="sc-plot">' + grid + line + dots + hits + "</div>" +
+      '<div class="sc-xaxis">' + xlab + "</div></div>";
     return '<section class="panel sales-chart" aria-labelledby="sc-title">' +
       '<header class="sc-head"><div><h3 id="sc-title">Ventas cerradas en ' + year + "</h3>" +
       '<p class="muted small">Cada venta cuenta en el mes en que se firmó el booking form.</p></div>' +
@@ -528,7 +541,7 @@
       }).join("") + "</div>" +
       (years.length > 1 ? '<select id="sc-year" aria-label="Año">' + years.map(function (y) { return "<option" + (y === year ? " selected" : "") + ">" + y + "</option>"; }).join("") + "</select>" : "") + "</div></header>" +
       '<div class="sc-totals"><div><span>Ventas cerradas</span><b>' + tot.n + "</b></div><div><span>Volumen</span><b>" + aed(tot.vol) + "</b></div><div><span>Comisión</span><b>" + aed(tot.com) + "</b></div></div>" +
-      (tot.n ? '<div class="sc-chart" role="img" aria-label="' + esc(SC_METRICS[m] + " por mes en " + year) + '">' + bars + "</div>" +
+      (tot.n ? chart +
         '<details class="sc-table"><summary>Ver tabla</summary><table><thead><tr><th>Mes</th><th>Ventas</th><th>Volumen</th><th>Comisión</th></tr></thead><tbody>' +
         months.map(function (x, i) { return "<tr><td>" + MESES_L[i] + "</td><td>" + x.n + "</td><td>" + (x.n ? aed(x.vol) : "—") + "</td><td>" + (x.n ? aed(x.com) : "—") + "</td></tr>"; }).join("") +
         "</tbody></table></details>"

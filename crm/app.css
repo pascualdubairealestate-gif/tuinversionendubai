@@ -575,20 +575,28 @@ tbody tr:last-child td { border-bottom: 0; }
 .sc-totals { display: flex; flex-wrap: wrap; gap: 10px 32px; margin-bottom: 18px; }
 .sc-totals span { display: block; font-size: 12px; font-weight: 700; color: var(--mute); text-transform: uppercase; letter-spacing: .04em; }
 .sc-totals b { font-size: 22px; font-weight: 800; }
-.sc-chart { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px; height: 210px; }
-.sc-col { position: relative; display: grid; grid-template-rows: 1fr auto; min-width: 0; outline: none; border-radius: 8px; }
-.sc-col:hover, .sc-col:focus-visible { background: var(--amber-soft); }
-.sc-track { position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 0 18%; border-bottom: 1px solid var(--line); }
-.sc-bar { display: block; width: 100%; max-width: 34px; background: var(--amber); border-radius: 4px 4px 0 0; }
-.sc-val { font-size: 11px; font-weight: 800; color: var(--ink); margin-bottom: 4px; white-space: nowrap; }
-.sc-m { text-align: center; font-size: 11px; font-weight: 700; color: var(--mute); padding: 6px 0 4px; }
-.sc-col.future .sc-m { opacity: .5; }
-.sc-tip { display: none; position: absolute; z-index: 5; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); width: max-content; max-width: 230px; background: var(--ink); color: var(--surface); font-size: 12px; font-weight: 600; line-height: 1.4; padding: 7px 10px; border-radius: 8px; box-shadow: var(--shadow); pointer-events: none; }
-.sc-col:hover .sc-tip, .sc-col:focus-visible .sc-tip { display: block; }
-.sc-col:first-child .sc-tip, .sc-col:nth-child(2) .sc-tip { left: 0; transform: none; }
-.sc-col:last-child .sc-tip, .sc-col:nth-child(11) .sc-tip { left: auto; right: 0; transform: none; }
+.sc-chart { padding: 10px 0 0 58px; }
+.sc-plot { position: relative; height: 220px; border-left: 1px solid var(--line); }
+.sc-grid { position: absolute; left: 0; right: 0; height: 0; border-top: 1px solid var(--line); }
+.sc-grid em { position: absolute; right: calc(100% + 10px); top: -9px; font-style: normal; font-size: 11.5px; color: var(--mute); white-space: nowrap; }
+.sc-line { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.sc-line polyline { fill: none; stroke: var(--amber); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.sc-dot { position: absolute; width: 10px; height: 10px; margin: 0 0 -5px -5px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 2px var(--surface); pointer-events: none; }
+.sc-hit { position: absolute; top: -10px; bottom: 0; outline: none; z-index: 2; }
+.sc-cross { display: none; position: absolute; left: 50%; top: 10px; bottom: 0; border-left: 1px dashed var(--mute); opacity: .6; }
+.sc-hit:hover .sc-cross, .sc-hit:focus-visible .sc-cross { display: block; }
+.sc-hit.future { pointer-events: none; }
+.sc-tip { display: none; position: absolute; z-index: 5; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); width: max-content; max-width: 230px; background: var(--ink); color: var(--surface); font-size: 12px; font-weight: 600; line-height: 1.4; padding: 7px 10px; border-radius: 8px; box-shadow: var(--shadow); pointer-events: none; }
+.sc-hit:hover .sc-tip, .sc-hit:focus-visible .sc-tip { display: block; }
+.sc-hit.edge-l .sc-tip { left: 0; transform: none; }
+.sc-hit.edge-r .sc-tip { left: auto; right: 0; transform: none; }
+.sc-xaxis { position: relative; height: 26px; border-top: 1px solid var(--line); }
+.sc-x { position: absolute; top: 8px; transform: translateX(-50%); font-size: 11.5px; font-weight: 600; color: var(--mute); }
+.sc-x.future { opacity: .45; }
+.sc-ini { display: none; }
+@media (max-width: 640px) { .sc-full { display: none; } .sc-ini { display: inline; } }
 .sc-table { margin-top: 14px; font-size: 13px; }
 .sc-table summary { cursor: pointer; font-weight: 700; color: var(--mute); }
 .sc-table table { margin-top: 8px; width: 100%; border-collapse: collapse; }
 .sc-table th, .sc-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
-@media (max-width: 640px) { .sc-chart { gap: 2px; height: 160px; } .sc-val { font-size: 9.5px; } .sc-m { font-size: 10px; } }
+@media (max-width: 640px) { .sc-chart { padding-left: 44px; } .sc-plot { height: 170px; } .sc-x { font-size: 9.5px; } .sc-grid em { font-size: 10px; right: calc(100% + 6px); } }
