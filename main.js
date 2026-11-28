@@ -33,12 +33,12 @@ window.__PV__ = {
   googleTagId: "GTM-PPLZPBMG",
   // Google Ads: tu ID de cuenta (Herramientas → Conversiones → «Instalar la etiqueta tú mismo», empieza por AW-).
   // Vacío = no se carga nada de Google ni aparece el aviso de cookies.
-  googleAdsId: "",
+  googleAdsId: "AW-18544480634",
   // Etiqueta de cada conversión (lo que va tras la barra en «send_to»: AW-123456789/AbC-dEfGh).
   googleAdsLabels: {
-    consultoria: "",   // formulario de consultoría o dossier enviado
-    guia: "",          // guía descargada o alta en noticias
-    whatsapp: ""       // clic en cualquier botón de WhatsApp
+    consultoria: "3BXZCK3QosEdEPqi2YpF",   // formulario de consultoría o dossier enviado
+    guia: "3yDfCOzip8EdEPqi2YpF",          // guía descargada o alta en noticias
+    whatsapp: "AQFnCLDQosEdEPqi2YpF"       // clic en cualquier botón de WhatsApp
   },
   // Google Analytics 4 (opcional, empieza por G-)
   ga4Id: ""
@@ -80,6 +80,13 @@ window.__PV__ = {
       ? "https://www.googletagmanager.com/gtm.js?id=" + encodeURIComponent(CFG.googleTagId)
       : "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(CFG.googleAdsId || CFG.ga4Id);
     document.head.appendChild(sc);
+    if (CFG.googleTagId && CFG.googleAdsId) {
+      // Con GTM, carga también la etiqueta de Google Ads para que se registren las conversiones
+      var sa = document.createElement("script");
+      sa.async = true;
+      sa.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(CFG.googleAdsId);
+      document.head.appendChild(sa);
+    }
     if (CFG.googleAdsId) gtag("config", CFG.googleAdsId);
     if (CFG.ga4Id) gtag("config", CFG.ga4Id);
   }
