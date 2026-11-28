@@ -11,7 +11,7 @@ window.__PV__ = {
   // Enlace directo de WhatsApp Business. Si está relleno, TODOS los botones usan este enlace.
   whatsappLink: "https://wa.me/message/QI3A7Q5BXFTCA1",
   // Alternativa: número internacional sin "+" ni espacios (solo se usa si whatsappLink está vacío)
-  whatsapp: "971500000000",
+  whatsapp: "971507963006",
 
   // URL del webhook / endpoint de tu CRM. Vacío = los leads se guardan solo en el navegador (pruebas).
   // Recibe un POST con JSON: { formulario, email, nombre, telefono, ..., pagina, utm_*, fecha }
